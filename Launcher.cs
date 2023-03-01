@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
-using zeus.Model;
 
 namespace ThreadPoolApplication
 {
@@ -71,6 +70,7 @@ namespace ThreadPoolApplication
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
         }
+        
         static string GetBytesToStringConverted(byte[] bytes){
             MemoryStream stream = new MemoryStream(bytes);
             StreamReader streamReader = new StreamReader(stream);
@@ -78,3 +78,4 @@ namespace ThreadPoolApplication
         }
     }
 }
+

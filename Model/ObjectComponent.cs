@@ -1,7 +1,7 @@
 
 public class ObjectComponent {
     String activeField;
-    object instance;
+    Object instance;
 
     public String getActiveField() {
         return activeField;
