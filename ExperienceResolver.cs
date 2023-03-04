@@ -1,4 +1,5 @@
 using System;
+using Zeus;
 
 namespace Zeus{
 
@@ -21,8 +22,7 @@ namespace Zeus{
         string COMMENT      = "<%--";
         string HTML_COMMENT = "<!--";
 
-        //todo: please.
-        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<?>> viewRenderers) throws StargzrException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<T>> viewRenderers) {
             List<String> elementEntries = Arrays.asList(pageElement.split("\n"));
             List<String> viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
