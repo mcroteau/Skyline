@@ -2,7 +2,7 @@ using System;
 
 namespace Zeus{
 
-    public class ExperienceManager {
+    public class ExperienceResolver {
 
         int ZERO = 0;
         int ONE  = 1;
@@ -18,8 +18,8 @@ namespace Zeus{
         string OPENSPEC = "<a:if spec=\"${";
         string ENDSPEC  = "}";
 
-        final String COMMENT      = "<%--";
-        final String HTML_COMMENT = "<!--";
+        string COMMENT      = "<%--";
+        string HTML_COMMENT = "<!--";
 
         //todo: please.
         public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<?>> viewRenderers) throws StargzrException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
