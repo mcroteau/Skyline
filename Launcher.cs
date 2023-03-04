@@ -3,8 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
+using static Zeus.DataPartial;
 
-namespace ThreadPoolApplication
+namespace Zeus
 {
     class Launcher
     {
@@ -52,7 +53,7 @@ namespace ThreadPoolApplication
                     if(bytesRec < bytes.Length)break;
                 }
                 
-                DataPartial dataPartial = new DataPartial();
+                Zeus.DataPartial dataPartial = new DataPartial();
                 dataPartial.setEntry("spock");
                 Console.WriteLine(dataPartial.getEntry());
 

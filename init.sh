@@ -1,2 +1,2 @@
-mcs -out:Launcher.exe Launcher.cs
+mcs -out **/*.cs
 mono Launcher.exe
