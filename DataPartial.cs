@@ -5,22 +5,22 @@ using System.Collections.Generic;
 namespace Zeus {
         
     public class DataPartial {
-        int idx;
-        string guid;
-        string entry;
-        string field;
-        bool spec;
-        bool iterable;
-        bool specRequired;
-        bool withinSpec;
-        bool withinIterable;
-        bool endIterable;
-        bool endSpec;
-        bool setVar;
-        List<object> mojos;
-        List<ObjectComponent> components;
-        List<DataPartial> specPartials;
-        Dictionary<string, DataPartial> specPartialsMap;//todo:remove specpartials list rename
+        int idx; public int Idx { get; set; }
+        string guid; public string Guid { get; set; }
+        string entry; public string Entry { get; set; }
+        string field; public string Field { get; set; }
+        bool spec; public int MyProperty { get; set; }
+        bool iterable; public int MyProperty { get; set; }
+        bool specRequired; public int MyProperty { get; set; }
+        bool withinSpec; public int MyProperty { get; set; }
+        bool withinIterable; public int MyProperty { get; set; }
+        bool endIterable; public int MyProperty { get; set; }
+        bool endSpec; public int MyProperty { get; set; }
+        bool setVar; public int MyProperty { get; set; }
+        List<object> mojos; public int MyProperty { get; set; }
+        List<ObjectComponent> components; public int MyProperty { get; set; }
+        List<DataPartial> specPartials; public int MyProperty { get; set; }
+        Dictionary<string, DataPartial> specPartialsMap; public Dictionary SpecPartialsMap { get; set; }//todo:remove specpartials list rename
 
         public DataPartial(){
             this.guid = System.Guid.NewGuid().ToString();

@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
-using static Zeus.DataPartial;
+using Zeus;
 
 namespace Zeus
 {
@@ -53,9 +53,9 @@ namespace Zeus
                     if(bytesRec < bytes.Length)break;
                 }
                 
-                Zeus.DataPartial dataPartial = new DataPartial();
-                dataPartial.setEntry("spock");
-                Console.WriteLine(dataPartial.getEntry());
+                DataPartial dataPartial = new DataPartial();
+                dataPartial.Entry = "spock";
+                Console.WriteLine(dataPartial.Entry);
 
                 byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
                 handler.Send(resp);
