@@ -54,8 +54,8 @@ namespace Zeus
                 }
                 
                 DataPartial dataPartial = new DataPartial();
-                dataPartial.Entry = "spock";
-                Console.WriteLine(dataPartial.Entry);
+                dataPartial.setEntry("spock");
+                Console.WriteLine(dataPartial.getEntry());
 
                 byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
                 handler.Send(resp);
