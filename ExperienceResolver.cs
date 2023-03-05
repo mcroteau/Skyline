@@ -434,12 +434,11 @@ namespace Zeus{
                 DataPartial dataPartial = dataPartials.get(tao);
                 if(dataPartial.isSpec()) {
                     openCount++;
-                    matchIteration:
                     for (int chao = tao; chao < dataPartials.size(); chao++) {
                         DataPartial dataPartialDeux = dataPartials.get(chao);
-                        if (dataPartialDeux.getGuid().equals(dataPartial.getGuid())) continue matchIteration;
+                        if (dataPartialDeux.getGuid().equals(dataPartial.getGuid())) continue; 
                         if (dataPartialLocator.getGuid().equals(dataPartialDeux.getGuid())) {
-                            break matchIteration;
+                            goto matchIteration;
                         }
                         if (dataPartialDeux.isEndSpec()) {
                             endCount++;
@@ -447,9 +446,11 @@ namespace Zeus{
                         if (dataPartialDeux.isSpec()) {
                             openCount++;
                         }
-                        if(openCount == endCount)break matchIteration;
+                        if(openCount == endCount)goto matchIteration;
                     }
                 }
+                matchIteration:;
+
                 if(dataPartialLocator.getGuid().equals(dataPartial.getGuid()))break;
 
                 if(openCount > endCount)specPartials.add(dataPartial);
@@ -459,7 +460,7 @@ namespace Zeus{
             return specPartialsReady;
         }
 
-        List<DataPartial> getIterablePartials(int openIdx, List<DataPartial> dataPartials) throws StargzrException {
+        List<DataPartial> getIterablePartials(int openIdx, List<DataPartial> dataPartials){
             Integer openCount = 1, endCount = 0;
             List<DataPartial> dataPartialsDeux = new ArrayList<>();
             for (int foo = openIdx; foo < dataPartials.size(); foo++) {
@@ -475,7 +476,7 @@ namespace Zeus{
             return dataPartialsDeux;
         }
 
-        List<DataPartial> getIterablePartialsNested(int openIdx, List<DataPartial> dataPartials) throws StargzrException {
+        List<DataPartial> getIterablePartialsNested(int openIdx, List<DataPartial> dataPartials){
             List<DataPartial> dataPartialsDeux = new ArrayList<>();
             Integer endIdx = getEndEach(openIdx, dataPartials);
             for (int foo = openIdx; foo < endIdx; foo++) {
@@ -485,7 +486,7 @@ namespace Zeus{
             return dataPartialsDeux;
         }
 
-        int getEndEach(int openIdx, List<DataPartial> basePartials) throws StargzrException {
+        int getEndEach(int openIdx, List<DataPartial> basePartials) {
             Integer openEach = 1;
             Integer endEach = 0;
             for (int qxro = openIdx + 1; qxro < basePartials.size(); qxro++) {
@@ -504,7 +505,7 @@ namespace Zeus{
 
         boolean withinIterable(DataPartial dataPartial, List<DataPartial> dataPartials){
             int openCount = 0, endCount = 0;
-            for(DataPartial it : dataPartials){
+            foreach(DataPartial it in dataPartials){
                 if(it.isIterable())openCount++;
                 if(it.isEndIterable())endCount++;
                 if(it.getGuid().equals(dataPartial.getGuid()))break;
@@ -516,7 +517,7 @@ namespace Zeus{
         }
 
 
-        boolean passesIterableSpec(DataPartial specPartial, Object activeObject, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        boolean passesIterableSpec(DataPartial specPartial, Object activeObject, ViewCache resp){
 
             string specElementEntry = specPartial.getEntry();
             int startExpression = specElementEntry.indexOf(OPENSPEC);
@@ -552,7 +553,7 @@ namespace Zeus{
                 return passesSpecification;
             }else{
                 string[] activeSubjectFieldElements = activeSubjectFieldsElement.split(DOT);
-                for(string activeFieldElement : activeSubjectFieldElements){
+                foreach(string activeFieldElement in activeSubjectFieldElements){
                     activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                 }
             }
@@ -568,7 +569,7 @@ namespace Zeus{
                 string[] activePredicateFieldElements = activePredicateFields.split(DOT);
                 Object activePredicateObject = resp.get(predicateField);
                 if(activePredicateObject != null) {
-                    for (string activeFieldElement : activePredicateFieldElements) {
+                    foreach(string activeFieldElement in activePredicateFieldElements) {
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
                 }
@@ -589,14 +590,14 @@ namespace Zeus{
             return passesSpecification;
         }
 
-        boolean passesSpec(DataPartial specPartial, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        boolean passesSpec(DataPartial specPartial, ViewCache resp) {
             string specElementEntry = specPartial.getEntry();
             int startExpression = specElementEntry.indexOf(OPENSPEC);
             int endExpression = specElementEntry.indexOf(ENDSPEC);
             string completeExpressionElement = specElementEntry.substring(startExpression + OPENSPEC.length(), endExpression);
 
             string[] allElementExpressions = completeExpressionElement.split("&&");
-            for(string expressionElementClean : allElementExpressions) {
+            foreach(string expressionElementClean in allElementExpressions) {
                 string expressionElement = expressionElementClean.trim();
                 string conditionalElement = getConditionalElement(expressionElement);
 
@@ -623,7 +624,7 @@ namespace Zeus{
                         if (activeSubjectObject == null) return false;
 
                         string[] activeSubjectFieldElements = subjectFieldElementsRemainder.split(DOT);
-                        for (string activeFieldElement : activeSubjectFieldElements) {
+                        foreach(string activeFieldElement in activeSubjectFieldElements) {
                             activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                         }
 
@@ -658,7 +659,7 @@ namespace Zeus{
                     Object activeSubjectObject = resp.get(subjectField);
                     if (activeSubjectObject == null) return false;
 
-                    for (string activeFieldElement : activeSubjectFieldElements) {
+                    foreach(string activeFieldElement in activeSubjectFieldElements) {
                         activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                     }
 
@@ -676,7 +677,7 @@ namespace Zeus{
                         Object activePredicateObject = resp.get(predicateField);
                         if (activePredicateObject == null) return false;
 
-                        for (string activeFieldElement : activePredicateFieldElements) {
+                        foreach(string activeFieldElement in activePredicateFieldElements) {
                             activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                         }
 
@@ -719,7 +720,7 @@ namespace Zeus{
                     string[] activePredicateFieldElements = predicateFieldElementsRemainder.split(DOT);
                     Object activePredicateObject = resp.get(predicateField);
 
-                    for (string activeFieldElement : activePredicateFieldElements) {
+                    foreach(string activeFieldElement in activePredicateFieldElements) {
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
 
@@ -785,7 +786,7 @@ namespace Zeus{
             return "";
         }
 
-        IterableResult getIterableResultNested(string entry, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
+        IterableResult getIterableResultNested(string entry, Object activeSubjectObject){
             int startEach = entry.indexOf(this.FOREACH);
 
             int startIterate = entry.indexOf("items=", startEach + 1);
@@ -803,7 +804,7 @@ namespace Zeus{
             string activeField = entry.substring(startItem + 5, endItem);
 
             string[] activeSubjectFieldElements = activeSubjectFieldElement.split(DOT);
-            for(string activeFieldElement : activeSubjectFieldElements){
+            foreach(string activeFieldElement in activeSubjectFieldElements){
                 activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
             }
 
@@ -813,7 +814,7 @@ namespace Zeus{
             return iterableResult;
         }
 
-        private IterableResult getIterableResult(string entry, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
+        private IterableResult getIterableResult(string entry, ViewCache httpResponse){
 
             int startEach = entry.indexOf(this.FOREACH);
 
@@ -840,7 +841,7 @@ namespace Zeus{
             return iterableResult;
         }
 
-        private List<Object> getIterableInitial(string expression, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
+        private List<Object> getIterableInitial(string expression, ViewCache httpResponse){
             int startField = expression.indexOf("${");
             int endField = expression.indexOf(".", startField);
             string key = expression.substring(startField + 2, endField);
@@ -852,7 +853,7 @@ namespace Zeus{
             return new ArrayList<>();
         }
 
-        private List<Object> getIterableRecursive(string expression, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
+        private List<Object> getIterableRecursive(string expression, Object activeSubjectObject) {
             List<Object> objs = new ArrayList<>();
             int startField = expression.indexOf(".");
             int endField = expression.indexOf("}");
@@ -860,7 +861,7 @@ namespace Zeus{
             string activeSubjectFielElement = expression.substring(startField + 1, endField);
 
             string[] activeSubjectFieldElements = activeSubjectFielElement.split(DOT);
-            for(string activeFieldElement : activeSubjectFieldElements){
+            foreach(string activeFieldElement in activeSubjectFieldElements){
                 activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
             }
 
@@ -870,7 +871,7 @@ namespace Zeus{
             return objs;
         }
 
-        private Object getIterableValueRecursive(int idx, string baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
+        Object getIterableValueRecursive(int idx, string baseField, Object baseObj) {
             string[] fields = baseField.split("\\.");
             if(fields.length > 1){
                 idx++;
@@ -898,7 +899,7 @@ namespace Zeus{
             return new ArrayList();
         }
 
-        private Object getValueRecursive(int idx, string baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
+        Object getValueRecursive(int idx, string baseField, Object baseObj) {
             string[] fields = baseField.split("\\.");
             if(fields.length > 1){
                 idx++;
@@ -952,7 +953,7 @@ namespace Zeus{
             return lineComponents;
         }
 
-        string getResponseValueLineComponent(string activeField, string objectField, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getResponseValueLineComponent(string activeField, string objectField, ViewCache resp) {
 
             if(objectField.contains(".")){
 
@@ -961,7 +962,7 @@ namespace Zeus{
 
                     string[] activeObjectFields = objectField.split(DOT);
 
-                    for (string activeObjectField : activeObjectFields) {
+                    foreach(string activeObjectField in activeObjectFields) {
                         activeObject = getObjectValue(activeObjectField, activeObject);
                     }
 
@@ -1010,8 +1011,8 @@ namespace Zeus{
             return null;
         }
 
-        boolean passesSpec(Object object, DataPartial specPartial, DataPartial dataPartial, ViewCache resp) throws NoSuchMethodException, StargzrException, IllegalAccessException, NoSuchFieldException, InvocationTargetException {
-            if(dataPartial.isWithinIterable() && passesIterableSpec(specPartial, object, resp)){
+        boolean passesSpec(Object objectInstance, DataPartial specPartial, DataPartial dataPartial, ViewCache resp) {
+            if(dataPartial.isWithinIterable() && passesIterableSpec(specPartial, objectInstance, resp)){
                 return true;
             }
             if(!dataPartial.isWithinIterable() && passesSpec(specPartial, resp)){
@@ -1020,7 +1021,7 @@ namespace Zeus{
             return false;
         }
 
-        Object getObjectMethodValue(ViewCache resp, Object respValue, string objectField) throws InvocationTargetException, IllegalAccessException {
+        Object getObjectMethodValue(ViewCache resp, Object respValue, string objectField){
             Method activeMethod = getObjectMethod(respValue, objectField);
             string[] parameters = getMethodParameters(objectField);
             List<Object> values = new ArrayList<>();
@@ -1048,7 +1049,7 @@ namespace Zeus{
             string activeMethodName = activeMethodAttributes[ZERO];
             Method[] activeObjectMethods = activeObject.getClass().getDeclaredMethods();
             Method activeMethod = null;
-            for(Method activeObjectMethod : activeObjectMethods){
+            foreach(Method activeObjectMethod in activeObjectMethods){
                 if(activeObjectMethod.getName().equals(activeMethodName)){
                     activeMethod = activeObjectMethod;
                     break;
@@ -1067,41 +1068,41 @@ namespace Zeus{
             return false;
         }
 
-        string getObjectValueForLineComponent(string objectField, Object object) throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
+        string getObjectValueForLineComponent(string objectField, Object objectInstance){
 
             if(objectField.contains(".")){
                 string[] objectFields = objectField.split("\\.");
 
-                Object activeObject = object;
-                for(string activeObjectField : objectFields){
+                Object activeObject = objectInstance;
+                foreach(string activeObjectField in objectFields){
                     activeObject = getObjectValue(activeObjectField, activeObject);
                 }
 
                 if(activeObject == null)return "";
                 return string.valueOf(activeObject);
             }else {
-                if(hasDeclaredField(objectField, object)) {
-                    Object objectValue = getObjectValue(objectField, object);
+                if(hasDeclaredField(objectField, objectInstance)) {
+                    Object objectValue = getObjectValue(objectField, objectInstance);
                     if (objectValue == null) return null;
                     return string.valueOf(objectValue);
                 }else{
-                    return string.valueOf(object);
+                    return string.valueOf(objectInstance);
                 }
             }
         }
 
-        boolean hasDeclaredField(string objectField, Object object) {
-            Field[] declaredFields = object.getClass().getDeclaredFields();
-            for(Field declaredField: declaredFields){
+        boolean hasDeclaredField(string objectField, Object objectInstance) {
+            Field[] declaredFields = objectInstance.getClass().getDeclaredFields();
+            foreach(Field declaredField in declaredFields){
                 if(declaredField.getName().equals(objectField))return true;
             }
             return false;
         }
 
-        Object getObjectValue(string objectField, Object object) throws NoSuchFieldException, IllegalAccessException {
-            Field fieldObject = object.getClass().getDeclaredField(objectField);
+        Object getObjectValue(string objectField, Object objectInstance){
+            Field fieldObject = objectInstance.getClass().getDeclaredField(objectField);
             fieldObject.setAccessible(true);
-            Object objectValue = fieldObject.get(object);
+            Object objectValue = fieldObject.get(objectInstance);
             return objectValue;
         }
 
