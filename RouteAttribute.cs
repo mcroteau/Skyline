@@ -1,13 +1,11 @@
 using System;
-using System.Int32;
-using System.String;
 
 namespace Zeus{
     public class RouteAttribute {
 
         String qualifiedName;
         String typeKlass;
-        Int32 routePosition;
+        int routePosition;
         Boolean routeVariable;
 
         public String getQualifiedName()
@@ -30,12 +28,12 @@ namespace Zeus{
             this.typeKlass = typeKlass;
         }
 
-        public Int32 getRoutePosition()
+        public int getRoutePosition()
         {
             return this.routePosition;
         }
 
-        public void setRoutePosition(Int32 routePosition)
+        public void setRoutePosition(int routePosition)
         {
             this.routePosition = routePosition;
         }
@@ -49,10 +47,5 @@ namespace Zeus{
         {
             this.routeVariable = routeVariable;
         }
-
-
-
-
-
     }
 }

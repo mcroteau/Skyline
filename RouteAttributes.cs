@@ -5,9 +5,10 @@ namespace Zeus{
     public class RouteAttributes {
 
         public RouteAttributes(){
-            this.attributes = new ConcurrentHashMap<>();
+            this.attributes = new Dictionary<string, string>();
+            this.viewRenderers = new Dictionary<string, ViewRenderer>();
             this.routeEndpointHolder = new RouteEndpointHolder();
-            this.sessionRegistry = new ConcurrentHashMap<>();
+            this.sessionRegistry = new Dictionary<string, bool>();
         }
 
         PersistenceConfig persistenceConfig;
@@ -30,32 +31,32 @@ namespace Zeus{
             this.persistenceConfig = persistenceConfig;
         }
 
-        public String> getAttributes()
+        public Dictionary<String, String> getAttributes()
         {
             return this.attributes;
         }
 
-        public void setAttributes(String> attributes)
+        public void setAttributes(Dictionary<String, String> attributes)
         {
             this.attributes = attributes;
         }
 
-        public ViewRenderer> getViewRenderers()
+        public Dictionary<String, ViewRenderer> getViewRenderers()
         {
             return this.viewRenderers;
         }
 
-        public void setViewRenderers(ViewRenderer> viewRenderers)
+        public void setViewRenderers(Dictionary<String, ViewRenderer> viewRenderers)
         {
             this.viewRenderers = viewRenderers;
         }
 
-        public Boolean> getSessionRegistry()
+        public Dictionary<String, bool> getSessionRegistry()
         {
             return this.sessionRegistry;
         }
 
-        public void setSessionRegistry(Boolean> sessionRegistry)
+        public void setSessionRegistry(Dictionary<String, bool> sessionRegistry)
         {
             this.sessionRegistry = sessionRegistry;
         }
