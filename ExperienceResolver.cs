@@ -22,9 +22,9 @@ namespace Zeus{
         string COMMENT      = "<%--";
         string HTML_COMMENT = "<!--";
 
-        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<T>> viewRenderers) {
-            List<String> elementEntries = Arrays.asList(pageElement.split("\n"));
-            List<String> viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
+        public string execute(string pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<T>> viewRenderers) {
+            List<string> elementEntries = Arrays.asList(pageElement.split("\n"));
+            List<string> viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
             List<DataPartial> dataPartials = getConvertedDataPartials(viewRendererElementEntries);
             List<DataPartial> dataPartialsInflated = getInflatedPartials(dataPartials, viewCache);
@@ -32,23 +32,23 @@ namespace Zeus{
             List<DataPartial> dataPartialsComplete = getCompletedPartials(dataPartialsInflated, viewCache);
             List<DataPartial> dataPartialsCompleteReady = getNilElementEntryPartials(dataPartialsComplete);
 
-            StringBuilder pageElementsComplete = getElementsCompleted(dataPartialsCompleteReady);
-            return pageElementsComplete.toString();
+            stringBuilder pageElementsComplete = getElementsCompleted(dataPartialsCompleteReady);
+            return pageElementsComplete.tostring();
         }
 
         List<DataPartial> getNilElementEntryPartials(List<DataPartial> dataPartialsComplete) {
             List<DataPartial> dataPartialsCompleteReady = new ArrayList();
             for(DataPartial dataPartial : dataPartialsComplete){
-                String elementEntry = dataPartial.getEntry();
+                string elementEntry = dataPartial.getEntry();
                 Pattern pattern = Pattern.compile(LOCATOR);
                 Matcher matcher = pattern.matcher(elementEntry);
                 while (matcher.find()) {
-                    String element = matcher.group();
-                    String regexElement = element
+                    string element = matcher.group();
+                    string regexElement = element
                             .replace("${", "\\$\\{")
                             .replace("}", "\\}")
                             .replace(".", "\\.");
-                    String elementEntryComplete = elementEntry.replaceAll(regexElement, "");
+                    string elementEntryComplete = elementEntry.replaceAll(regexElement, "");
                     dataPartial.setEntry(elementEntryComplete);
                 }
                 dataPartialsCompleteReady.add(dataPartial);
@@ -56,8 +56,8 @@ namespace Zeus{
             return dataPartialsCompleteReady;
         }
 
-        StringBuilder getElementsCompleted(List<DataPartial> dataPartialsComplete) {
-            StringBuilder builder = new StringBuilder();
+        stringBuilder getElementsCompleted(List<DataPartial> dataPartialsComplete) {
+            stringBuilder builder = new stringBuilder();
             for(DataPartial dataPartial: dataPartialsComplete) {
                 if(!dataPartial.getEntry().equals("") &&
                         !dataPartial.getEntry().contains(SETVAR)){
@@ -67,19 +67,19 @@ namespace Zeus{
             return builder;
         }
 
-        void setResponseVariable(String baseEntry, ViewCache resp) {
+        void setResponseVariable(string baseEntry, ViewCache resp) {
             int startVariableIdx = baseEntry.indexOf("var=");
             int endVariableIdx = baseEntry.indexOf("\"", startVariableIdx + 5);
-            String variableEntry = baseEntry.substring(startVariableIdx + 5, endVariableIdx);
+            string variableEntry = baseEntry.substring(startVariableIdx + 5, endVariableIdx);
             int startValueIdx = baseEntry.indexOf("val=");
             int endValueIdx = baseEntry.indexOf("\"", startValueIdx + 5);
-            String valueEntry = baseEntry.substring(startValueIdx + 5, endValueIdx);
+            string valueEntry = baseEntry.substring(startValueIdx + 5, endValueIdx);
             resp.set(variableEntry, valueEntry);
         }
 
-        List<DataPartial> getConvertedDataPartials(List<String> elementEntries) {
+        List<DataPartial> getConvertedDataPartials(List<string> elementEntries) {
             List<DataPartial> dataPartials = new ArrayList<>();
-            for (String elementEntry : elementEntries) {
+            for (string elementEntry : elementEntries) {
                 if(elementEntry.contains(COMMENT) ||
                         elementEntry.contains(HTML_COMMENT))continue;
                 DataPartial dataPartial = new DataPartial();
@@ -100,20 +100,20 @@ namespace Zeus{
             return dataPartials;
         }
 
-        List<String> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<String> elementEntries, List<Class<?>> viewRenderers) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<string> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<string> elementEntries, List<Class<?>> viewRenderers) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
-            for(Class<?> viewRendererKlass : viewRenderers){
+            for(Class<T> viewRendererKlass : viewRenderers){
                 Object viewRendererInstance = viewRendererKlass.getConstructor().newInstance();
                 Method getKey = viewRendererInstance.getClass().getDeclaredMethod("getKey");
-                String rendererKey = (String) getKey.invoke(viewRendererInstance);
+                string rendererKey = (string) getKey.invoke(viewRendererInstance);
 
-                String openRendererKey = "<" + rendererKey + ">";
-                String completeRendererKey = "<" + rendererKey + "/>";
-                String endRendererKey = "</" + rendererKey + ">";
+                string openRendererKey = "<" + rendererKey + ">";
+                string completeRendererKey = "<" + rendererKey + "/>";
+                string endRendererKey = "</" + rendererKey + ">";
 
                 for(int tao = 0; tao < elementEntries.size(); tao++) {
 
-                    String elementEntry = elementEntries.get(tao);
+                    string elementEntry = elementEntries.get(tao);
                     Method isEval = viewRendererInstance.getClass().getDeclaredMethod("isEval");
                     Method truthy = viewRendererInstance.getClass().getDeclaredMethod("truthy", NetworkRequest.class, SecurityAttributes.class);
 
@@ -123,7 +123,7 @@ namespace Zeus{
 
                         viewRendererIteration:
                         for(int moa = tao; moa < elementEntries.size(); moa++){
-                            String elementEntryDeux = elementEntries.get(moa);
+                            string elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, elementEntryDeux);
                             if(elementEntryDeux.contains(endRendererKey))break viewRendererIteration;
                         }
@@ -133,7 +133,7 @@ namespace Zeus{
                             !(Boolean) truthy.invoke(viewRendererInstance, req, securityAttributes)) {
                         viewRendererIteration:
                         for(int moa = tao; moa < elementEntries.size(); moa++){
-                            String elementEntryDeux = elementEntries.get(moa);
+                            string elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, "");
                             if(elementEntryDeux.contains(endRendererKey))break viewRendererIteration;
                         }
@@ -141,7 +141,7 @@ namespace Zeus{
                     if(!(Boolean) isEval.invoke(viewRendererInstance) &&
                             elementEntry.contains(completeRendererKey)){
                         Method render = viewRendererInstance.getClass().getDeclaredMethod("render", NetworkRequest.class, SecurityAttributes.class);
-                        String rendered = (String) render.invoke(viewRendererInstance, req, securityAttributes);
+                        string rendered = (string) render.invoke(viewRendererInstance, req, securityAttributes);
                         elementEntries.set(tao, rendered);
                     }
                 }
@@ -176,10 +176,10 @@ namespace Zeus{
 
                     if(dataPartial.getComponents().isEmpty()) {
                         if (passesRespSpecsIterations) {
-                            String entryBase = dataPartial.getEntry();
+                            string entryBase = dataPartial.getEntry();
                             if (!dataPartial.isSetVar()) {
                                 List<LineComponent> lineComponents = getPageLineComponents(entryBase);
-                                String entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
+                                string entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
                                 DataPartial completePartial = new DataPartial(entryBaseComplete);
                                 dataPartials.add(completePartial);
                             } else {
@@ -188,10 +188,10 @@ namespace Zeus{
                         }
                     }else if (passesObjectSpecsIterations) {
                         if (!dataPartial.getComponents().isEmpty()) {
-                            String entryBase = dataPartial.getEntry();
+                            string entryBase = dataPartial.getEntry();
                             for (ObjectComponent objectComponent : dataPartial.getComponents()) {
                                 Object object = objectComponent.getObject();
-                                String activeField = objectComponent.getActiveField();
+                                string activeField = objectComponent.getActiveField();
                                 if (!dataPartial.isSetVar()) {
                                     entryBase = getCompleteLineElementObject(activeField, object, entryBase, resp);
                                 } else {
@@ -204,19 +204,19 @@ namespace Zeus{
                     }
 
                 }else if(dataPartial.isWithinIterable()){
-                    String entryBase = dataPartial.getEntry();
+                    string entryBase = dataPartial.getEntry();
                     if(!dataPartial.isSetVar()) {
-                        String entryBaseComplete = getCompleteInflatedDataPartial(dataPartial, resp);
+                        string entryBaseComplete = getCompleteInflatedDataPartial(dataPartial, resp);
                         DataPartial completePartial = new DataPartial(entryBaseComplete);
                         dataPartials.add(completePartial);
                     }else{
                         setResponseVariable(entryBase, resp);
                     }
                 }else{
-                    String entryBase = dataPartial.getEntry();
+                    string entryBase = dataPartial.getEntry();
                     if(!dataPartial.isSetVar()) {
                         List<LineComponent> lineComponents = getPageLineComponents(entryBase);
-                        String entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
+                        string entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
                         DataPartial completePartial = new DataPartial(entryBaseComplete);
                         dataPartials.add(completePartial);
                     }else{
@@ -227,15 +227,15 @@ namespace Zeus{
             return dataPartials;
         }
 
-        String getCompleteLineElementObject(String activeField, Object object, String entryBase, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getCompleteLineElementObject(string activeField, Object object, string entryBase, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
             List<LineComponent> lineComponents = getPageLineComponents(entryBase);
             List<LineComponent> iteratedLineComponents = new ArrayList<>();
             for(LineComponent lineComponent : lineComponents){
                 if(activeField.equals(lineComponent.getActiveField())) {
-                    String objectField = lineComponent.getObjectField();
-                    String objectValue = getObjectValueForLineComponent(objectField, object);
+                    string objectField = lineComponent.getObjectField();
+                    string objectValue = getObjectValueForLineComponent(objectField, object);
                     if(objectValue != null){
-                        String lineElement = lineComponent.getCompleteLineElement();
+                        string lineElement = lineComponent.getCompleteLineElement();
                         entryBase = entryBase.replaceAll(lineElement, objectValue);
                         lineComponent.setIterated(true);
                     }else{
@@ -245,24 +245,24 @@ namespace Zeus{
                 iteratedLineComponents.add(lineComponent);
             }
 
-            String entryBaseComplete = getCompleteLineElementResponse(entryBase, iteratedLineComponents, resp);
+            string entryBaseComplete = getCompleteLineElementResponse(entryBase, iteratedLineComponents, resp);
             return entryBaseComplete;
         }
 
-        String getCompleteInflatedDataPartial(DataPartial dataPartial, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-            String entryBase = dataPartial.getEntry();
+        string getCompleteInflatedDataPartial(DataPartial dataPartial, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            string entryBase = dataPartial.getEntry();
             List<LineComponent> lineComponents = getPageLineComponents(entryBase);
             List<LineComponent> iteratedLineComponents = new ArrayList<>();
             for(ObjectComponent objectComponent : dataPartial.getComponents()) {
                 Object object = objectComponent.getObject();
-                String activeField = objectComponent.getActiveField();
+                string activeField = objectComponent.getActiveField();
 
                 for(LineComponent lineComponent : lineComponents){
                     if(activeField.equals(lineComponent.getActiveField())) {
-                        String objectField = lineComponent.getObjectField();
-                        String objectValue = getObjectValueForLineComponent(objectField, object);
+                        string objectField = lineComponent.getObjectField();
+                        string objectValue = getObjectValueForLineComponent(objectField, object);
                         if(objectValue != null){
-                            String lineElement = lineComponent.getCompleteLineElement();
+                            string lineElement = lineComponent.getCompleteLineElement();
                             entryBase = entryBase.replaceAll(lineElement, objectValue);
                             lineComponent.setIterated(true);
                         }else{
@@ -273,21 +273,21 @@ namespace Zeus{
                 }
             }
 
-            String entryBaseComplete = getCompleteLineElementResponse(entryBase, iteratedLineComponents, resp);
+            string entryBaseComplete = getCompleteLineElementResponse(entryBase, iteratedLineComponents, resp);
             return entryBaseComplete;
         }
 
-        String getCompleteLineElementResponse(String entryBase, List<LineComponent> lineComponents, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getCompleteLineElementResponse(string entryBase, List<LineComponent> lineComponents, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
             for(LineComponent lineComponent: lineComponents){
-                String activeObjectField = lineComponent.getActiveField();
-                String objectField = lineComponent.getObjectField();
-                String objectValue = getResponseValueLineComponent(activeObjectField, objectField, resp);
-                String objectValueClean = objectValue != null ? objectValue.replace("${", "\\$\\{").replace("}", "\\}") : "";
+                string activeObjectField = lineComponent.getActiveField();
+                string objectField = lineComponent.getObjectField();
+                string objectValue = getResponseValueLineComponent(activeObjectField, objectField, resp);
+                string objectValueClean = objectValue != null ? objectValue.replace("${", "\\$\\{").replace("}", "\\}") : "";
                 if(objectValue != null && objectField.contains("(")){
-                    String lineElement = "\\$\\{" + lineComponent.getLineElement().replace("(", "\\(").replace(")", "\\)") + "\\}";
+                    string lineElement = "\\$\\{" + lineComponent.getLineElement().replace("(", "\\(").replace(")", "\\)") + "\\}";
                     entryBase = entryBase.replaceAll(lineElement, objectValue);
                 }else if(objectValue != null && !objectValue.contains("(")){
-                    String lineElement = lineComponent.getCompleteLineElement();
+                    string lineElement = lineComponent.getCompleteLineElement();
                     entryBase = entryBase.replaceAll(lineElement, objectValueClean);
                 }
             }
@@ -301,7 +301,7 @@ namespace Zeus{
             List<DataPartial> dataPartialsPre = new ArrayList<>();
             for(int tao = 0; tao < dataPartials.size(); tao++) {
                 DataPartial dataPartial = dataPartials.get(tao);
-                String basicEntry = dataPartial.getEntry();
+                string basicEntry = dataPartial.getEntry();
 
                 DataPartial dataPartialSies = new DataPartial();
                 dataPartialSies.setEntry(basicEntry);
@@ -326,7 +326,7 @@ namespace Zeus{
 
                         for(int beta = 0; beta < iterablePartials.size(); beta++){
                             DataPartial dataPartialDeux = iterablePartials.get(beta);
-                            String basicEntryDeux = dataPartialDeux.getEntry();
+                            string basicEntryDeux = dataPartialDeux.getEntry();
 
                             DataPartial dataPartialCinq = new DataPartial();
                             dataPartialCinq.setEntry(basicEntryDeux);
@@ -489,7 +489,7 @@ namespace Zeus{
             Integer endEach = 0;
             for (int qxro = openIdx + 1; qxro < basePartials.size(); qxro++) {
                 DataPartial basePartial = basePartials.get(qxro);
-                String basicEntry = basePartial.getEntry();
+                string basicEntry = basePartial.getEntry();
                 if(basicEntry.contains(this.ENDEACH))endEach++;
 
                 if(openEach > 3)throw new StargzrException("too many nested <a:foreach>.");
@@ -517,93 +517,93 @@ namespace Zeus{
 
         boolean passesIterableSpec(DataPartial specPartial, Object activeObject, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-            String specElementEntry = specPartial.getEntry();
+            string specElementEntry = specPartial.getEntry();
             int startExpression = specElementEntry.indexOf(OPENSPEC);
             int endExpression = specElementEntry.indexOf(ENDSPEC);
-            String expressionElement = specElementEntry.substring(startExpression + OPENSPEC.length(), endExpression);
-            String conditionalElement = getConditionalElement(expressionElement);
+            string expressionElement = specElementEntry.substring(startExpression + OPENSPEC.length(), endExpression);
+            string conditionalElement = getConditionalElement(expressionElement);
 
             if(conditionalElement.equals(""))return false;
 
-            String[] expressionElements = expressionElement.split(conditionalElement);
-            String subjectElement = expressionElements[ZERO].trim();
+            string[] expressionElements = expressionElement.split(conditionalElement);
+            string subjectElement = expressionElements[ZERO].trim();
 
-            String[] subjectFieldElements = subjectElement.split(DOT, 2);
-            String activeSubjectFieldElement = subjectFieldElements[ZERO];
-            String activeSubjectFieldsElement = subjectFieldElements[ONE];
+            string[] subjectFieldElements = subjectElement.split(DOT, 2);
+            string activeSubjectFieldElement = subjectFieldElements[ZERO];
+            string activeSubjectFieldsElement = subjectFieldElements[ONE];
 
-            String predicateElement = expressionElements[ONE].trim();
+            string predicateElement = expressionElements[ONE].trim();
             Object activeSubjectObject = activeObject;
 
             if(activeSubjectFieldsElement.contains("()")){
-                String activeMethodName = activeSubjectFieldsElement.replace("()", "");
+                string activeMethodName = activeSubjectFieldsElement.replace("()", "");
                 Object activeMethodObject = resp.get(activeSubjectFieldElement);
                 if(activeMethodObject == null)return false;
                 Method activeMethod = activeMethodObject.getClass().getMethod(activeMethodName);
                 activeMethod.setAccessible(true);
                 Object activeObjectValue = activeMethod.invoke(activeMethodObject);
                 if(activeObjectValue == null)return false;
-                String subjectValue = String.valueOf(activeObjectValue);
+                string subjectValue = string.valueOf(activeObjectValue);
                 Integer subjectNumericValue = Integer.parseInt(subjectValue);
-                String predicateValue = predicateElement.replaceAll("'", "");
+                string predicateValue = predicateElement.replaceAll("'", "");
                 Integer predicateNumericValue = Integer.parseInt(predicateValue);
                 boolean passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
                 return passesSpecification;
             }else{
-                String[] activeSubjectFieldElements = activeSubjectFieldsElement.split(DOT);
-                for(String activeFieldElement : activeSubjectFieldElements){
+                string[] activeSubjectFieldElements = activeSubjectFieldsElement.split(DOT);
+                for(string activeFieldElement : activeSubjectFieldElements){
                     activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                 }
             }
 
-            String subjectValue = String.valueOf(activeSubjectObject);
+            string subjectValue = string.valueOf(activeSubjectObject);
 
             if(predicateElement.contains(".")){
 
-                String[] predicateFieldElements = predicateElement.split(DOT, 2);
-                String predicateField = predicateFieldElements[ZERO];
-                String activePredicateFields = predicateFieldElements[ONE];
+                string[] predicateFieldElements = predicateElement.split(DOT, 2);
+                string predicateField = predicateFieldElements[ZERO];
+                string activePredicateFields = predicateFieldElements[ONE];
 
-                String[] activePredicateFieldElements = activePredicateFields.split(DOT);
+                string[] activePredicateFieldElements = activePredicateFields.split(DOT);
                 Object activePredicateObject = resp.get(predicateField);
                 if(activePredicateObject != null) {
-                    for (String activeFieldElement : activePredicateFieldElements) {
+                    for (string activeFieldElement : activePredicateFieldElements) {
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
                 }
 
-                String predicateValue = String.valueOf(activePredicateObject);
+                string predicateValue = string.valueOf(activePredicateObject);
                 boolean passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
 
             }else if(!predicateElement.contains("'")){
                 Object activePredicateObject = resp.get(predicateElement);
-                String predicateValue = String.valueOf(activePredicateObject);
+                string predicateValue = string.valueOf(activePredicateObject);
                 boolean passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
             }
 
-            String predicateValue = predicateElement.replaceAll("'", "");
+            string predicateValue = predicateElement.replaceAll("'", "");
             boolean passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
             return passesSpecification;
         }
 
         boolean passesSpec(DataPartial specPartial, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-            String specElementEntry = specPartial.getEntry();
+            string specElementEntry = specPartial.getEntry();
             int startExpression = specElementEntry.indexOf(OPENSPEC);
             int endExpression = specElementEntry.indexOf(ENDSPEC);
-            String completeExpressionElement = specElementEntry.substring(startExpression + OPENSPEC.length(), endExpression);
+            string completeExpressionElement = specElementEntry.substring(startExpression + OPENSPEC.length(), endExpression);
 
-            String[] allElementExpressions = completeExpressionElement.split("&&");
-            for(String expressionElementClean : allElementExpressions) {
-                String expressionElement = expressionElementClean.trim();
-                String conditionalElement = getConditionalElement(expressionElement);
+            string[] allElementExpressions = completeExpressionElement.split("&&");
+            for(string expressionElementClean : allElementExpressions) {
+                string expressionElement = expressionElementClean.trim();
+                string conditionalElement = getConditionalElement(expressionElement);
 
-                String subjectElement = expressionElement, predicateElementClean = "";
+                string subjectElement = expressionElement, predicateElementClean = "";
                 if (!conditionalElement.equals("")) {
-                    String[] expressionElements = expressionElement.split(conditionalElement);
+                    string[] expressionElements = expressionElement.split(conditionalElement);
                     subjectElement = expressionElements[ZERO].trim();
-                    String predicateElement = expressionElements[ONE];
+                    string predicateElement = expressionElements[ONE];
                     predicateElementClean = predicateElement.replaceAll("'", "").trim();
                 }
 
@@ -612,17 +612,17 @@ namespace Zeus{
                     if (predicateElementClean.equals("") &&
                             conditionalElement.equals("")) {
                         boolean falseActive = subjectElement.contains("!");
-                        String subjectElementClean = subjectElement.replace("!", "");
+                        string subjectElementClean = subjectElement.replace("!", "");
 
-                        String[] subjectFieldElements = subjectElementClean.split(DOT, 2);
-                        String subjectField = subjectFieldElements[ZERO];
-                        String subjectFieldElementsRemainder = subjectFieldElements[ONE];
+                        string[] subjectFieldElements = subjectElementClean.split(DOT, 2);
+                        string subjectField = subjectFieldElements[ZERO];
+                        string subjectFieldElementsRemainder = subjectFieldElements[ONE];
 
                         Object activeSubjectObject = resp.get(subjectField);
                         if (activeSubjectObject == null) return false;
 
-                        String[] activeSubjectFieldElements = subjectFieldElementsRemainder.split(DOT);
-                        for (String activeFieldElement : activeSubjectFieldElements) {
+                        string[] activeSubjectFieldElements = subjectFieldElementsRemainder.split(DOT);
+                        for (string activeFieldElement : activeSubjectFieldElements) {
                             activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                         }
 
@@ -632,55 +632,55 @@ namespace Zeus{
                     }
 
                     if (subjectElement.contains("()")) {
-                        String subjectElements = subjectElement.replace("()", "");
-                        String[] subjectFieldElements = subjectElements.split(DOT);
-                        String subjectField = subjectFieldElements[ZERO];
-                        String methodName = subjectFieldElements[ONE];
+                        string subjectElements = subjectElement.replace("()", "");
+                        string[] subjectFieldElements = subjectElements.split(DOT);
+                        string subjectField = subjectFieldElements[ZERO];
+                        string methodName = subjectFieldElements[ONE];
                         Object activeSubjectObject = resp.get(subjectField);
                         if (activeSubjectObject == null) return false;
                         Method activeMethod = activeSubjectObject.getClass().getMethod(methodName);
                         activeMethod.setAccessible(true);
                         Object activeObjectValue = activeMethod.invoke(activeSubjectObject);
                         if (activeObjectValue == null) return false;
-                        String subjectValue = String.valueOf(activeObjectValue);
+                        string subjectValue = string.valueOf(activeObjectValue);
                         Integer subjectNumericValue = Integer.parseInt(subjectValue);
                         Integer predicateNumericValue = Integer.parseInt(predicateElementClean);
                         if(getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement))return true;
                         return false;
                     }
 
-                    String[] subjectFieldElements = subjectElement.split(DOT, 2);
-                    String subjectField = subjectFieldElements[ZERO];
-                    String activeSubjectFields = subjectFieldElements[ONE];
+                    string[] subjectFieldElements = subjectElement.split(DOT, 2);
+                    string subjectField = subjectFieldElements[ZERO];
+                    string activeSubjectFields = subjectFieldElements[ONE];
 
-                    String[] activeSubjectFieldElements = activeSubjectFields.split(DOT);
+                    string[] activeSubjectFieldElements = activeSubjectFields.split(DOT);
                     Object activeSubjectObject = resp.get(subjectField);
                     if (activeSubjectObject == null) return false;
 
-                    for (String activeFieldElement : activeSubjectFieldElements) {
+                    for (string activeFieldElement : activeSubjectFieldElements) {
                         activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                     }
 
-                    String[] expressionElements = expressionElement.split(conditionalElement);
-                    String predicateElement = expressionElements[ONE];
+                    string[] expressionElements = expressionElement.split(conditionalElement);
+                    string predicateElement = expressionElements[ONE];
 
                     if(predicateElement.contains("'")){
-                        String subjectValue = String.valueOf(activeSubjectObject);
-                        String predicateValue = predicateElement.replaceAll("'", "").trim();
+                        string subjectValue = string.valueOf(activeSubjectObject);
+                        string predicateValue = predicateElement.replaceAll("'", "").trim();
                         if(passesSpec(subjectValue, predicateValue, conditionalElement))return true;
                         return false;
                     }else{
-                        String[] activePredicateFieldElements = predicateElement.split(DOT);
-                        String predicateField = activePredicateFieldElements[ZERO];
+                        string[] activePredicateFieldElements = predicateElement.split(DOT);
+                        string predicateField = activePredicateFieldElements[ZERO];
                         Object activePredicateObject = resp.get(predicateField);
                         if (activePredicateObject == null) return false;
 
-                        for (String activeFieldElement : activePredicateFieldElements) {
+                        for (string activeFieldElement : activePredicateFieldElements) {
                             activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                         }
 
-                        String subjectValue = String.valueOf(activeSubjectObject);
-                        String predicateValue = String.valueOf(activeSubjectObject);
+                        string subjectValue = string.valueOf(activeSubjectObject);
+                        string predicateValue = string.valueOf(activeSubjectObject);
 
                         if (activeSubjectObject == null) {
                             if(!passesNilSpec(activeSubjectObject, predicateValue, conditionalElement))return false;
@@ -695,7 +695,7 @@ namespace Zeus{
                 } else if (predicateElementClean.equals("") &&
                         conditionalElement.equals("")) {
                     boolean falseActive = subjectElement.contains("!");
-                    String subjectElementClean = subjectElement.replace("!", "");
+                    string subjectElementClean = subjectElement.replace("!", "");
                     Object activeSubjectObject = resp.get(subjectElementClean);
                     if (activeSubjectObject == null) return false;
                     boolean activeSubjectObjectBoolean = (Boolean) activeSubjectObject;
@@ -711,19 +711,19 @@ namespace Zeus{
                         return false;
                     }
 
-                    String[] predicateFieldElements = predicateElementClean.split(DOT, 2);
-                    String predicateField = predicateFieldElements[ZERO];
-                    String predicateFieldElementsRemainder = predicateFieldElements[ONE];
+                    string[] predicateFieldElements = predicateElementClean.split(DOT, 2);
+                    string predicateField = predicateFieldElements[ZERO];
+                    string predicateFieldElementsRemainder = predicateFieldElements[ONE];
 
-                    String[] activePredicateFieldElements = predicateFieldElementsRemainder.split(DOT);
+                    string[] activePredicateFieldElements = predicateFieldElementsRemainder.split(DOT);
                     Object activePredicateObject = resp.get(predicateField);
 
-                    for (String activeFieldElement : activePredicateFieldElements) {
+                    for (string activeFieldElement : activePredicateFieldElements) {
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
 
-                    String subjectValue = String.valueOf(activeSubjectObject).trim();
-                    String predicateValue = String.valueOf(activePredicateObject).trim();
+                    string subjectValue = string.valueOf(activeSubjectObject).trim();
+                    string predicateValue = string.valueOf(activePredicateObject).trim();
 
                     if (activeSubjectObject == null) {
                         if (passesNilSpec(activeSubjectObject, predicateValue, conditionalElement)) return true;
@@ -735,7 +735,7 @@ namespace Zeus{
                 }
 
                 Object activeSubjectObject = resp.get(subjectElement);
-                String subjectValue = String.valueOf(activeSubjectObject).trim();
+                string subjectValue = string.valueOf(activeSubjectObject).trim();
 
                 if (activeSubjectObject == null) {
                     if (!passesNilSpec(activeSubjectObject, predicateElementClean, conditionalElement)) return false;
@@ -748,7 +748,7 @@ namespace Zeus{
             return true;
         }
 
-        boolean passesNilSpec(Object activeSubjectObject, Object activePredicateObject, String conditionalElement) {
+        boolean passesNilSpec(Object activeSubjectObject, Object activePredicateObject, string conditionalElement) {
             if(activeSubjectObject == null && activePredicateObject.equals("null") && conditionalElement.equals("=="))return true;
             if(activeSubjectObject == null && activePredicateObject.equals("null") && conditionalElement.equals("!="))return false;
             if(activeSubjectObject == null && activePredicateObject.equals("") && conditionalElement.equals("=="))return true;
@@ -757,7 +757,7 @@ namespace Zeus{
             return false;
         }
 
-        boolean passesSpec(String subjectValue, String predicateValue, String conditionalElement) {
+        boolean passesSpec(string subjectValue, string predicateValue, string conditionalElement) {
             if(subjectValue.equals(predicateValue) && conditionalElement.equals("=="))return true;
             if(subjectValue.equals(predicateValue) && conditionalElement.equals("!="))return false;
             if(!subjectValue.equals(predicateValue) && conditionalElement.equals("!="))return true;
@@ -765,7 +765,7 @@ namespace Zeus{
             return false;
         }
 
-        Boolean getValidation(Integer subjectValue, Integer predicateValue, String condition, String expressionElement){
+        Boolean getValidation(Integer subjectValue, Integer predicateValue, string condition, string expressionElement){
             if(condition.equals(">")) {
                 if(subjectValue > predicateValue)return true;
             }else if (condition.equals("==")) {
@@ -774,7 +774,7 @@ namespace Zeus{
             return false;
         }
 
-        String getConditionalElement(String expressionElement){
+        string getConditionalElement(string expressionElement){
             if(expressionElement.contains(">"))return ">";
             if(expressionElement.contains("<"))return "<";
             if(expressionElement.contains("=="))return "==";
@@ -784,25 +784,25 @@ namespace Zeus{
             return "";
         }
 
-        IterableResult getIterableResultNested(String entry, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
+        IterableResult getIterableResultNested(string entry, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
             int startEach = entry.indexOf(this.FOREACH);
 
             int startIterate = entry.indexOf("items=", startEach + 1);
             int endIterate = entry.indexOf("\"", startIterate + 7);//items="
-            String iterableKey = entry.substring(startIterate + 9, endIterate -1 );//items="${ and }
+            string iterableKey = entry.substring(startIterate + 9, endIterate -1 );//items="${ and }
 
-            String iterablePadded = "${" + iterableKey + "}";
+            string iterablePadded = "${" + iterableKey + "}";
 
             int startField = iterablePadded.indexOf(".");
             int endField = iterablePadded.indexOf("}", startField);
-            String activeSubjectFieldElement = iterablePadded.substring(startField + 1, endField);
+            string activeSubjectFieldElement = iterablePadded.substring(startField + 1, endField);
 
             int startItem = entry.indexOf("var=", endIterate);
             int endItem = entry.indexOf("\"", startItem + 5);//var="
-            String activeField = entry.substring(startItem + 5, endItem);
+            string activeField = entry.substring(startItem + 5, endItem);
 
-            String[] activeSubjectFieldElements = activeSubjectFieldElement.split(DOT);
-            for(String activeFieldElement : activeSubjectFieldElements){
+            string[] activeSubjectFieldElements = activeSubjectFieldElement.split(DOT);
+            for(string activeFieldElement : activeSubjectFieldElements){
                 activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
             }
 
@@ -812,19 +812,19 @@ namespace Zeus{
             return iterableResult;
         }
 
-        private IterableResult getIterableResult(String entry, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
+        private IterableResult getIterableResult(string entry, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
 
             int startEach = entry.indexOf(this.FOREACH);
 
             int startIterate = entry.indexOf("items=", startEach);
             int endIterate = entry.indexOf("\"", startIterate + 7);//items=".
-            String iterableKey = entry.substring(startIterate + 9, endIterate -1 );//items="${ }
+            string iterableKey = entry.substring(startIterate + 9, endIterate -1 );//items="${ }
 
             int startItem = entry.indexOf("var=", endIterate);
             int endItem = entry.indexOf("\"", startItem + 6);//items="
-            String activeField = entry.substring(startItem + 5, endItem);
+            string activeField = entry.substring(startItem + 5, endItem);
 
-            String expression = entry.substring(startIterate + 7, endIterate);
+            string expression = entry.substring(startIterate + 7, endIterate);
 
             List<Object> pojos = new ArrayList<>();
             if(iterableKey.contains(".")){
@@ -839,10 +839,10 @@ namespace Zeus{
             return iterableResult;
         }
 
-        private List<Object> getIterableInitial(String expression, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
+        private List<Object> getIterableInitial(string expression, ViewCache httpResponse) throws NoSuchFieldException, IllegalAccessException {
             int startField = expression.indexOf("${");
             int endField = expression.indexOf(".", startField);
-            String key = expression.substring(startField + 2, endField);
+            string key = expression.substring(startField + 2, endField);
             if(httpResponse.getCache().containsKey(key)){
                 Object obj = httpResponse.get(key);
                 Object objList = getIterableRecursive(expression, obj);
@@ -851,15 +851,15 @@ namespace Zeus{
             return new ArrayList<>();
         }
 
-        private List<Object> getIterableRecursive(String expression, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
+        private List<Object> getIterableRecursive(string expression, Object activeSubjectObject) throws NoSuchFieldException, IllegalAccessException {
             List<Object> objs = new ArrayList<>();
             int startField = expression.indexOf(".");
             int endField = expression.indexOf("}");
 
-            String activeSubjectFielElement = expression.substring(startField + 1, endField);
+            string activeSubjectFielElement = expression.substring(startField + 1, endField);
 
-            String[] activeSubjectFieldElements = activeSubjectFielElement.split(DOT);
-            for(String activeFieldElement : activeSubjectFieldElements){
+            string[] activeSubjectFieldElements = activeSubjectFielElement.split(DOT);
+            for(string activeFieldElement : activeSubjectFieldElements){
                 activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
             }
 
@@ -869,17 +869,17 @@ namespace Zeus{
             return objs;
         }
 
-        private Object getIterableValueRecursive(int idx, String baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
-            String[] fields = baseField.split("\\.");
+        private Object getIterableValueRecursive(int idx, string baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
+            string[] fields = baseField.split("\\.");
             if(fields.length > 1){
                 idx++;
-                String key = fields[0];
+                string key = fields[0];
                 Field fieldObj = baseObj.getClass().getDeclaredField(key);
                 if(fieldObj != null){
                     fieldObj.setAccessible(true);
                     Object obj = fieldObj.get(baseObj);
                     int start = baseField.indexOf(".");
-                    String fieldPre = baseField.substring(start + 1);
+                    string fieldPre = baseField.substring(start + 1);
                     if(obj != null) {
                         return getValueRecursive(idx, fieldPre, obj);
                     }
@@ -897,16 +897,16 @@ namespace Zeus{
             return new ArrayList();
         }
 
-        private Object getValueRecursive(int idx, String baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
-            String[] fields = baseField.split("\\.");
+        private Object getValueRecursive(int idx, string baseField, Object baseObj) throws NoSuchFieldException, IllegalAccessException {
+            string[] fields = baseField.split("\\.");
             if(fields.length > 1){
                 idx++;
-                String key = fields[0];
+                string key = fields[0];
                 Field fieldObj = baseObj.getClass().getDeclaredField(key);
                 fieldObj.setAccessible(true);
                 Object obj = fieldObj.get(baseObj);
                 int start = baseField.indexOf(".");
-                String fieldPre = baseField.substring(start + 1);
+                string fieldPre = baseField.substring(start + 1);
                 if(obj != null) {
                     return getValueRecursive(idx, fieldPre, obj);
                 }
@@ -925,20 +925,20 @@ namespace Zeus{
         }
 
 
-        List<LineComponent> getPageLineComponents(String pageElementEntry){
+        List<LineComponent> getPageLineComponents(string pageElementEntry){
             List<LineComponent> lineComponents = new ArrayList<>();
             Pattern pattern = Pattern.compile(LOCATOR);
             Matcher matcher = pattern.matcher(pageElementEntry);
             while (matcher.find()) {
                 LineComponent lineComponent = new LineComponent();
-                String lineElement = matcher.group();
-                String cleanElement = lineElement
+                string lineElement = matcher.group();
+                string cleanElement = lineElement
                         .replace("${", "")
                         .replace("}", "");
-                String activeField = cleanElement;
-                String objectField = "";
+                string activeField = cleanElement;
+                string objectField = "";
                 if(cleanElement.contains(".")) {
-                    String[] elements = cleanElement.split("\\.", 2);
+                    string[] elements = cleanElement.split("\\.", 2);
                     activeField = elements[0];
                     objectField = elements[1];
                 }
@@ -951,21 +951,21 @@ namespace Zeus{
             return lineComponents;
         }
 
-        String getResponseValueLineComponent(String activeField, String objectField, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getResponseValueLineComponent(string activeField, string objectField, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
             if(objectField.contains(".")){
 
                 Object activeObject = resp.get(activeField);
                 if(activeObject != null) {
 
-                    String[] activeObjectFields = objectField.split(DOT);
+                    string[] activeObjectFields = objectField.split(DOT);
 
-                    for (String activeObjectField : activeObjectFields) {
+                    for (string activeObjectField : activeObjectFields) {
                         activeObject = getObjectValue(activeObjectField, activeObject);
                     }
 
                     if (activeObject == null) return null;
-                    return String.valueOf(activeObject);
+                    return string.valueOf(activeObject);
 
                 }
             }else{
@@ -978,7 +978,7 @@ namespace Zeus{
                     Object objectValue = null;
 
                     if(objectField.contains("()")){
-                        String methodName = objectField.replace("()", "");
+                        string methodName = objectField.replace("()", "");
                         Method methodObject = respValue.getClass().getDeclaredMethod(methodName);
                         methodObject.setAccessible(true);
                         if(methodObject != null) {
@@ -989,7 +989,7 @@ namespace Zeus{
                         Object activeObject = getObjectMethodValue(resp, respValue, objectField);
                         if(activeObject == null) return null;
 
-                        return String.valueOf(activeObject);
+                        return string.valueOf(activeObject);
 
                     }else{
 
@@ -998,12 +998,12 @@ namespace Zeus{
                     }
 
                     if (objectValue == null) return null;
-                    return String.valueOf(objectValue);
+                    return string.valueOf(objectValue);
 
                 }else{
 
                     if (respValue == null) return null;
-                    return String.valueOf(respValue);
+                    return string.valueOf(respValue);
                 }
             }
             return null;
@@ -1019,12 +1019,12 @@ namespace Zeus{
             return false;
         }
 
-        Object getObjectMethodValue(ViewCache resp, Object respValue, String objectField) throws InvocationTargetException, IllegalAccessException {
+        Object getObjectMethodValue(ViewCache resp, Object respValue, string objectField) throws InvocationTargetException, IllegalAccessException {
             Method activeMethod = getObjectMethod(respValue, objectField);
-            String[] parameters = getMethodParameters(objectField);
+            string[] parameters = getMethodParameters(objectField);
             List<Object> values = new ArrayList<>();
             for(int foo = 0; foo < parameters.length; foo++){
-                String parameter = parameters[foo].trim();
+                string parameter = parameters[foo].trim();
                 Object parameterValue = resp.get(parameter);
                 values.add(parameterValue);
             }
@@ -1033,18 +1033,18 @@ namespace Zeus{
             return activeObjectValue;
         }
 
-        String[] getMethodParameters(String objectField){
-            String[] activeMethodAttributes = objectField.split("\\(");
-            String methodParameters = activeMethodAttributes[ONE];
-            String activeMethod = methodParameters.replace("(", "").replace(")", "");
-            String[] parameters = activeMethod.split(",");
+        string[] getMethodParameters(string objectField){
+            string[] activeMethodAttributes = objectField.split("\\(");
+            string methodParameters = activeMethodAttributes[ONE];
+            string activeMethod = methodParameters.replace("(", "").replace(")", "");
+            string[] parameters = activeMethod.split(",");
             return parameters;
         }
 
 
-        Method getObjectMethod(Object activeObject, String objectField) {
-            String[] activeMethodAttributes = objectField.split("\\(");
-            String activeMethodName = activeMethodAttributes[ZERO];
+        Method getObjectMethod(Object activeObject, string objectField) {
+            string[] activeMethodAttributes = objectField.split("\\(");
+            string activeMethodName = activeMethodAttributes[ZERO];
             Method[] activeObjectMethods = activeObject.getClass().getDeclaredMethods();
             Method activeMethod = null;
             for(Method activeObjectMethod : activeObjectMethods){
@@ -1056,9 +1056,9 @@ namespace Zeus{
             return activeMethod;
         }
 
-        boolean isObjectMethod(Object respValue, String objectField) {
-            String[] activeMethodAttributes = objectField.split("\\(");
-            String activeMethodName = activeMethodAttributes[ZERO];
+        boolean isObjectMethod(Object respValue, string objectField) {
+            string[] activeMethodAttributes = objectField.split("\\(");
+            string activeMethodName = activeMethodAttributes[ZERO];
             Method[] activeObjectMethods = respValue.getClass().getDeclaredMethods();
             for(Method activeMethod : activeObjectMethods){
                 if(activeMethod.getName().equals(activeMethodName))return true;
@@ -1066,30 +1066,30 @@ namespace Zeus{
             return false;
         }
 
-        String getObjectValueForLineComponent(String objectField, Object object) throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
+        string getObjectValueForLineComponent(string objectField, Object object) throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
 
             if(objectField.contains(".")){
-                String[] objectFields = objectField.split("\\.");
+                string[] objectFields = objectField.split("\\.");
 
                 Object activeObject = object;
-                for(String activeObjectField : objectFields){
+                for(string activeObjectField : objectFields){
                     activeObject = getObjectValue(activeObjectField, activeObject);
                 }
 
                 if(activeObject == null)return "";
-                return String.valueOf(activeObject);
+                return string.valueOf(activeObject);
             }else {
                 if(hasDeclaredField(objectField, object)) {
                     Object objectValue = getObjectValue(objectField, object);
                     if (objectValue == null) return null;
-                    return String.valueOf(objectValue);
+                    return string.valueOf(objectValue);
                 }else{
-                    return String.valueOf(object);
+                    return string.valueOf(object);
                 }
             }
         }
 
-        boolean hasDeclaredField(String objectField, Object object) {
+        boolean hasDeclaredField(string objectField, Object object) {
             Field[] declaredFields = object.getClass().getDeclaredFields();
             for(Field declaredField: declaredFields){
                 if(declaredField.getName().equals(objectField))return true;
@@ -1097,7 +1097,7 @@ namespace Zeus{
             return false;
         }
 
-        Object getObjectValue(String objectField, Object object) throws NoSuchFieldException, IllegalAccessException {
+        Object getObjectValue(string objectField, Object object) throws NoSuchFieldException, IllegalAccessException {
             Field fieldObject = object.getClass().getDeclaredField(objectField);
             fieldObject.setAccessible(true);
             Object objectValue = fieldObject.get(object);
