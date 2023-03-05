@@ -599,8 +599,12 @@ namespace Zeus{
             String completeExpressionElement = specElementEntry.subString(startExpression + OPENSPEC.length(), endExpression);
 
             String[] allElementExpressions = completeExpressionElement.split("&&");
-            String subjectField = null;
+            
+            String subjectField = new String();
+            Object activeSubjectObject = new Object();
             String[] subjectFieldElements = new String[]{};
+            String[] activeSubjectFieldElements = new String[]{};
+
             foreach(String expressionElementClean in allElementExpressions) {
                 String expressionElement = expressionElementClean.trim();
                 String conditionalElement = getConditionalElement(expressionElement);
@@ -624,10 +628,10 @@ namespace Zeus{
                         subjectField = subjectFieldElements[ZERO];
                         String subjectFieldElementsRemainder = subjectFieldElements[ONE];
 
-                        Object activeSubjectObject = resp.get(subjectField);
+                        activeSubjectObject = resp.get(subjectField);
                         if (activeSubjectObject == null) return false;
 
-                        String[] activeSubjectFieldElements = subjectFieldElementsRemainder.split(DOT);
+                        activeSubjectFieldElements = subjectFieldElementsRemainder.split(DOT);
                         foreach(String activeFieldElement in activeSubjectFieldElements) {
                             activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
                         }
@@ -640,9 +644,9 @@ namespace Zeus{
                     if (subjectElement.contains("()")) {
                         String subjectElements = subjectElement.replace("()", "");
                         subjectFieldElements = subjectElements.split(DOT);
-                        String subjectField = subjectFieldElements[ZERO];
+                        subjectField = subjectFieldElements[ZERO];
                         String methodName = subjectFieldElements[ONE];
-                        Object activeSubjectObject = resp.get(subjectField);
+                        activeSubjectObject = resp.get(subjectField);
                         if (activeSubjectObject == null) return false;
                         Method activeMethod = activeSubjectObject.getClass().getMethod(methodName);
                         activeMethod.setAccessible(true);
@@ -659,8 +663,8 @@ namespace Zeus{
                     subjectField = subjectFieldElements[ZERO];
                     String activeSubjectFields = subjectFieldElements[ONE];
 
-                    String[] activeSubjectFieldElements = activeSubjectFields.split(DOT);
-                    Object activeSubjectObject = resp.get(subjectField);
+                    activeSubjectFieldElements = activeSubjectFields.split(DOT);
+                    activeSubjectObject = resp.get(subjectField);
                     if (activeSubjectObject == null) return false;
 
                     foreach(String activeFieldElement in activeSubjectFieldElements) {
@@ -702,7 +706,7 @@ namespace Zeus{
                         conditionalElement.equals("")) {
                     Boolean falseActive = subjectElement.contains("!");
                     String subjectElementClean = subjectElement.replace("!", "");
-                    Object activeSubjectObject = resp.get(subjectElementClean);
+                    activeSubjectObject = resp.get(subjectElementClean);
                     if (activeSubjectObject == null) return false;
                     Boolean activeSubjectObjectBoolean = (Boolean) activeSubjectObject;
                     if (!activeSubjectObjectBoolean && falseActive) return true;
@@ -710,7 +714,7 @@ namespace Zeus{
                 }
 
                 if(!predicateElementClean.equals("")) {
-                    Object activeSubjectObject = resp.get(subjectElement);
+                    activeSubjectObject = resp.get(subjectElement);
 
                     if(!predicateElementClean.contains(".") && activeSubjectObject == null) {
                         if (passesNilSpec(activeSubjectObject, predicateElementClean, conditionalElement)) return true;
@@ -740,7 +744,7 @@ namespace Zeus{
                     return false;
                 }
 
-                Object activeSubjectObject = resp.get(subjectElement);
+                activeSubjectObject = resp.get(subjectElement);
                 String subjectValue = (String)(activeSubjectObject).trim();
 
                 if (activeSubjectObject == null) {
