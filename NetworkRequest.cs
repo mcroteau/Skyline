@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Zeus{
     public class NetworkRequest {
         public NetworkRequest() {

@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Collections.Generic;
 using Zeus;
 
 namespace Zeus{
@@ -100,9 +102,9 @@ namespace Zeus{
             return dataPartials;
         }
 
-        List<String> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<String> elementEntries, List<Class<T>> viewRenderers){
+        List<String> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<String> elementEntries, List<String> viewRenderers){
 
-            foreach(Class<T> viewRendererKlass in viewRenderers){
+            foreach(String viewRendererKlass in viewRenderers){
                 Object viewRendererInstance = Activator.CreateInstance(viewRendererKlass);
 
                 MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
@@ -397,7 +399,7 @@ namespace Zeus{
         }
 
         Boolean isTrailingPartialNested(int tao, List<DataPartial> dataPartials) {
-            Integer openCount = 0, endCount = 0, endIdx = 0;
+            int openCount = 0, endCount = 0, endIdx = 0;
             for(int tai = 0; tai < dataPartials.size(); tai++){
                 DataPartial dataPartial = dataPartials.get(tai);
                 if(dataPartial.isIterable())openCount++;
@@ -411,7 +413,7 @@ namespace Zeus{
         }
 
         Boolean isTrailingPartial(int chi, List<DataPartial> dataPartials) {
-            Integer openCount = 0, endIdx = 0;
+            int openCount = 0, endIdx = 0;
             for(int tai = 0; tai < dataPartials.size(); tai++){
                 DataPartial dataPartial = dataPartials.get(tai);
                 if(dataPartial.isIterable())openCount++;
@@ -461,7 +463,7 @@ namespace Zeus{
         }
 
         List<DataPartial> getIterablePartials(int openIdx, List<DataPartial> dataPartials){
-            Integer openCount = 1, endCount = 0;
+            int openCount = 1, endCount = 0;
             List<DataPartial> dataPartialsDeux = new ArrayList<>();
             for (int foo = openIdx; foo < dataPartials.size(); foo++) {
                 DataPartial dataPartial = dataPartials.get(foo);
@@ -478,7 +480,7 @@ namespace Zeus{
 
         List<DataPartial> getIterablePartialsNested(int openIdx, List<DataPartial> dataPartials){
             List<DataPartial> dataPartialsDeux = new ArrayList<>();
-            Integer endIdx = getEndEach(openIdx, dataPartials);
+            int endIdx = getEndEach(openIdx, dataPartials);
             for (int foo = openIdx; foo < endIdx; foo++) {
                 DataPartial basePartial = dataPartials.get(foo);
                 dataPartialsDeux.add(basePartial);
@@ -487,8 +489,8 @@ namespace Zeus{
         }
 
         int getEndEach(int openIdx, List<DataPartial> basePartials) {
-            Integer openEach = 1;
-            Integer endEach = 0;
+            int openEach = 1;
+            int endEach = 0;
             for (int qxro = openIdx + 1; qxro < basePartials.size(); qxro++) {
                 DataPartial basePartial = basePartials.get(qxro);
                 String basicEntry = basePartial.getEntry();
@@ -548,9 +550,9 @@ namespace Zeus{
                 Object activeObjectValue = activeMethod.invoke(activeMethodObject);
                 if(activeObjectValue == null)return false;
                 String subjectValueVar = (String)(activeObjectValue);
-                Integer subjectNumericValue = Integer.parseInt(subjectValueVar);
+                int subjectNumericValue = int.parseInt(subjectValueVar);
                 predicateValue = predicateElement.replaceAll("'", "");
-                Integer predicateNumericValue = Integer.parseInt(predicateValue);
+                int predicateNumericValue = int.parseInt(predicateValue);
                 passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
                 return passesSpecification;
             }else{
@@ -654,8 +656,8 @@ namespace Zeus{
                         Object activeObjectValue = activeMethod.invoke(activeSubjectObject);
                         if (activeObjectValue == null) return false;
                         subjectValue = (String)(activeObjectValue);
-                        Integer subjectNumericValue = Integer.parseInt(subjectValue);
-                        Integer predicateNumericValue = Integer.parseInt(predicateElementClean);
+                        int subjectNumericValue = int.parseInt(subjectValue);
+                        int predicateNumericValue = int.parseInt(predicateElementClean);
                         if(getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement))return true;
                         return false;
                     }
@@ -776,7 +778,7 @@ namespace Zeus{
             return false;
         }
 
-        Boolean getValidation(Integer subjectValue, Integer predicateValue, String condition, String expressionElement){
+        Boolean getValidation(int subjectValue, int predicateValue, String condition, String expressionElement){
             if(condition.equals(">")) {
                 if(subjectValue > predicateValue)return true;
             }else if (condition.equals("==")) {
