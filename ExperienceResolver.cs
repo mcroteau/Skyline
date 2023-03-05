@@ -601,6 +601,7 @@ namespace Zeus{
             String[] allElementExpressions = completeExpressionElement.split("&&");
             
             String subjectField = new String();
+            String subjectValue = new String();
             Object activeSubjectObject = new Object();
             String[] subjectFieldElements = new String[]{};
             String[] activeSubjectFieldElements = new String[]{};
@@ -652,7 +653,7 @@ namespace Zeus{
                         activeMethod.setAccessible(true);
                         Object activeObjectValue = activeMethod.invoke(activeSubjectObject);
                         if (activeObjectValue == null) return false;
-                        String subjectValue = (String)(activeObjectValue);
+                        subjectValue = (String)(activeObjectValue);
                         Integer subjectNumericValue = Integer.parseInt(subjectValue);
                         Integer predicateNumericValue = Integer.parseInt(predicateElementClean);
                         if(getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement))return true;
@@ -675,7 +676,7 @@ namespace Zeus{
                     String predicateElement = expressionElements[ONE];
 
                     if(predicateElement.contains("'")){
-                        String subjectValue = (String)(activeSubjectObject);
+                        subjectValue = (String)(activeSubjectObject);
                         String predicateValue = predicateElement.replaceAll("'", "").trim();
                         if(passesSpec(subjectValue, predicateValue, conditionalElement))return true;
                         return false;
@@ -689,7 +690,7 @@ namespace Zeus{
                             activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                         }
 
-                        String subjectValue = (String)(activeSubjectObject);
+                        subjectValue = (String)(activeSubjectObject);
                         String predicateValue = (String)(activeSubjectObject);
 
                         if (activeSubjectObject == null) {
@@ -732,7 +733,7 @@ namespace Zeus{
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
 
-                    String subjectValue = (String)(activeSubjectObject).trim();
+                    subjectValue = (String)(activeSubjectObject).trim();
                     String predicateValue = (String)(activePredicateObject).trim();
 
                     if (activeSubjectObject == null) {
@@ -745,7 +746,7 @@ namespace Zeus{
                 }
 
                 activeSubjectObject = resp.get(subjectElement);
-                String subjectValue = (String)(activeSubjectObject).trim();
+                subjectValue = (String)(activeSubjectObject).trim();
 
                 if (activeSubjectObject == null) {
                     if (!passesNilSpec(activeSubjectObject, predicateElementClean, conditionalElement)) return false;
