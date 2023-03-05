@@ -38,7 +38,7 @@ namespace Zeus{
 
         List<DataPartial> getNilElementEntryPartials(List<DataPartial> dataPartialsComplete) {
             List<DataPartial> dataPartialsCompleteReady = new ArrayList();
-            for(DataPartial dataPartial : dataPartialsComplete){
+            foreach(DataPartial dataPartial in dataPartialsComplete){
                 string elementEntry = dataPartial.getEntry();
                 Pattern pattern = Pattern.compile(LOCATOR);
                 Matcher matcher = pattern.matcher(elementEntry);
@@ -58,7 +58,7 @@ namespace Zeus{
 
         stringBuilder getElementsCompleted(List<DataPartial> dataPartialsComplete) {
             stringBuilder builder = new stringBuilder();
-            for(DataPartial dataPartial: dataPartialsComplete) {
+            foreach(DataPartial dataPartial in dataPartialsComplete) {
                 if(!dataPartial.getEntry().equals("") &&
                         !dataPartial.getEntry().contains(SETVAR)){
                     builder.append(dataPartial.getEntry() + NEWLINE);
@@ -79,7 +79,7 @@ namespace Zeus{
 
         List<DataPartial> getConvertedDataPartials(List<string> elementEntries) {
             List<DataPartial> dataPartials = new ArrayList<>();
-            for (string elementEntry : elementEntries) {
+            foreach (string elementEntry in elementEntries) {
                 if(elementEntry.contains(COMMENT) ||
                         elementEntry.contains(HTML_COMMENT))continue;
                 DataPartial dataPartial = new DataPartial();
@@ -100,11 +100,12 @@ namespace Zeus{
             return dataPartials;
         }
 
-        List<string> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<string> elementEntries, List<Class<?>> viewRenderers) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<string> getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, List<string> elementEntries, List<Class<T>> viewRenderers){
 
-            for(Class<T> viewRendererKlass : viewRenderers){
-                Object viewRendererInstance = viewRendererKlass.getConstructor().newInstance();
-                Method getKey = viewRendererInstance.getClass().getDeclaredMethod("getKey");
+            foreach(Class<T> viewRendererKlass in viewRenderers){
+                Object viewRendererInstance = Activator.CreateInstance(viewRendererKlass);
+
+                MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
                 string rendererKey = (string) getKey.invoke(viewRendererInstance);
 
                 string openRendererKey = "<" + rendererKey + ">";
@@ -114,33 +115,31 @@ namespace Zeus{
                 for(int tao = 0; tao < elementEntries.size(); tao++) {
 
                     string elementEntry = elementEntries.get(tao);
-                    Method isEval = viewRendererInstance.getClass().getDeclaredMethod("isEval");
-                    Method truthy = viewRendererInstance.getClass().getDeclaredMethod("truthy", NetworkRequest.class, SecurityAttributes.class);
+                    MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval");
+                    MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", NetworkRequest, SecurityAttributes);
 
-                    if ((Boolean) isEval.invoke(viewRendererInstance) &&
-                            (elementEntry.contains(openRendererKey)) &&
-                            (Boolean) truthy.invoke(viewRendererInstance, req, securityAttributes)) {
+                    if (isEval.Invoke(viewRendererInstance, nil) &
+                            elementEntry.contains(openRendererKey) &
+                            truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
 
-                        viewRendererIteration:
                         for(int moa = tao; moa < elementEntries.size(); moa++){
                             string elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, elementEntryDeux);
-                            if(elementEntryDeux.contains(endRendererKey))break viewRendererIteration;
+                            if(elementEntryDeux.contains(endRendererKey))break;
                         }
                     }
-                    if ((Boolean) isEval.invoke(viewRendererInstance) &&
-                            (elementEntry.contains(openRendererKey)) &&
-                            !(Boolean) truthy.invoke(viewRendererInstance, req, securityAttributes)) {
-                        viewRendererIteration:
+                    if (isEval.Invoke(viewRendererInstance) &
+                            elementEntry.contains(openRendererKey) &
+                            !truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
                         for(int moa = tao; moa < elementEntries.size(); moa++){
                             string elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, "");
-                            if(elementEntryDeux.contains(endRendererKey))break viewRendererIteration;
+                            if(elementEntryDeux.contains(endRendererKey))break;
                         }
                     }
-                    if(!(Boolean) isEval.invoke(viewRendererInstance) &&
+                    if(!isEval.invoke(viewRendererInstance) &
                             elementEntry.contains(completeRendererKey)){
-                        Method render = viewRendererInstance.getClass().getDeclaredMethod("render", NetworkRequest.class, SecurityAttributes.class);
+                        MethodInfo render = viewRendererInstance.GetType().GetMethod("render", NetworkRequest, SecurityAttributes);
                         string rendered = (string) render.invoke(viewRendererInstance, req, securityAttributes);
                         elementEntries.set(tao, rendered);
                     }
@@ -149,22 +148,22 @@ namespace Zeus{
             return elementEntries;
         }
 
-        List<DataPartial> getCompletedPartials(List<DataPartial> dataPartialsPre, ViewCache resp) throws InvocationTargetException, NoSuchMethodException, StargzrException, NoSuchFieldException, IllegalAccessException {
+        List<DataPartial> getCompletedPartials(List<DataPartial> dataPartialsPre, ViewCache resp) {
 
             List<DataPartial> dataPartials = new ArrayList<>();
-            for(DataPartial dataPartial : dataPartialsPre) {
+            foreach(DataPartial dataPartial in dataPartialsPre) {
 
                 if (!dataPartial.getSpecPartials().isEmpty()) {
-                    boolean passesRespSpecsIterations = true;
-                    boolean passesObjectSpecsIterations = true;
-                    specIteration:
-                    for(DataPartial specPartial : dataPartial.getSpecPartials()) {
+                    bool passesRespSpecsIterations = true;
+                    bool passesObjectSpecsIterations = true;
+                    
+                    foreach(DataPartial specPartial in dataPartial.getSpecPartials()) {
                         if(!dataPartial.getComponents().isEmpty()){
-                            for(ObjectComponent objectComponent : dataPartial.getComponents()) {
-                                Object object = objectComponent.getObject();
-                                if (!passesSpec(object, specPartial, dataPartial, resp)) {
+                            foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
+                                Object objectInstance = objectComponent.getObject();
+                                if (!passesSpec(objectInstance, specPartial, dataPartial, resp)) {
                                     passesObjectSpecsIterations = false;
-                                    break specIteration;
+                                    goto specIteration;
                                 }
                             }
                         }else{
@@ -174,6 +173,8 @@ namespace Zeus{
                         }
                     }
 
+                    specIteration:;
+                            
                     if(dataPartial.getComponents().isEmpty()) {
                         if (passesRespSpecsIterations) {
                             string entryBase = dataPartial.getEntry();
@@ -189,11 +190,11 @@ namespace Zeus{
                     }else if (passesObjectSpecsIterations) {
                         if (!dataPartial.getComponents().isEmpty()) {
                             string entryBase = dataPartial.getEntry();
-                            for (ObjectComponent objectComponent : dataPartial.getComponents()) {
-                                Object object = objectComponent.getObject();
+                            foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
+                                Object objectInstance = objectComponent.getObject();
                                 string activeField = objectComponent.getActiveField();
                                 if (!dataPartial.isSetVar()) {
-                                    entryBase = getCompleteLineElementObject(activeField, object, entryBase, resp);
+                                    entryBase = getCompleteLineElementObject(activeField, objectInstance, entryBase, resp);
                                 } else {
                                     setResponseVariable(entryBase, resp);
                                 }
@@ -227,13 +228,13 @@ namespace Zeus{
             return dataPartials;
         }
 
-        string getCompleteLineElementObject(string activeField, Object object, string entryBase, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getCompleteLineElementObject(string activeField, Object objectInstance, string entryBase, ViewCache resp){
             List<LineComponent> lineComponents = getPageLineComponents(entryBase);
             List<LineComponent> iteratedLineComponents = new ArrayList<>();
-            for(LineComponent lineComponent : lineComponents){
+            foreach(LineComponent lineComponent in lineComponents){
                 if(activeField.equals(lineComponent.getActiveField())) {
                     string objectField = lineComponent.getObjectField();
-                    string objectValue = getObjectValueForLineComponent(objectField, object);
+                    string objectValue = getObjectValueForLineComponent(objectField, objectInstance);
                     if(objectValue != null){
                         string lineElement = lineComponent.getCompleteLineElement();
                         entryBase = entryBase.replaceAll(lineElement, objectValue);
@@ -249,18 +250,18 @@ namespace Zeus{
             return entryBaseComplete;
         }
 
-        string getCompleteInflatedDataPartial(DataPartial dataPartial, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        string getCompleteInflatedDataPartial(DataPartial dataPartial, ViewCache resp){
             string entryBase = dataPartial.getEntry();
             List<LineComponent> lineComponents = getPageLineComponents(entryBase);
             List<LineComponent> iteratedLineComponents = new ArrayList<>();
             for(ObjectComponent objectComponent : dataPartial.getComponents()) {
-                Object object = objectComponent.getObject();
+                Object objectInstance = objectComponent.getObject();
                 string activeField = objectComponent.getActiveField();
 
-                for(LineComponent lineComponent : lineComponents){
+                foreach(LineComponent lineComponent in lineComponents){
                     if(activeField.equals(lineComponent.getActiveField())) {
                         string objectField = lineComponent.getObjectField();
-                        string objectValue = getObjectValueForLineComponent(objectField, object);
+                        string objectValue = getObjectValueForLineComponent(objectField, objectInstance);
                         if(objectValue != null){
                             string lineElement = lineComponent.getCompleteLineElement();
                             entryBase = entryBase.replaceAll(lineElement, objectValue);
@@ -277,8 +278,8 @@ namespace Zeus{
             return entryBaseComplete;
         }
 
-        string getCompleteLineElementResponse(string entryBase, List<LineComponent> lineComponents, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-            for(LineComponent lineComponent: lineComponents){
+        string getCompleteLineElementResponse(string entryBase, List<LineComponent> lineComponents, ViewCache resp) {
+            foreach(LineComponent lineComponent in lineComponents){
                 string activeObjectField = lineComponent.getActiveField();
                 string objectField = lineComponent.getObjectField();
                 string objectValue = getResponseValueLineComponent(activeObjectField, objectField, resp);
@@ -295,7 +296,7 @@ namespace Zeus{
         }
 
 
-        List<DataPartial> getInflatedPartials(List<DataPartial> dataPartials, ViewCache resp) throws NoSuchFieldException, IllegalAccessException, StargzrException, InvocationTargetException, NoSuchMethodException {
+        List<DataPartial> getInflatedPartials(List<DataPartial> dataPartials, ViewCache resp){
 
             List<ObjectComponent> activeObjectComponents = new ArrayList();
             List<DataPartial> dataPartialsPre = new ArrayList<>();
@@ -315,11 +316,11 @@ namespace Zeus{
 
                     List<Object> objects = iterableResult.getMojos();//renaming variables
                     for(int foo = 0; foo < objects.size(); foo++){
-                        Object object = objects.get(foo);
+                        Object objectInstance = objects.get(foo);
 
                         ObjectComponent component = new ObjectComponent();
                         component.setActiveField(iterableResult.getField());
-                        component.setObject(object);
+                        component.setObject(objectInstance);
 
                         List<ObjectComponent> objectComponents = new ArrayList<>();
                         objectComponents.add(component);
@@ -337,7 +338,7 @@ namespace Zeus{
 
                             if(dataPartialDeux.isIterable()) {
 
-                                IterableResult iterableResultDeux = getIterableResultNested(basicEntryDeux, object);
+                                IterableResult iterableResultDeux = getIterableResultNested(basicEntryDeux, objectInstance);
                                 List<DataPartial> iterablePartialsDeux = getIterablePartialsNested(beta + 1, iterablePartials);
 
                                 List<Object> pojosDeux = iterableResultDeux.getMojos();
@@ -347,7 +348,7 @@ namespace Zeus{
 
                                     ObjectComponent componentDeux = new ObjectComponent();
                                     componentDeux.setActiveField(iterableResult.getField());
-                                    componentDeux.setObject(object);
+                                    componentDeux.setObject(objectInstance);
 
                                     ObjectComponent componentTrois = new ObjectComponent();
                                     componentTrois.setActiveField(iterableResultDeux.getField());
