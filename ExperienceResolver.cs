@@ -537,6 +537,8 @@ namespace Zeus{
             String predicateElement = expressionElements[ONE].trim();
             Object activeSubjectObject = activeObject;
 
+            String predicateValue = null;
+            Boolean passesSpecification = false;
             if(activeSubjectFieldsElement.contains("()")){
                 String activeMethodName = activeSubjectFieldsElement.replace("()", "");
                 Object activeMethodObject = resp.get(activeSubjectFieldElement);
@@ -547,9 +549,9 @@ namespace Zeus{
                 if(activeObjectValue == null)return false;
                 String subjectValueVar = (String)(activeObjectValue);
                 Integer subjectNumericValue = Integer.parseInt(subjectValueVar);
-                String predicateValue = predicateElement.replaceAll("'", "");
+                predicateValue = predicateElement.replaceAll("'", "");
                 Integer predicateNumericValue = Integer.parseInt(predicateValue);
-                Boolean passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
+                passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
                 return passesSpecification;
             }else{
                 String[] activeSubjectFieldElements = activeSubjectFieldsElement.split(DOT);
@@ -574,19 +576,19 @@ namespace Zeus{
                     }
                 }
 
-                String predicateValueVar = (String)(activePredicateObject);
-                Boolean passesSpecification = passesSpec(subjectValue, predicateValueVar, conditionalElement);
+                predicateValue = (String)(activePredicateObject);
+                passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
 
             }else if(!predicateElement.contains("'")){
                 Object activePredicateObject = resp.get(predicateElement);
-                String predicateValueVar = (String)(activePredicateObject);
-                Boolean passesSpecification = passesSpec(subjectValue, predicateValueVar, conditionalElement);
+                predicateValue = (String)(activePredicateObject);
+                passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
             }
 
-            String predicateValue = predicateElement.replaceAll("'", "");
-            Boolean passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
+            predicateValue = predicateElement.replaceAll("'", "");
+            passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
             return passesSpecification;
         }
 
@@ -597,6 +599,8 @@ namespace Zeus{
             String completeExpressionElement = specElementEntry.subString(startExpression + OPENSPEC.length(), endExpression);
 
             String[] allElementExpressions = completeExpressionElement.split("&&");
+            String subjectField = null;
+            String[] subjectFieldElements = new String[]{};
             foreach(String expressionElementClean in allElementExpressions) {
                 String expressionElement = expressionElementClean.trim();
                 String conditionalElement = getConditionalElement(expressionElement);
@@ -616,8 +620,8 @@ namespace Zeus{
                         Boolean falseActive = subjectElement.contains("!");
                         String subjectElementClean = subjectElement.replace("!", "");
 
-                        String[] subjectFieldElements = subjectElementClean.split(DOT, 2);
-                        String subjectField = subjectFieldElements[ZERO];
+                        subjectFieldElements = subjectElementClean.split(DOT, 2);
+                        subjectField = subjectFieldElements[ZERO];
                         String subjectFieldElementsRemainder = subjectFieldElements[ONE];
 
                         Object activeSubjectObject = resp.get(subjectField);
@@ -635,7 +639,7 @@ namespace Zeus{
 
                     if (subjectElement.contains("()")) {
                         String subjectElements = subjectElement.replace("()", "");
-                        String[] subjectFieldElements = subjectElements.split(DOT);
+                        subjectFieldElements = subjectElements.split(DOT);
                         String subjectField = subjectFieldElements[ZERO];
                         String methodName = subjectFieldElements[ONE];
                         Object activeSubjectObject = resp.get(subjectField);
@@ -651,8 +655,8 @@ namespace Zeus{
                         return false;
                     }
 
-                    String[] subjectFieldElements = subjectElement.split(DOT, 2);
-                    String subjectField = subjectFieldElements[ZERO];
+                    subjectFieldElements = subjectElement.split(DOT, 2);
+                    subjectField = subjectFieldElements[ZERO];
                     String activeSubjectFields = subjectFieldElements[ONE];
 
                     String[] activeSubjectFieldElements = activeSubjectFields.split(DOT);

@@ -1,21 +1,21 @@
 namespace Zeus{
     public class NetworkRequest {
         public NetworkRequest() {
-            this.headers = new Dictionary<string, string>();
-            this.requestComponents = new Dictionary<string, RequestComponent>();
+            this.headers = new Dictionary<String, String>();
+            this.requestComponents = new Dictionary<String, RequestComponent>();
         }
 
         bool redirect;
-        string redirectLocation;
-        string requestPath;
-        string requestAction;
-        string requestBody;
-        Dictionary<string, string> headers;
-        Dictionary<string, RequestComponent> requestComponents;
+        String redirectLocation;
+        String requestPath;
+        String requestAction;
+        String requestBody;
+        Dictionary<String, String> headers;
+        Dictionary<String, RequestComponent> requestComponents;
         RouteAttributes routeAttributes;
-        string securityAttributeInfo;
+        String securityAttributeInfo;
         SecurityAttributes securityAttributes;
-        string userCredential;
+        String userCredential;
 
         public bool isRedirect()
         {
@@ -27,62 +27,62 @@ namespace Zeus{
             this.redirect = redirect;
         }
 
-        public string getRedirectLocation()
+        public String getRedirectLocation()
         {
             return this.redirectLocation;
         }
 
-        public void setRedirectLocation(string redirectLocation)
+        public void setRedirectLocation(String redirectLocation)
         {
             this.redirectLocation = redirectLocation;
         }
 
-        public string getRequestPath()
+        public String getRequestPath()
         {
             return this.requestPath;
         }
 
-        public void setRequestPath(string requestPath)
+        public void setRequestPath(String requestPath)
         {
             this.requestPath = requestPath;
         }
 
-        public string getRequestAction()
+        public String getRequestAction()
         {
             return this.requestAction;
         }
 
-        public void setRequestAction(string requestAction)
+        public void setRequestAction(String requestAction)
         {
             this.requestAction = requestAction;
         }
 
-        public string getRequestBody()
+        public String getRequestBody()
         {
             return this.requestBody;
         }
 
-        public void setRequestBody(string requestBody)
+        public void setRequestBody(String requestBody)
         {
             this.requestBody = requestBody;
         }
 
-        public string> getHeaders()
+        public Dictionary<String, String> getHeaders()
         {
             return this.headers;
         }
 
-        public void setHeaders(string> headers)
+        public void setHeaders(Dictionary<String, String> headers)
         {
             this.headers = headers;
         }
 
-        public RequestComponent> getRequestComponents()
+        public Dictionary<String, RequestComponent> getRequestComponents()
         {
             return this.requestComponents;
         }
 
-        public void setRequestComponents(RequestComponent> requestComponents)
+        public void setRequestComponents(Dictionary<String, RequestComponent> requestComponents)
         {
             this.requestComponents = requestComponents;
         }
@@ -97,12 +97,12 @@ namespace Zeus{
             this.routeAttributes = routeAttributes;
         }
 
-        public string getSecurityAttributeInfo()
+        public String getSecurityAttributeInfo()
         {
             return this.securityAttributeInfo;
         }
 
-        public void setSecurityAttributeInfo(string securityAttributeInfo)
+        public void setSecurityAttributeInfo(String securityAttributeInfo)
         {
             this.securityAttributeInfo = securityAttributeInfo;
         }
@@ -117,12 +117,12 @@ namespace Zeus{
             this.securityAttributes = securityAttributes;
         }
 
-        public string getUserCredential()
+        public String getUserCredential()
         {
             return this.userCredential;
         }
 
-        public void setUserCredential(string userCredential)
+        public void setUserCredential(String userCredential)
         {
             this.userCredential = userCredential;
         }

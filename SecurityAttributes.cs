@@ -38,6 +38,5 @@ namespace Zeus{
         {
             this.securedAttribute = securedAttribute;
         }
-
-
     }
+}
