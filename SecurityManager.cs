@@ -69,12 +69,12 @@ public class SecurityManager {
                 networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
                 String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal + "; path=/;";
                 SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-                networkResponse.getSecurityAttributes().put("plsar.security", securityAttribute);
+                networkResponse.getSecurityAttributes().Add("plsar.security", securityAttribute);
                 return true;
             }
 
         }catch(Exception ex){
-            ex.printStackTrace();
+            ex.StackTrace();
         }
 
         return false;
@@ -85,7 +85,7 @@ public class SecurityManager {
         String securityAttributeValue = ";Expires/MaxAge=-1;Expires=-1;MaxAge=-1;";
         SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
         networkResponse.getSecurityAttributes().remove("plsar.security");
-        networkResponse.getSecurityAttributes().put("plsar.security", securityAttribute);
+        networkResponse.getSecurityAttributes().Add("plsar.security", securityAttribute);
         return true;
     }
 
@@ -110,7 +110,7 @@ public class SecurityManager {
         return Sb.ToString();
     }
 
-    public static String dirty(String password){
+    public static String dirty(String passwd){
         StringBuilder Sb = new StringBuilder();
         var hash = SHA256.Create();
 

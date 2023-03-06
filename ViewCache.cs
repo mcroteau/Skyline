@@ -6,10 +6,10 @@ namespace Zeus{
         Dictionary<string, object> cache;
 
         public void set(string key, object value){
-            this.cache.put(key, value);
+            this.cache.Add(key, value);
         }
         public object get(string key){
-            if(this.cache.containsKey(key)){
+            if(this.cache.ContainsKey(key)){
                 return this.cache.get(key);
             }
             return null;

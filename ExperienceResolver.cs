@@ -59,7 +59,7 @@ namespace Zeus{
                     String elementEntryComplete = elementEntry.Replace(regexElement, "");
                     dataPartial.setEntry(elementEntryComplete);
                 }
-                dataPartialsCompleteReady.add(dataPartial);
+                dataPartialsCompleteReady.Add(dataPartial);
             }
             return dataPartialsCompleteReady;
         }
@@ -103,7 +103,7 @@ namespace Zeus{
                 }else if(elementEntry.Contains(SETVAR)){
                     dataPartial.setSetVar(true);
                 }
-                dataPartials.add(dataPartial);
+                dataPartials.Add(dataPartial);
             }
             return dataPartials;
         }
@@ -132,7 +132,7 @@ namespace Zeus{
 
                         for(int moa = tao; moa < elementEntries.Count(); moa++){
                             String elementEntryDeux = elementEntries.get(moa);
-                            elementEntries.set(moa, elementEntryDeux);
+                            elementEntries[moa] = elementEntryDeux;
                             if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
@@ -141,7 +141,7 @@ namespace Zeus{
                             !truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
                         for(int moa = tao; moa < elementEntries.Count(); moa++){
                             String elementEntryDeux = elementEntries.get(moa);
-                            elementEntries.set(moa, "");
+                            elementEntries[mao] = "";
                             if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
@@ -149,7 +149,7 @@ namespace Zeus{
                             elementEntry.Contains(completeRendererKey)){
                         MethodInfo render = viewRendererInstance.GetType().GetMethod("render", NetworkRequest, SecurityAttributes);
                         String rendered = (String) render.invoke(viewRendererInstance, req, securityAttributes);
-                        elementEntries.set(tao, rendered);
+                        elementEntries[tao] =  rendered;
                     }
                 }
             }
@@ -161,12 +161,12 @@ namespace Zeus{
             ArrayList dataPartials = new ArrayList();
             foreach(DataPartial dataPartial in dataPartialsPre) {
 
-                if (!dataPartial.getSpecPartials().isEmpty()) {
+                if (dataPartial.getSpecPartials().Count() != 0) {
                     Boolean passesRespSpecsIterations = true;
                     Boolean passesObjectSpecsIterations = true;
                     
                     foreach(DataPartial specPartial in dataPartial.getSpecPartials()) {
-                        if(!dataPartial.getComponents().isEmpty()){
+                        if(dataPartial.getComponents().Count() != 0){
                             foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
                                 Object objectInstance = objectComponent.getObject();
                                 if (!passesSpec(objectInstance, specPartial, dataPartial, resp)) {
@@ -183,20 +183,20 @@ namespace Zeus{
 
                     specIteration:;
                             
-                    if(dataPartial.getComponents().isEmpty()) {
+                    if(dataPartial.getComponents().Count() == 0) {
                         if (passesRespSpecsIterations) {
                             String entryBase = dataPartial.getEntry();
                             if (!dataPartial.isSetVar()) {
                                 List<LineComponent> lineComponents = getPageLineComponents(entryBase);
                                 String entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
                                 DataPartial completePartial = new DataPartial(entryBaseComplete);
-                                dataPartials.add(completePartial);
+                                dataPartials.Add(completePartial);
                             } else {
                                 setResponseVariable(entryBase, resp);
                             }
                         }
                     }else if (passesObjectSpecsIterations) {
-                        if (!dataPartial.getComponents().isEmpty()) {
+                        if (dataPartial.getComponents().Count() != 0) {
                             String entryBase = dataPartial.getEntry();
                             foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
                                 Object objectInstance = objectComponent.getObject();
@@ -208,7 +208,7 @@ namespace Zeus{
                                 }
                             }
                             DataPartial completePartial = new DataPartial(entryBase);
-                            dataPartials.add(completePartial);
+                            dataPartials.Add(completePartial);
                         }
                     }
 
@@ -217,7 +217,7 @@ namespace Zeus{
                     if(!dataPartial.isSetVar()) {
                         String entryBaseComplete = getCompleteInflatedDataPartial(dataPartial, resp);
                         DataPartial completePartial = new DataPartial(entryBaseComplete);
-                        dataPartials.add(completePartial);
+                        dataPartials.Add(completePartial);
                     }else{
                         setResponseVariable(entryBase, resp);
                     }
@@ -227,7 +227,7 @@ namespace Zeus{
                         List<LineComponent> lineComponents = getPageLineComponents(entryBase);
                         String entryBaseComplete = getCompleteLineElementResponse(entryBase, lineComponents, resp);
                         DataPartial completePartial = new DataPartial(entryBaseComplete);
-                        dataPartials.add(completePartial);
+                        dataPartials.Add(completePartial);
                     }else{
                         setResponseVariable(entryBase, resp);
                     }
@@ -251,7 +251,7 @@ namespace Zeus{
                         lineComponent.setIterated(false);
                     }
                 }
-                iteratedLineComponents.add(lineComponent);
+                iteratedLineComponents.Add(lineComponent);
             }
 
             String entryBaseComplete = getCompleteLineElementResponse(entryBase, iteratedLineComponents, resp);
@@ -278,7 +278,7 @@ namespace Zeus{
                             lineComponent.setIterated(false);
                         }
                     }
-                    iteratedLineComponents.add(lineComponent);
+                    iteratedLineComponents.Add(lineComponent);
                 }
             }
 
@@ -331,7 +331,7 @@ namespace Zeus{
                         component.setObject(objectInstance);
 
                         List<ObjectComponent> objectComponents = new ArrayList();
-                        objectComponents.add(component);
+                        objectComponents.Add(component);
 
                         for(int beta = 0; beta < iterablePartials.Count(); beta++){
                             DataPartial dataPartialDeux = iterablePartials.get(beta);
@@ -363,8 +363,8 @@ namespace Zeus{
                                     componentTrois.setObject(objectDeux);
 
                                     List<ObjectComponent> objectComponentsDeux = new ArrayList();
-                                    objectComponentsDeux.add(componentDeux);
-                                    objectComponentsDeux.add(componentTrois);
+                                    objectComponentsDeux.Add(componentDeux);
+                                    objectComponentsDeux.Add(componentTrois);
 
                                     for (int chi = 0; chi < iterablePartialsDeux.Count(); chi++) {
                                         DataPartial dataPartialTrois = iterablePartialsDeux.get(chi);
@@ -378,7 +378,7 @@ namespace Zeus{
                                         if(!isPeripheralPartial(dataPartialTrois)) {
                                             ArrayList specPartials = getSpecPartials(dataPartialTrois, dataPartials);
                                             dataPartialQuatre.setSpecPartials(specPartials);
-                                            dataPartialsPre.add(dataPartialQuatre);
+                                            dataPartialsPre.Add(dataPartialQuatre);
                                         }
                                     }
                                 }
@@ -386,7 +386,7 @@ namespace Zeus{
                                     (isTrailingPartialNested(beta, iterablePartials) || !withinIterable(dataPartialDeux, iterablePartials))){
                                 ArrayList specPartials = getSpecPartials(dataPartialDeux, dataPartials);
                                 dataPartialCinq.setSpecPartials(specPartials);
-                                dataPartialsPre.add(dataPartialCinq);
+                                dataPartialsPre.Add(dataPartialCinq);
                             }
                         }
                     }
@@ -397,7 +397,7 @@ namespace Zeus{
                     dataPartialSies.setComponents(activeObjectComponents);
                     dataPartialSies.setSpecPartials(specPartials);
                     dataPartialSies.setWithinIterable(false);
-                    dataPartialsPre.add(dataPartialSies);
+                    dataPartialsPre.Add(dataPartialSies);
                 }
             }
 
@@ -461,7 +461,7 @@ namespace Zeus{
 
                 if(dataPartialLocator.getGuid().Equals(dataPartial.getGuid()))break;
 
-                if(openCount > endCount)specPartials.add(dataPartial);
+                if(openCount > endCount)specPartials.Add(dataPartial);
             }
             ArrayList specPartialsReady = new ArrayList(specPartials);
 
@@ -479,7 +479,7 @@ namespace Zeus{
 
                 if(openCount != 0 && openCount == endCount)break;
 
-                dataPartialsDeux.add(dataPartial);
+                dataPartialsDeux.Add(dataPartial);
             }
             return dataPartialsDeux;
         }
@@ -489,7 +489,7 @@ namespace Zeus{
             int endIdx = getEndEach(openIdx, dataPartials);
             for (int foo = openIdx; foo < endIdx; foo++) {
                 DataPartial basePartial = dataPartials.get(foo);
-                dataPartialsDeux.add(basePartial);
+                dataPartialsDeux.Add(basePartial);
             }
             return dataPartialsDeux;
         }
@@ -848,7 +848,7 @@ namespace Zeus{
             List<Object> pojos = new ArrayList();
             if(iterableKey.Contains(".")){
                 pojos = getIterableInitial(expression, httpResponse);
-            }else if(httpResponse.getCache().containsKey(iterableKey)){
+            }else if(httpResponse.getCache().ContainsKey(iterableKey)){
                 pojos = (ArrayList) httpResponse.get(iterableKey);
             }
 
@@ -862,7 +862,7 @@ namespace Zeus{
             int startField = expression.IndexOf("${");
             int endField = expression.IndexOf(".", startField);
             String key = expression.Substring(startField + 2, endField);
-            if(httpResponse.getCache().containsKey(key)){
+            if(httpResponse.getCache().ContainsKey(key)){
                 Object obj = httpResponse.get(key);
                 Object objList = getIterableRecursive(expression, obj);
                 return (ArrayList) objList;
@@ -964,7 +964,7 @@ namespace Zeus{
                 lineComponent.setActiveField(activeField);
                 lineComponent.setObjectField(objectField);
                 lineComponent.setLineElement(cleanElement);
-                lineComponents.add(lineComponent);
+                lineComponents.Add(lineComponent);
             }
 
             return lineComponents;
@@ -1045,7 +1045,7 @@ namespace Zeus{
             for(int foo = 0; foo < parameters.length; foo++){
                 String parameter = parameters[foo].Trim();
                 Object parameterValue = resp.get(parameter);
-                values.add(parameterValue);
+                values.Add(parameterValue);
             }
 
             Object activeObjectValue = activeMethod.invoke(respValue, values.toArray());
