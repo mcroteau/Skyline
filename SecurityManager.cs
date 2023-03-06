@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Security.Cryptography;
 using Zeus;
 public class SecurityManager {
     public SecurityManager(SecurityAccess securityAccess) {
@@ -94,39 +96,31 @@ public class SecurityManager {
         return false;
     }
 
-    public String hash(String password){
-        MessageDigest md;
-        StringBuffer passwordHashed = new StringBuffer();
+    public String hash(String passwd){
+        StringBuilder Sb = new StringBuilder();
+        var hash = SHA256.Create();
 
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-            md.update(password.getBytes());
-            byte[] byteData = md.digest();
+        Encoding enc = Encoding.UTF8;
+        byte[] result = hash.ComputeHash(enc.GetBytes(passwd));
 
-            for (int i = 0; i < byteData.length; i++) {
-                passwordHashed.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        foreach (byte b in result){
+            Sb.Append(b.ToString("x2"));
         }
-        return passwordHashed.toString();
+
+        return Sb.ToString();
     }
 
     public static String dirty(String password){
-        MessageDigest md;
-        StringBuffer passwordHashed = new StringBuffer();
+        StringBuilder Sb = new StringBuilder();
+        var hash = SHA256.Create();
 
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-            md.update(password.getBytes());
-            byte[] byteData = md.digest();
+        Encoding enc = Encoding.UTF8;
+        byte[] result = hash.ComputeHash(enc.GetBytes(passwd));
 
-            for (int i = 0; i < byteData.length; i++) {
-                passwordHashed.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        foreach (byte b in result){
+            Sb.Append(b.ToString("x2"));
         }
-        return passwordHashed.toString();
+
+        return Sb.ToString();
     }
 }
