@@ -7,12 +7,12 @@ namespace Zeus{
             this.debug = false;
         }
         SchemaConfig schemaConfig;
-        boolean debug;
+        Boolean debug;
         String url;
         String driver;
         String user;
         String password;
-        Integer connections;
+        int connections;
 
         public SchemaConfig getSchemaConfig()
         {
@@ -24,12 +24,12 @@ namespace Zeus{
             this.schemaConfig = schemaConfig;
         }
 
-        public boolean isDebug()
+        public Boolean isDebug()
         {
             return this.debug;
         }
 
-        public void setDebug(boolean debug)
+        public void setDebug(Boolean debug)
         {
             this.debug = debug;
         }
@@ -74,12 +74,12 @@ namespace Zeus{
             this.password = password;
         }
 
-        public Integer getConnections()
+        public int getConnections()
         {
             return this.connections;
         }
 
-        public void setConnections(Integer connections)
+        public void setConnections(int connections)
         {
             this.connections = connections;
         }

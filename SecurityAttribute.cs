@@ -1,10 +1,10 @@
 using System;
 
 namespace Zeus{
-    public class RequestComponent {
+    public class SecurityAttribute {
         String name;
         String value;
-        Boolean hasFiles;
+        String expires;
 
         public String getName()
         {
@@ -26,14 +26,14 @@ namespace Zeus{
             this.value = value;
         }
 
-        public Boolean isHasFiles()
+        public String getExpires()
         {
-            return this.hasFiles;
+            return this.expires;
         }
 
-        public void setHasFiles(Boolean hasFiles)
+        public void setExpires(String expires)
         {
-            this.hasFiles = hasFiles;
+            this.expires = expires;
         }
 
     }

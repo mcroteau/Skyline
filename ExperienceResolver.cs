@@ -1,5 +1,7 @@
 using System;
 using System.Text;
+using System.Collections;
+using System.Reflection;
 using System.Collections.Generic;
 using Zeus;
 
@@ -25,7 +27,11 @@ namespace Zeus{
         String HTML_COMMENT = "<!--";
 
         public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<String> viewRenderers) {
-            List<String> elementEntries = Arrays.asList(pageElement.split("\n"));
+            String[] elementEntriesPre = pageElement.Split("\n");
+            
+            ArrayList<String> elementEntries = new ArrayList<String>();
+            elementEntries.AddRange(elementEntries);
+
             List<String> viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
             List<DataPartial> dataPartials = getConvertedDataPartials(viewRendererElementEntries);
@@ -62,7 +68,7 @@ namespace Zeus{
             StringBuilder builder = new StringBuilder();
             foreach(DataPartial dataPartial in dataPartialsComplete) {
                 if(!dataPartial.getEntry().equals("") &&
-                        !dataPartial.getEntry().contains(SETVAR)){
+                        !dataPartial.getEntry().Contains(SETVAR)){
                     builder.append(dataPartial.getEntry() + NEWLINE);
                 }
             }
@@ -70,11 +76,11 @@ namespace Zeus{
         }
 
         void setResponseVariable(String baseEntry, ViewCache resp) {
-            int startVariableIdx = baseEntry.indexOf("var=");
-            int endVariableIdx = baseEntry.indexOf("\"", startVariableIdx + 5);
+            int startVariableIdx = baseEntry.IndexOf("var=");
+            int endVariableIdx = baseEntry.IndexOf("\"", startVariableIdx + 5);
             String variableEntry = baseEntry.subString(startVariableIdx + 5, endVariableIdx);
-            int startValueIdx = baseEntry.indexOf("val=");
-            int endValueIdx = baseEntry.indexOf("\"", startValueIdx + 5);
+            int startValueIdx = baseEntry.IndexOf("val=");
+            int endValueIdx = baseEntry.IndexOf("\"", startValueIdx + 5);
             String valueEntry = baseEntry.subString(startValueIdx + 5, endValueIdx);
             resp.set(variableEntry, valueEntry);
         }
@@ -82,19 +88,19 @@ namespace Zeus{
         List<DataPartial> getConvertedDataPartials(List<String> elementEntries) {
             List<DataPartial> dataPartials = new ArrayList<>();
             foreach (String elementEntry in elementEntries) {
-                if(elementEntry.contains(COMMENT) ||
-                        elementEntry.contains(HTML_COMMENT))continue;
+                if(elementEntry.Contains(COMMENT) ||
+                        elementEntry.Contains(HTML_COMMENT))continue;
                 DataPartial dataPartial = new DataPartial();
                 dataPartial.setEntry(elementEntry);
-                if (elementEntry.contains(this.FOREACH)) {
+                if (elementEntry.Contains(this.FOREACH)) {
                     dataPartial.setIterable(true);
-                }else if(elementEntry.contains(this.IFSPEC)) {
+                }else if(elementEntry.Contains(this.IFSPEC)) {
                     dataPartial.setSpec(true);
-                }else if(elementEntry.contains(this.ENDEACH)){
+                }else if(elementEntry.Contains(this.ENDEACH)){
                     dataPartial.setEndIterable(true);
-                }else if(elementEntry.contains(this.ENDIF)){
+                }else if(elementEntry.Contains(this.ENDIF)){
                     dataPartial.setEndSpec(true);
-                }else if(elementEntry.contains(SETVAR)){
+                }else if(elementEntry.Contains(SETVAR)){
                     dataPartial.setSetVar(true);
                 }
                 dataPartials.add(dataPartial);
@@ -121,26 +127,26 @@ namespace Zeus{
                     MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", NetworkRequest, SecurityAttributes);
 
                     if (isEval.Invoke(viewRendererInstance, nil) &
-                            elementEntry.contains(openRendererKey) &
+                            elementEntry.Contains(openRendererKey) &
                             truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
 
                         for(int moa = tao; moa < elementEntries.size(); moa++){
                             String elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, elementEntryDeux);
-                            if(elementEntryDeux.contains(endRendererKey))break;
+                            if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
                     if (isEval.Invoke(viewRendererInstance) &
-                            elementEntry.contains(openRendererKey) &
+                            elementEntry.Contains(openRendererKey) &
                             !truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
                         for(int moa = tao; moa < elementEntries.size(); moa++){
                             String elementEntryDeux = elementEntries.get(moa);
                             elementEntries.set(moa, "");
-                            if(elementEntryDeux.contains(endRendererKey))break;
+                            if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
                     if(!isEval.invoke(viewRendererInstance) &
-                            elementEntry.contains(completeRendererKey)){
+                            elementEntry.Contains(completeRendererKey)){
                         MethodInfo render = viewRendererInstance.GetType().GetMethod("render", NetworkRequest, SecurityAttributes);
                         String rendered = (String) render.invoke(viewRendererInstance, req, securityAttributes);
                         elementEntries.set(tao, rendered);
@@ -286,10 +292,10 @@ namespace Zeus{
                 String objectField = lineComponent.getObjectField();
                 String objectValue = getResponseValueLineComponent(activeObjectField, objectField, resp);
                 String objectValueClean = objectValue != null ? objectValue.replace("${", "\\$\\{").replace("}", "\\}") : "";
-                if(objectValue != null && objectField.contains("(")){
+                if(objectValue != null && objectField.Contains("(")){
                     String lineElement = "\\$\\{" + lineComponent.getLineElement().replace("(", "\\(").replace(")", "\\)") + "\\}";
                     entryBase = entryBase.replaceAll(lineElement, objectValue);
-                }else if(objectValue != null && !objectValue.contains("(")){
+                }else if(objectValue != null && !objectValue.Contains("(")){
                     String lineElement = lineComponent.getCompleteLineElement();
                     entryBase = entryBase.replaceAll(lineElement, objectValueClean);
                 }
@@ -494,10 +500,10 @@ namespace Zeus{
             for (int qxro = openIdx + 1; qxro < basePartials.size(); qxro++) {
                 DataPartial basePartial = basePartials.get(qxro);
                 String basicEntry = basePartial.getEntry();
-                if(basicEntry.contains(this.ENDEACH))endEach++;
+                if(basicEntry.Contains(this.ENDEACH))endEach++;
 
                 if(openEach > 3)throw new StargzrException("too many nested <a:foreach>.");
-                if(basicEntry.contains(this.ENDEACH) && endEach == openEach && endEach != 0){
+                if(basicEntry.Contains(this.ENDEACH) && endEach == openEach && endEach != 0){
                     return qxro + 1;
                 }
             }
@@ -522,8 +528,8 @@ namespace Zeus{
         Boolean passesIterableSpec(DataPartial specPartial, Object activeObject, ViewCache resp){
 
             String specElementEntry = specPartial.getEntry();
-            int startExpression = specElementEntry.indexOf(OPENSPEC);
-            int endExpression = specElementEntry.indexOf(ENDSPEC);
+            int startExpression = specElementEntry.IndexOf(OPENSPEC);
+            int endExpression = specElementEntry.IndexOf(ENDSPEC);
             String expressionElement = specElementEntry.subString(startExpression + OPENSPEC.length(), endExpression);
             String conditionalElement = getConditionalElement(expressionElement);
 
@@ -541,7 +547,7 @@ namespace Zeus{
 
             String predicateValue = null;
             Boolean passesSpecification = false;
-            if(activeSubjectFieldsElement.contains("()")){
+            if(activeSubjectFieldsElement.Contains("()")){
                 String activeMethodName = activeSubjectFieldsElement.replace("()", "");
                 Object activeMethodObject = resp.get(activeSubjectFieldElement);
                 if(activeMethodObject == null)return false;
@@ -564,7 +570,7 @@ namespace Zeus{
 
             String subjectValue = (String)(activeSubjectObject);
 
-            if(predicateElement.contains(".")){
+            if(predicateElement.Contains(".")){
 
                 String[] predicateFieldElements = predicateElement.split(DOT, 2);
                 String predicateField = predicateFieldElements[ZERO];
@@ -582,7 +588,7 @@ namespace Zeus{
                 passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
 
-            }else if(!predicateElement.contains("'")){
+            }else if(!predicateElement.Contains("'")){
                 Object activePredicateObject = resp.get(predicateElement);
                 predicateValue = (String)(activePredicateObject);
                 passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
@@ -596,8 +602,8 @@ namespace Zeus{
 
         Boolean passesSpec(DataPartial specPartial, ViewCache resp) {
             String specElementEntry = specPartial.getEntry();
-            int startExpression = specElementEntry.indexOf(OPENSPEC);
-            int endExpression = specElementEntry.indexOf(ENDSPEC);
+            int startExpression = specElementEntry.IndexOf(OPENSPEC);
+            int endExpression = specElementEntry.IndexOf(ENDSPEC);
             String completeExpressionElement = specElementEntry.subString(startExpression + OPENSPEC.length(), endExpression);
 
             String[] allElementExpressions = completeExpressionElement.split("&&");
@@ -620,11 +626,11 @@ namespace Zeus{
                     predicateElementClean = predicateElement.replaceAll("'", "").trim();
                 }
 
-                if (subjectElement.contains(".")) {
+                if (subjectElement.Contains(".")) {
 
                     if (predicateElementClean.equals("") &&
                             conditionalElement.equals("")) {
-                        Boolean falseActive = subjectElement.contains("!");
+                        Boolean falseActive = subjectElement.Contains("!");
                         String subjectElementClean = subjectElement.replace("!", "");
 
                         subjectFieldElements = subjectElementClean.split(DOT, 2);
@@ -644,7 +650,7 @@ namespace Zeus{
                         if (!activeSubjectObjectBoolean && falseActive) return true;
                     }
 
-                    if (subjectElement.contains("()")) {
+                    if (subjectElement.Contains("()")) {
                         String subjectElements = subjectElement.replace("()", "");
                         subjectFieldElements = subjectElements.split(DOT);
                         subjectField = subjectFieldElements[ZERO];
@@ -677,7 +683,7 @@ namespace Zeus{
                     String[] expressionElements = expressionElement.split(conditionalElement);
                     String predicateElement = expressionElements[ONE];
 
-                    if(predicateElement.contains("'")){
+                    if(predicateElement.Contains("'")){
                         subjectValue = (String)(activeSubjectObject);
                         String predicateValue = predicateElement.replaceAll("'", "").trim();
                         if(passesSpec(subjectValue, predicateValue, conditionalElement))return true;
@@ -707,7 +713,7 @@ namespace Zeus{
 
                 } else if (predicateElementClean.equals("") &&
                         conditionalElement.equals("")) {
-                    Boolean falseActive = subjectElement.contains("!");
+                    Boolean falseActive = subjectElement.Contains("!");
                     String subjectElementClean = subjectElement.replace("!", "");
                     activeSubjectObject = resp.get(subjectElementClean);
                     if (activeSubjectObject == null) return false;
@@ -719,7 +725,7 @@ namespace Zeus{
                 if(!predicateElementClean.equals("")) {
                     activeSubjectObject = resp.get(subjectElement);
 
-                    if(!predicateElementClean.contains(".") && activeSubjectObject == null) {
+                    if(!predicateElementClean.Contains(".") && activeSubjectObject == null) {
                         if (passesNilSpec(activeSubjectObject, predicateElementClean, conditionalElement)) return true;
                         return false;
                     }
@@ -788,30 +794,30 @@ namespace Zeus{
         }
 
         String getConditionalElement(String expressionElement){
-            if(expressionElement.contains(">"))return ">";
-            if(expressionElement.contains("<"))return "<";
-            if(expressionElement.contains("=="))return "==";
-            if(expressionElement.contains(">="))return ">=";
-            if(expressionElement.contains("<="))return "<=";
-            if(expressionElement.contains("!="))return "!=";
+            if(expressionElement.Contains(">"))return ">";
+            if(expressionElement.Contains("<"))return "<";
+            if(expressionElement.Contains("=="))return "==";
+            if(expressionElement.Contains(">="))return ">=";
+            if(expressionElement.Contains("<="))return "<=";
+            if(expressionElement.Contains("!="))return "!=";
             return "";
         }
 
         IterableResult getIterableResultNested(String entry, Object activeSubjectObject){
-            int startEach = entry.indexOf(this.FOREACH);
+            int startEach = entry.IndexOf(this.FOREACH);
 
-            int startIterate = entry.indexOf("items=", startEach + 1);
-            int endIterate = entry.indexOf("\"", startIterate + 7);//items="
+            int startIterate = entry.IndexOf("items=", startEach + 1);
+            int endIterate = entry.IndexOf("\"", startIterate + 7);//items="
             String iterableKey = entry.subString(startIterate + 9, endIterate -1 );//items="${ and }
 
             String iterablePadded = "${" + iterableKey + "}";
 
-            int startField = iterablePadded.indexOf(".");
-            int endField = iterablePadded.indexOf("}", startField);
+            int startField = iterablePadded.IndexOf(".");
+            int endField = iterablePadded.IndexOf("}", startField);
             String activeSubjectFieldElement = iterablePadded.subString(startField + 1, endField);
 
-            int startItem = entry.indexOf("var=", endIterate);
-            int endItem = entry.indexOf("\"", startItem + 5);//var="
+            int startItem = entry.IndexOf("var=", endIterate);
+            int endItem = entry.IndexOf("\"", startItem + 5);//var="
             String activeField = entry.subString(startItem + 5, endItem);
 
             String[] activeSubjectFieldElements = activeSubjectFieldElement.split(DOT);
@@ -827,20 +833,20 @@ namespace Zeus{
 
         private IterableResult getIterableResult(String entry, ViewCache httpResponse){
 
-            int startEach = entry.indexOf(this.FOREACH);
+            int startEach = entry.IndexOf(this.FOREACH);
 
-            int startIterate = entry.indexOf("items=", startEach);
-            int endIterate = entry.indexOf("\"", startIterate + 7);//items=".
+            int startIterate = entry.IndexOf("items=", startEach);
+            int endIterate = entry.IndexOf("\"", startIterate + 7);//items=".
             String iterableKey = entry.subString(startIterate + 9, endIterate -1 );//items="${ }
 
-            int startItem = entry.indexOf("var=", endIterate);
-            int endItem = entry.indexOf("\"", startItem + 6);//items="
+            int startItem = entry.IndexOf("var=", endIterate);
+            int endItem = entry.IndexOf("\"", startItem + 6);//items="
             String activeField = entry.subString(startItem + 5, endItem);
 
             String expression = entry.subString(startIterate + 7, endIterate);
 
             List<Object> pojos = new ArrayList<>();
-            if(iterableKey.contains(".")){
+            if(iterableKey.Contains(".")){
                 pojos = getIterableInitial(expression, httpResponse);
             }else if(httpResponse.getCache().containsKey(iterableKey)){
                 pojos = (ArrayList) httpResponse.get(iterableKey);
@@ -853,8 +859,8 @@ namespace Zeus{
         }
 
         private List<Object> getIterableInitial(String expression, ViewCache httpResponse){
-            int startField = expression.indexOf("${");
-            int endField = expression.indexOf(".", startField);
+            int startField = expression.IndexOf("${");
+            int endField = expression.IndexOf(".", startField);
             String key = expression.subString(startField + 2, endField);
             if(httpResponse.getCache().containsKey(key)){
                 Object obj = httpResponse.get(key);
@@ -866,8 +872,8 @@ namespace Zeus{
 
         private List<Object> getIterableRecursive(String expression, Object activeSubjectObject) {
             List<Object> objs = new ArrayList<>();
-            int startField = expression.indexOf(".");
-            int endField = expression.indexOf("}");
+            int startField = expression.IndexOf(".");
+            int endField = expression.IndexOf("}");
 
             String activeSubjectFielElement = expression.subString(startField + 1, endField);
 
@@ -891,7 +897,7 @@ namespace Zeus{
                 if(fieldObj != null){
                     fieldObj.setAccessible(true);
                     Object obj = fieldObj.get(baseObj);
-                    int start = baseField.indexOf(".");
+                    int start = baseField.IndexOf(".");
                     String fieldPre = baseField.subString(start + 1);
                     if(obj != null) {
                         return getValueRecursive(idx, fieldPre, obj);
@@ -918,7 +924,7 @@ namespace Zeus{
                 Field fieldObj = baseObj.getClass().getDeclaredField(key);
                 fieldObj.setAccessible(true);
                 Object obj = fieldObj.get(baseObj);
-                int start = baseField.indexOf(".");
+                int start = baseField.IndexOf(".");
                 String fieldPre = baseField.subString(start + 1);
                 if(obj != null) {
                     return getValueRecursive(idx, fieldPre, obj);
@@ -950,7 +956,7 @@ namespace Zeus{
                         .replace("}", "");
                 String activeField = cleanElement;
                 String objectField = "";
-                if(cleanElement.contains(".")) {
+                if(cleanElement.Contains(".")) {
                     String[] elements = cleanElement.split("\\.", 2);
                     activeField = elements[0];
                     objectField = elements[1];
@@ -966,7 +972,7 @@ namespace Zeus{
 
         String getResponseValueLineComponent(String activeField, String objectField, ViewCache resp) {
 
-            if(objectField.contains(".")){
+            if(objectField.Contains(".")){
 
                 Object activeObject = resp.get(activeField);
                 if(activeObject != null) {
@@ -986,11 +992,11 @@ namespace Zeus{
                 Object respValue = resp.get(activeField);
                 if(respValue != null &&
                         !objectField.equals("") &&
-                            !objectField.contains(".")) {
+                            !objectField.Contains(".")) {
 
                     Object objectValue = null;
 
-                    if(objectField.contains("()")){
+                    if(objectField.Contains("()")){
                         String methodName = objectField.replace("()", "");
                         Method methodObject = respValue.getClass().getDeclaredMethod(methodName);
                         methodObject.setAccessible(true);
@@ -1081,7 +1087,7 @@ namespace Zeus{
 
         String getObjectValueForLineComponent(String objectField, Object objectInstance){
 
-            if(objectField.contains(".")){
+            if(objectField.Contains(".")){
                 String[] objectFields = objectField.split("\\.");
 
                 Object activeObject = objectInstance;

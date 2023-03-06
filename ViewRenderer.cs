@@ -10,7 +10,7 @@ namespace Zeus{
         */
         Boolean isEval();
 
-        boolean truthy(NetworkRequest networkRequest, SecurityAttributes securityAttributes);
+        Boolean truthy(NetworkRequest networkRequest, SecurityAttributes securityAttributes);
 
         String render(NetworkRequest networkRequest, SecurityAttributes securityAttributes);
 

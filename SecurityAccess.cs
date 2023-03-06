@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Zeus{
 
@@ -19,7 +20,7 @@ namespace Zeus{
         * @param user
         * @return returns a unique set of role strings
         */
-        Set<String> getRoles(String user);
+        HashSet<String> getRoles(String user);
 
 
         /**
@@ -29,7 +30,7 @@ namespace Zeus{
         * net.plsar.example permission user:maintenance:(id) (id)
         * replaced with actual id of user
         */
-        Set<String> getPermissions(String user);
+        HashSet<String> getPermissions(String user);
 
         void setDao(Dao dao);
     }

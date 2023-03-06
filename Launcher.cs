@@ -11,7 +11,7 @@ namespace Zeus
     {
         public static int Main(String[] args)
         {
-            StartServer();
+            //StartServer();
             return 0;
         }
 
