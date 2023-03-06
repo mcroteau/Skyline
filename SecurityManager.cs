@@ -29,7 +29,7 @@ public class SecurityManager {
         this.securityAccess = securityAccess;
     }
 
-    public boolean hasRole(String role, NetworkRequest networkRequest){
+    public bool hasRole(String role, NetworkRequest networkRequest){
         String user = getUser(networkRequest);
         if(user != null) {
             Set<String> roles = securityAccess.getRoles(user);
@@ -40,7 +40,7 @@ public class SecurityManager {
         return false;
     }
 
-    public boolean hasPermission(String permission, NetworkRequest networkRequest){
+    public bool hasPermission(String permission, NetworkRequest networkRequest){
         String user = networkRequest.getUserCredential();
         if(user != null) {
             Set<String> permissions = securityAccess.getPermissions(user);
@@ -66,7 +66,6 @@ public class SecurityManager {
                 String securityAttributePrincipal = Base64.getEncoder().encodeToString(username.getBytes());
                 networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
                 String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal + "; path=/;";
-//                System.out.println("signin: " + securityAttributeValue);
                 SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
                 networkResponse.getSecurityAttributes().put("plsar.security", securityAttribute);
                 return true;
@@ -79,7 +78,7 @@ public class SecurityManager {
         return false;
     }
 
-    public boolean signout(NetworkRequest networkRequest, NetworkResponse networkResponse){
+    public bool signout(NetworkRequest networkRequest, NetworkResponse networkResponse){
         networkRequest.setSecurityAttributeInfo("");
         String securityAttributeValue = ";Expires/MaxAge=-1;Expires=-1;MaxAge=-1;";
         SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
@@ -88,7 +87,7 @@ public class SecurityManager {
         return true;
     }
 
-    public boolean isAuthenticated(NetworkRequest networkRequest){
+    public bool isAuthenticated(NetworkRequest networkRequest){
         if(!networkRequest.getUserCredential().equals("")){
             return true;
         }
@@ -102,7 +101,7 @@ public class SecurityManager {
         try {
             md = MessageDigest.getInstance("SHA-256");
             md.update(password.getBytes());
-            byte byteData[] = md.digest();
+            byte[] byteData = md.digest();
 
             for (int i = 0; i < byteData.length; i++) {
                 passwordHashed.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
@@ -120,7 +119,7 @@ public class SecurityManager {
         try {
             md = MessageDigest.getInstance("SHA-256");
             md.update(password.getBytes());
-            byte byteData[] = md.digest();
+            byte[] byteData = md.digest();
 
             for (int i = 0; i < byteData.length; i++) {
                 passwordHashed.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));

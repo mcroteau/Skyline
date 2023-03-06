@@ -10,7 +10,7 @@ namespace Zeus{
         * @param user
         * @return returns hashed password
         */
-        public String getPassword(String user);
+        String getPassword(String user);
 
 
         /**
@@ -19,7 +19,7 @@ namespace Zeus{
         * @param user
         * @return returns a unique set of role strings
         */
-        public Set<String> getRoles(String user);
+        Set<String> getRoles(String user);
 
 
         /**
@@ -29,9 +29,9 @@ namespace Zeus{
         * net.plsar.example permission user:maintenance:(id) (id)
         * replaced with actual id of user
         */
-        public Set<String> getPermissions(String user);
+        Set<String> getPermissions(String user);
 
-        public void setDao(Dao dao);
+        void setDao(Dao dao);
     }
 
 }

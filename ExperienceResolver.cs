@@ -24,7 +24,7 @@ namespace Zeus{
         String COMMENT      = "<%--";
         String HTML_COMMENT = "<!--";
 
-        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<Class<T>> viewRenderers) {
+        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, List<String> viewRenderers) {
             List<String> elementEntries = Arrays.asList(pageElement.split("\n"));
             List<String> viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
@@ -1055,7 +1055,7 @@ namespace Zeus{
         }
 
 
-        Method getObjectMethod(Object activeObject, String objectField) {
+        MethodInfo getObjectMethod(Object activeObject, String objectField) {
             String[] activeMethodAttributes = objectField.split("\\(");
             String activeMethodName = activeMethodAttributes[ZERO];
             Method[] activeObjectMethods = activeObject.getClass().getDeclaredMethods();
