@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zeus {
@@ -17,10 +18,10 @@ namespace Zeus {
         bool endIterable;
         bool endSpec;
         bool setVar;
-        List<object> mojos;
-        List<ObjectComponent> components;
-        List<DataPartial> specPartials;
-        Dictionary<string, DataPartial> specPartialsMap;
+        ArrayList mojos;
+        ArrayList components;
+        ArrayList specPartials;
+        Dictionary<String, DataPartial> specPartialsMap;
 
 
         public int getIdx()
@@ -143,40 +144,40 @@ namespace Zeus {
             this.setVar = setVar;
         }
 //todo:remove specpartials list rename
-        public List<object> getMojos()
+        public ArrayList getMojos()
         {
             return this.mojos;
         }
 
-        public void setMojos(List<object> mojos)
+        public void setMojos(ArrayList mojos)
         {
             this.mojos = mojos;
         }
-        public List<ObjectComponent> getComponents()
+        public ArrayList getComponents()
         {
             return this.components;
         }
 
-        public void setComponents(List<ObjectComponent> components)
+        public void setComponents(ArrayList components)
         {
             this.components = components;
         }
-        public List<DataPartial> getSpecPartials()
+        public ArrayList getSpecPartials()
         {
             return this.specPartials;
         }
 
-        public void setSpecPartials(List<DataPartial> specPartials)
+        public void setSpecPartials(ArrayList specPartials)
         {
             this.specPartials = specPartials;
         }
 
-        public Dictionary<string, DataPartial> getSpecPartialsMap()
+        public Dictionary<String, DataPartial> getSpecPartialsMap()
         {
             return this.specPartialsMap;
         }
 
-        public void setSpecPartialsMap(Dictionary<string, DataPartial> specPartialsMap)
+        public void setSpecPartialsMap(Dictionary<String, DataPartial> specPartialsMap)
         {
             this.specPartialsMap = specPartialsMap;
         }
@@ -184,10 +185,10 @@ namespace Zeus {
         public DataPartial(){
             this.guid = System.Guid.NewGuid().ToString();
             this.field = "";
-            this.mojos = new List<object>();
-            this.components = new List<ObjectComponent>();
-            this.specPartials = new List<DataPartial>();
-            this.specPartialsMap = new Dictionary<string, DataPartial>();
+            this.mojos = new ArrayList();
+            this.components = new ArrayList();
+            this.specPartials = new ArrayList();
+            this.specPartialsMap = new Dictionary<String, DataPartial>();
         }
 
     }

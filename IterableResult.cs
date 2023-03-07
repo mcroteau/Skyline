@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zeus{
     public class IterableResult {
         String field;
         String key;
-        List<Object> mojos;
+        ArrayList mojos;
 
         public String getField()
         {
@@ -27,12 +28,12 @@ namespace Zeus{
             this.key = key;
         }
 
-        public List<Object> getMojos()
+        public ArrayList getMojos()
         {
             return this.mojos;
         }
 
-        public void setMojos(List<Object> mojos)
+        public void setMojos(ArrayList mojos)
         {
             this.mojos = mojos;
         }
