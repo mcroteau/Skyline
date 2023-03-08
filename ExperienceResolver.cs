@@ -34,9 +34,9 @@ namespace Zeus{
             ArrayList elementEntries = new ArrayList();
             elementEntries.AddRange(elementEntriesPre);
 
-            ArrayList viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
+            // ArrayList viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
-            ArrayList dataPartials = getConvertedDataPartials(viewRendererElementEntries);
+            ArrayList dataPartials = getConvertedDataPartials(elementEntries);
             ArrayList dataPartialsInflated = getInflatedPartials(dataPartials, viewCache);
 
             ArrayList dataPartialsComplete = getCompletedPartials(dataPartialsInflated, viewCache);
@@ -111,56 +111,53 @@ namespace Zeus{
             return dataPartials;
         }
 
-        ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
+        // ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
-            foreach(String viewRendererKlass in viewRenderers){
-                Console.WriteLine(viewRendererKlass);
-                Object viewRendererInstance = Activator.CreateInstance(typeof(viewRendererKlass), new Object[]{});
-
-                Console.WriteLine(viewRendererInstance);
+        //     foreach(String viewRendererKlass in viewRenderers){
+        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Zeus", viewRendererKlass);
                 
-                MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
-                String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});
+        //         MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
+        //         String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});
 
-                String openRendererKey = "<" + rendererKey + ">";
-                String completeRendererKey = "<" + rendererKey + "/>";
-                String endRendererKey = "</" + rendererKey + ">";
+        //         String openRendererKey = "<" + rendererKey + ">";
+        //         String completeRendererKey = "<" + rendererKey + "/>";
+        //         String endRendererKey = "</" + rendererKey + ">";
 
-                for(int tao = 0; tao < elementEntries.Count; tao++) {
+        //         for(int tao = 0; tao < elementEntries.Count; tao++) {
 
-                    String elementEntry = (String) elementEntries[tao];
-                    MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval", new Type[]{});
-                    MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", new Type[]{NetworkRequest.GetType(), SecurityAttributes.GetType()});
+        //             String elementEntry = (String) elementEntries[tao];
+        //             MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval", new Type[]{});
+        //             MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", new Type[]{NetworkRequest.GetType(), SecurityAttributes.GetType()});
 
-                    if (((Boolean)(isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
-                            elementEntry.Contains(openRendererKey) &&
-                            truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
+        //             if (((Boolean)(isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
+        //                     elementEntry.Contains(openRendererKey) &&
+        //                     truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
 
-                        for(int moa = tao; moa < elementEntries.Count; moa++){
-                            String elementEntryDeux = (String) elementEntries[moa];
-                            elementEntries[moa] = elementEntryDeux;
-                            if(elementEntryDeux.Contains(endRendererKey))break;
-                        }
-                    }
-                    if (((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{})) &&
-                            elementEntry.Contains(openRendererKey) &&
-                            !truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
-                        for(int moa = tao; moa < elementEntries.Count; moa++){
-                            String elementEntryDeux = (String) elementEntries[moa];
-                            elementEntries[moa] = "";
-                            if(elementEntryDeux.Contains(endRendererKey))break;
-                        }
-                    }
-                    if(!(((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
-                            elementEntry.Contains(completeRendererKey)){
-                        MethodInfo render = viewRendererInstance.GetType().GetMethod("render", new Type[] { NetworkRequest.GetType(), SecurityAttributes.GetType()});
-                        String rendered = (String) render.Invoke(viewRendererInstance, new Object[]{req, securityAttributes});
-                        elementEntries[tao] =  rendered;
-                    }
-                }
-            }
-            return elementEntries;
-        }
+        //                 for(int moa = tao; moa < elementEntries.Count; moa++){
+        //                     String elementEntryDeux = (String) elementEntries[moa];
+        //                     elementEntries[moa] = elementEntryDeux;
+        //                     if(elementEntryDeux.Contains(endRendererKey))break;
+        //                 }
+        //             }
+        //             if (((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{})) &&
+        //                     elementEntry.Contains(openRendererKey) &&
+        //                     !truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
+        //                 for(int moa = tao; moa < elementEntries.Count; moa++){
+        //                     String elementEntryDeux = (String) elementEntries[moa];
+        //                     elementEntries[moa] = "";
+        //                     if(elementEntryDeux.Contains(endRendererKey))break;
+        //                 }
+        //             }
+        //             if(!(((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
+        //                     elementEntry.Contains(completeRendererKey)){
+        //                 MethodInfo render = viewRendererInstance.GetType().GetMethod("render", new Type[] { NetworkRequest.GetType(), SecurityAttributes.GetType()});
+        //                 String rendered = (String) render.Invoke(viewRendererInstance, new Object[]{req, securityAttributes});
+        //                 elementEntries[tao] =  rendered;
+        //             }
+        //         }
+        //     }
+        //     return elementEntries;
+        // }
 
         ArrayList getCompletedPartials(ArrayList dataPartialsPre, ViewCache resp) {
 
