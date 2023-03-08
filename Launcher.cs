@@ -14,15 +14,24 @@ namespace Zeus
         {
             ExperienceResolver experienceResolver = new ExperienceResolver();
             StringBuilder sb = new StringBuilder();
-            sb.Append("${name}");
+            sb.Append("${name}\n");
+            sb.Append("<c:if spec=\"${todos.Count > 0}\">\n");
+            sb.Append("<c:foreach items=\"${todos}\" var=\"todo\">\n");
+            sb.Append("${todo}\n");
+            sb.Append("</c:foreach>\n");
+            sb.Append("</c:if>\n");
+
+
+            ArrayList todos = new ArrayList();
+            todos.Add("Zebra House");
+            todos.Add("Zebra Bra");
+            todos.Add("Zebra Love");
 
             ViewCache cache = new ViewCache();
             cache.set("name", "Dirk");
+            cache.set("todos", todos);
 
-            ArrayList viewRenderers = new ArrayList();
-            viewRenderers.Add("UsernameRenderer");
-
-            String output = experienceResolver.resolve(sb.ToString(), cache, null, null, viewRenderers);
+            String output = experienceResolver.resolve(sb.ToString(), cache, null, null, null);
             Console.WriteLine(output);
 
             //StartServer();
@@ -76,7 +85,7 @@ namespace Zeus
                 
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
-                
+
                 Console.WriteLine(data);
             }
             catch (Exception e)

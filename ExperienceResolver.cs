@@ -17,12 +17,12 @@ namespace Zeus{
         String DOT      = "\\.";
         String NEWLINE  = "\n";
         String LOCATOR  = "\\$\\{[a-zA-Z+\\.+\\(\\a-zA-Z+)]*\\}";
-        String FOREACH  = "<a:foreach";
-        String ENDEACH  = "</a:foreach>";
-        String IFSPEC   = "<a:if";
-        String ENDIF    = "</a:if>";
-        String SETVAR   = "<a:set";
-        String OPENSPEC = "<a:if spec=\"${";
+        String FOREACH  = "<c:foreach";
+        String ENDEACH  = "</c:foreach>";
+        String IFSPEC   = "<c:if";
+        String ENDIF    = "</c:if>";
+        String SETVAR   = "<c:set";
+        String OPENSPEC = "<c:if spec=\"${";
         String ENDSPEC  = "}";
 
         String COMMENT      = "<%--";
@@ -835,25 +835,40 @@ namespace Zeus{
             return iterableResult;
         }
 
-        private IterableResult getIterableResult(String entry, ViewCache httpResponse){
+        private IterableResult getIterableResult(String entry, ViewCache cache){
 
-            int startEach = entry.IndexOf(this.FOREACH);
+            int startEach = entry.IndexOf(FOREACH);
 
             int startIterate = entry.IndexOf("items=", startEach);
-            int endIterate = entry.IndexOf("\"", startIterate + 7);//items=".
-            String iterableKey = entry.Substring(startIterate + 9, endIterate -1 );//items="${ }
-
+            Console.WriteLine((startIterate + 7));
+            int startIterateWith = (startIterate + 9);
+            int endIterate = entry.IndexOf("\"", startIterateWith) -1;//items=".
+            int iterateDiff = endIterate - startIterateWith;
+            Console.WriteLine(startIterateWith + ":" + endIterate + ":" + iterateDiff);
+            
+            String iterableKey = entry.Substring(startIterateWith, iterateDiff);//items="${ }
+            Console.WriteLine(iterableKey);
+            
             int startItem = entry.IndexOf("var=", endIterate);
-            int endItem = entry.IndexOf("\"", startItem + 6);//items="
-            String activeField = entry.Substring(startItem + 5, endItem);
+            int startItemWith = startItem + 5;
+            int endItem = entry.IndexOf("\"", startItemWith);//var="
+            int itemDiff = endItem - startItemWith;
+            String activeField = entry.Substring(startItemWith, itemDiff);
+            Console.WriteLine(activeField);
 
-            String expression = entry.Substring(startIterate + 7, endIterate);
+            String expression = "${" + iterableKey + "}";
+
+            Console.WriteLine(expression);
 
             ArrayList pojos = new ArrayList();
             if(iterableKey.Contains(".")){
-                pojos = getIterableInitial(expression, httpResponse);
-            }else if(httpResponse.getCache().ContainsKey(iterableKey)){
-                pojos = (ArrayList) httpResponse.get(iterableKey);
+                pojos = getIterableInitial(expression, cache);
+            }else if(cache.getCache().ContainsKey(iterableKey)){
+                pojos = (ArrayList) cache.get(iterableKey);
+            }
+
+            foreach(Object o in pojos){
+                Console.WriteLine(o);
             }
 
             IterableResult iterableResult = new IterableResult();
