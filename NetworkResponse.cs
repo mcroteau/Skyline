@@ -5,7 +5,7 @@ namespace Zeus{
 
     public class NetworkResponse {
         public NetworkResponse(){
-            this.securityAttributes = new HashMap<>();
+            this.securityAttributes = new Dictionary<String, SecurityAttribute>();
         }
 
         Boolean redirect;

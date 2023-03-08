@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Zeus;
 
 namespace Zeus{
@@ -30,7 +31,7 @@ namespace Zeus{
             String[] elementEntriesPre = pageElement.Split("\n");
             
             ArrayList elementEntries = new ArrayList();
-            elementEntries.AddRange(elementEntries);
+            elementEntries.AddRange(elementEntriesPre);
 
             ArrayList viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
@@ -50,7 +51,6 @@ namespace Zeus{
                 String elementEntry = dataPartial.getEntry();
                 Regex regexLocator = new Regex(LOCATOR, RegexOptions.IgnoreCase);
                 Match matcher = regexLocator.Match(elementEntry);
-                int matchCount = 0;
                 while (matcher.Success){
                     String element = matcher.Value;
                     String regexElement = element
@@ -124,7 +124,7 @@ namespace Zeus{
 
                 for(int tao = 0; tao < elementEntries.Count; tao++) {
 
-                    String elementEntry = elementEntries[tao];
+                    String elementEntry = (String) elementEntries[tao];
                     MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval");
                     MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", NetworkRequest, SecurityAttributes);
 
@@ -170,7 +170,7 @@ namespace Zeus{
                     foreach(DataPartial specPartial in dataPartial.getSpecPartials()) {
                         if(dataPartial.getComponents().Count != 0){
                             foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
-                                Object objectInstance = objectComponent.getObject();
+                                Object objectInstance = objectComponent.getInstance();
                                 if (!passesSpec(objectInstance, specPartial, dataPartial, resp)) {
                                     passesObjectSpecsIterations = false;
                                     goto specIteration;
@@ -201,7 +201,7 @@ namespace Zeus{
                         if (dataPartial.getComponents().Count != 0) {
                             String entryBase = dataPartial.getEntry();
                             foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
-                                Object objectInstance = objectComponent.getObject();
+                                Object objectInstance = objectComponent.getInstance();
                                 String activeField = objectComponent.getActiveField();
                                 if (!dataPartial.isSetVar()) {
                                     entryBase = getCompleteLineElementObject(activeField, objectInstance, entryBase, resp);
@@ -265,7 +265,7 @@ namespace Zeus{
             ArrayList lineComponents = getPageLineComponents(entryBase);
             ArrayList iteratedLineComponents = new ArrayList();
             foreach(ObjectComponent objectComponent in dataPartial.getComponents()) {
-                Object objectInstance = objectComponent.getObject();
+                Object objectInstance = objectComponent.getInstance();
                 String activeField = objectComponent.getActiveField();
 
                 foreach(LineComponent lineComponent in lineComponents){
@@ -557,9 +557,9 @@ namespace Zeus{
                 Object activeObjectValue = activeMethod.invoke(activeMethodObject);
                 if(activeObjectValue == null)return false;
                 String subjectValueVar = (String)(activeObjectValue);
-                int subjectNumericValue = (int)(subjectValueVar);
+                int subjectNumericValue = Int32.Parse(subjectValueVar);
                 predicateValue = predicateElement.Replace("'", "");
-                int predicateNumericValue = (int)(predicateValue);
+                int predicateNumericValue = Int32.Parse(predicateValue);
                 passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
                 return passesSpecification;
             }else{
@@ -609,8 +609,8 @@ namespace Zeus{
 
             String[] allElementExpressions = completeExpressionElement.Split("&&");
             
-            String subjectField = new String();
-            String subjectValue = new String();
+            String subjectField = new String("");
+            String subjectValue = new String("");
             Object activeSubjectObject = new Object();
             String[] subjectFieldElements = new String[]{};
             String[] activeSubjectFieldElements = new String[]{};
@@ -662,8 +662,8 @@ namespace Zeus{
                         Object activeObjectValue = activeMethod.invoke(activeSubjectObject);
                         if (activeObjectValue == null) return false;
                         subjectValue = (String)(activeObjectValue);
-                        int subjectNumericValue = (int)(subjectValue);
-                        int predicateNumericValue = (int)(predicateElementClean);
+                        int subjectNumericValue = Int32.Parse(subjectValue);
+                        int predicateNumericValue = Int32.Parse(predicateElementClean);
                         if(getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement))return true;
                         return false;
                     }
@@ -943,10 +943,13 @@ namespace Zeus{
         ArrayList getPageLineComponents(String pageElementEntry){
             ArrayList lineComponents = new ArrayList();
             Pattern pattern = Pattern.compile(LOCATOR);
-            Matcher matcher = pattern.matcher(pageElementEntry);
-            while (matcher.find()) {
+            
+            Regex regexLocator = new Regex(LOCATOR, RegexOptions.IgnoreCase);
+            Match matcher = regexLocator.Match(elementEntry);
+            int matchCount = 0;
+            while (matcher.Success){
                 LineComponent lineComponent = new LineComponent();
-                String lineElement = matcher.group();
+                String lineElement = matcher.Value;
                 String cleanElement = lineElement
                         .Replace("${", "")
                         .Replace("}", "");
@@ -961,8 +964,8 @@ namespace Zeus{
                 lineComponent.setObjectField(objectField);
                 lineComponent.setLineElement(cleanElement);
                 lineComponents.Add(lineComponent);
+                matcher = matcher.NextMatch();
             }
-
             return lineComponents;
         }
 
@@ -1104,8 +1107,8 @@ namespace Zeus{
         }
 
         Boolean hasDeclaredField(String objectField, Object objectInstance) {
-            Field[] declaredFields = objectInstance.getClass().getDeclaredFields();
-            foreach(Field declaredField in declaredFields){
+            FieldInfo[] declaredFields = objectInstance.GetType().GetFields();
+            foreach(FieldInfo declaredField in declaredFields){
                 if(declaredField.getName().Equals(objectField))return true;
             }
             return false;

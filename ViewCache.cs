@@ -3,25 +3,25 @@ using System.Collections.Generic;
 
 namespace Zeus{
     public class ViewCache {
-        Dictionary<string, object> cache;
+        Dictionary<String, Object> cache;
 
-        public void set(string key, object value){
+        public void set(String key, Object value){
             this.cache.Add(key, value);
         }
-        public object get(string key){
+        public Object get(String key){
             if(this.cache.ContainsKey(key)){
-                return this.cache.get(key);
+                return this.cache.GetValueOrDefault(key, null);
             }
             return null;
         }
-        public Dictionary<string, object> getCache() {
+        public Dictionary<String, Object> getCache() {
             return cache;
         }
-        public void setCache(Dictionary<string, object> cache) {
+        public void setCache(Dictionary<String, Object> cache) {
             this.cache = cache;
         }
         public ViewCache(){
-            this.cache = new Dictionary<string, object>();
+            this.cache = new Dictionary<String, Object>();
         }
     }
 }
