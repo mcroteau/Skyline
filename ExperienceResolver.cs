@@ -275,7 +275,7 @@ namespace Zeus{
                         String objectValue = getObjectValueForLineComponent(objectField, objectInstance);
                         if(objectValue != null){
                             String lineElement = lineComponent.getCompleteLineElement();
-                            entryBase = entryBase.Replace(lineElement, objectValue);
+                            entryBase = Regex.Replace(entryBase, lineElement, objectValue);
                             lineComponent.setIterated(true);
                         }else{
                             lineComponent.setIterated(false);
@@ -297,10 +297,10 @@ namespace Zeus{
                 String objectValueClean = objectValue != null ? objectValue.Replace("${", "\\$\\{").Replace("}", "\\}") : "";
                 if(objectValue != null && objectField.Contains("(")){
                     String lineElement = "\\$\\{" + lineComponent.getLineElement().Replace("(", "\\(").Replace(")", "\\)") + "\\}";
-                    entryBase = entryBase.Replace(lineElement, objectValue);
+                    entryBase = Regex.Replace(entryBase, lineElement, objectValue);
                 }else if(objectValue != null && !objectValue.Contains("(")){
                     String lineElement = lineComponent.getCompleteLineElement();
-                    entryBase = entryBase.Replace(lineElement, objectValueClean);
+                    entryBase = Regex.Replace(entryBase, lineElement, objectValueClean);
                 }
             }
             return entryBase;
@@ -938,7 +938,9 @@ namespace Zeus{
                     if (obj != null) {
                         return obj;
                     }
-                }catch(Exception ex){}
+                }catch(Exception ex){
+                    Console.WriteLine(ex.Message);
+                }
             }
             return null;
         }
@@ -948,7 +950,6 @@ namespace Zeus{
             ArrayList lineComponents = new ArrayList();
             Regex regexLocator = new Regex(LOCATOR, RegexOptions.IgnoreCase);
             Match matcher = regexLocator.Match(pageElementEntry);
-            int matchCount = 0;
             while (matcher.Success){
                 LineComponent lineComponent = new LineComponent();
                 String lineElement = matcher.Value;

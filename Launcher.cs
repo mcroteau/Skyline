@@ -76,6 +76,8 @@ namespace Zeus
                 
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
+                
+                Console.WriteLine(data);
             }
             catch (Exception e)
             {
