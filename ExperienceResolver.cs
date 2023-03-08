@@ -14,7 +14,7 @@ namespace Zeus{
         int ZERO = 0;
         int ONE  = 1;
 
-        String DOT      = "\\.";
+        String DOT      = ".";
         String NEWLINE  = "\n";
         String LOCATOR  = "\\$\\{[a-zA-Z+\\.+\\(\\a-zA-Z+)]*\\}";
         String FOREACH  = "<c:foreach";
@@ -28,7 +28,7 @@ namespace Zeus{
         String COMMENT      = "<%--";
         String HTML_COMMENT = "<!--";
 
-        public String resolve(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, ArrayList viewRenderers) {
+        public String resolve(String pageElement, ViewCache cache, NetworkRequest req, SecurityAttributes securityAttributes, ArrayList viewRenderers) {
             String[] elementEntriesPre = pageElement.Split("\n");
             
             ArrayList elementEntries = new ArrayList();
@@ -37,9 +37,9 @@ namespace Zeus{
             // ArrayList viewRendererElementEntries = getInterpretedRenderers(req, securityAttributes, elementEntries, viewRenderers);
 
             ArrayList dataPartials = getConvertedDataPartials(elementEntries);
-            ArrayList dataPartialsInflated = getInflatedPartials(dataPartials, viewCache);
+            ArrayList dataPartialsInflated = getInflatedPartials(dataPartials, cache);
 
-            ArrayList dataPartialsComplete = getCompletedPartials(dataPartialsInflated, viewCache);
+            ArrayList dataPartialsComplete = getCompletedPartials(dataPartialsInflated, cache);
             ArrayList dataPartialsCompleteReady = getNilElementEntryPartials(dataPartialsComplete);
 
             StringBuilder pageElementsComplete = getElementsCompleted(dataPartialsCompleteReady);
@@ -248,7 +248,7 @@ namespace Zeus{
                     String objectValue = getObjectValueForLineComponent(objectField, objectInstance);
                     if(objectValue != null){
                         String lineElement = lineComponent.getCompleteLineElement();
-                        entryBase = entryBase.Replace(lineElement, objectValue);
+                        entryBase = Regex.Replace(entryBase, lineElement, objectValue);
                         lineComponent.setIterated(true);
                     }else{
                         lineComponent.setIterated(false);
@@ -536,37 +536,49 @@ namespace Zeus{
             String specElementEntry = specPartial.getEntry();
             int startExpression = specElementEntry.IndexOf(OPENSPEC);
             int endExpression = specElementEntry.IndexOf(ENDSPEC);
-            String expressionElement = specElementEntry.Substring(startExpression + OPENSPEC.Length, endExpression);
+            int startExpressionWith = startExpression + OPENSPEC.Length;
+            int expressionDiff = endExpression - startExpressionWith;
+            Console.WriteLine(startExpression + ":" + startExpressionWith + ":" + endExpression);
+            String expressionElement = specElementEntry.Substring(startExpressionWith, expressionDiff);
+            Console.WriteLine("expression:" + expressionElement);
+            
             String conditionalElement = getConditionalElement(expressionElement);
 
             if(conditionalElement.Equals(""))return false;
 
             String[] expressionElements = expressionElement.Split(conditionalElement);
+            Console.WriteLine("size:" + expressionElements.Length);
+
             String subjectElement = expressionElements[ZERO].Trim();
 
             String[] subjectFieldElements = subjectElement.Split(DOT, 2);
             String activeSubjectFieldElement = subjectFieldElements[ZERO];
+            Console.WriteLine("activeSubjectFieldElement:" + activeSubjectFieldElement);
             String activeSubjectFieldsElement = subjectFieldElements[ONE];
+            Console.WriteLine("activeSubjectFieldsElement:" + activeSubjectFieldsElement);
 
             String predicateElement = expressionElements[ONE].Trim();
+            Console.WriteLine("predicateElement:" + predicateElement);
             Object activeSubjectObject = activeObject;
 
             String predicateValue = null;
             Boolean passesSpecification = false;
-            if(activeSubjectFieldsElement.Contains("()")){
-                String activeMethodName = activeSubjectFieldsElement.Replace("()", "");
-                Object activeMethodObject = resp.get(activeSubjectFieldElement);
-                if(activeMethodObject == null)return false;
-                MethodInfo activeMethod = activeMethodObject.GetType().GetMethod(activeMethodName);
-                Object activeObjectValue = activeMethod.Invoke(activeMethodObject, new Object[]{});
-                if(activeObjectValue == null)return false;
-                String subjectValueVar = (String)(activeObjectValue);
-                int subjectNumericValue = Int32.Parse(subjectValueVar);
+            if(activeSubjectFieldsElement.Contains("Count")){
+                Console.WriteLine("1:" + activeSubjectFieldElement);
+                ArrayList activeFieldObject = (ArrayList) resp.get(activeSubjectFieldElement);
+                Console.WriteLine("2.1:" + activeFieldObject.Count);
+                if(activeFieldObject == null)return false;
+                Console.WriteLine("5:" + activeFieldObject);
+                int subjectNumericValue = activeFieldObject.Count;
+                Console.WriteLine("6:" + activeFieldObject);
                 predicateValue = predicateElement.Replace("'", "");
+                
                 int predicateNumericValue = Int32.Parse(predicateValue);
+                Console.WriteLine("8:" + activeFieldObject);
                 passesSpecification = getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement);
                 return passesSpecification;
             }else{
+                Console.WriteLine("1.1");
                 String[] activeSubjectFieldElements = activeSubjectFieldsElement.Split(DOT);
                 foreach(String activeFieldElement in activeSubjectFieldElements){
                     activeSubjectObject = getObjectValue(activeFieldElement, activeSubjectObject);
@@ -877,12 +889,15 @@ namespace Zeus{
             return iterableResult;
         }
 
-        ArrayList getIterableInitial(String expression, ViewCache httpResponse){
+        ArrayList getIterableInitial(String expression, ViewCache cache){
             int startField = expression.IndexOf("${");
+            int startFieldWith = startField + 2;
             int endField = expression.IndexOf(".", startField);
-            String key = expression.Substring(startField + 2, endField);
-            if(httpResponse.getCache().ContainsKey(key)){
-                Object obj = httpResponse.get(key);
+            int fieldDiff = endField - startFieldWith;
+            String key = expression.Substring(startField, fieldDiff);
+            Console.WriteLine("key: " + key);
+            if(cache.getCache().ContainsKey(key)){
+                Object obj = cache.get(key);
                 Object objList = getIterableRecursive(expression, obj);
                 return (ArrayList) objList;
             }
