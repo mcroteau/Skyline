@@ -182,6 +182,17 @@ namespace Zeus {
             this.specPartialsMap = specPartialsMap;
         }
 
+
+        public DataPartial(String entry){
+            this.guid = System.Guid.NewGuid().ToString();
+            this.field = "";
+            this.entry = entry;
+            this.mojos = new ArrayList();
+            this.components = new ArrayList();
+            this.specPartials = new ArrayList();
+            this.specPartialsMap = new Dictionary<String, DataPartial>();
+        }
+
         public DataPartial(){
             this.guid = System.Guid.NewGuid().ToString();
             this.field = "";

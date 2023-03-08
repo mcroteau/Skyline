@@ -112,11 +112,11 @@ namespace Zeus{
 
         ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
-            foreach(String viewRendererKlass in viewRenderers){
-                Object viewRendererInstance = Activator.CreateInstance(viewRendererKlass.GetType());
+            foreach(Type viewRendererKlass in viewRenderers){
+                ViewRenderer viewRendererInstance = (ViewRenderer) Activator.CreateInstance(typeOf(viewRendererKlass));
 
-                MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
-                String rendererKey = (String) getKey.Invoke(viewRendererInstance);
+                MethodInfo getKey = viewRendererKlass.GetMethod("getKey");
+                String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});
 
                 String openRendererKey = "<" + rendererKey + ">";
                 String completeRendererKey = "<" + rendererKey + "/>";
@@ -128,9 +128,9 @@ namespace Zeus{
                     MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval");
                     MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", NetworkRequest.GetType(), SecurityAttributes.getType());
 
-                    if (isEval.Invoke(viewRendererInstance, nil) &
+                    if (isEval.Invoke(viewRendererInstance, new Object[]{}) &
                             elementEntry.Contains(openRendererKey) &
-                            truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
+                            truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
 
                         for(int moa = tao; moa < elementEntries.Count; moa++){
                             String elementEntryDeux = (String) elementEntries[moa];
@@ -138,9 +138,9 @@ namespace Zeus{
                             if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
-                    if (isEval.Invoke(viewRendererInstance) &
+                    if (isEval.Invoke(viewRendererInstance, new Object[]{}) &
                             elementEntry.Contains(openRendererKey) &
-                            !truthy.Invoke(viewRendererInstance, req, securityAttributes)) {
+                            !truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
                         for(int moa = tao; moa < elementEntries.Count; moa++){
                             String elementEntryDeux = elementEntries.get(moa);
                             elementEntries[mao] = "";
@@ -150,7 +150,7 @@ namespace Zeus{
                     if(!isEval.Invoke(viewRendererInstance) &
                             elementEntry.Contains(completeRendererKey)){
                         MethodInfo render = viewRendererInstance.GetType().GetMethod("render", NetworkRequest, SecurityAttributes);
-                        String rendered = (String) render.Invoke(viewRendererInstance, req, securityAttributes);
+                        String rendered = (String) render.Invoke(viewRendererInstance, new Object[]{req, securityAttributes});
                         elementEntries[tao] =  rendered;
                     }
                 }
@@ -288,7 +288,7 @@ namespace Zeus{
             return entryBaseComplete;
         }
 
-        String getCompleteLineElementResponse(String entryBase, List<LineComponent> lineComponents, ViewCache resp) {
+        String getCompleteLineElementResponse(String entryBase, ArrayList lineComponents, ViewCache resp) {
             foreach(LineComponent lineComponent in lineComponents){
                 String activeObjectField = lineComponent.getActiveField();
                 String objectField = lineComponent.getObjectField();
@@ -330,7 +330,7 @@ namespace Zeus{
 
                         ObjectComponent component = new ObjectComponent();
                         component.setActiveField(iterableResult.getField());
-                        component.setObject(objectInstance);
+                        component.setInstance(objectInstance);
 
                         ArrayList objectComponents = new ArrayList();
                         objectComponents.Add(component);
@@ -358,11 +358,11 @@ namespace Zeus{
 
                                     ObjectComponent componentDeux = new ObjectComponent();
                                     componentDeux.setActiveField(iterableResult.getField());
-                                    componentDeux.setObject(objectInstance);
+                                    componentDeux.setInstance(objectInstance);
 
                                     ObjectComponent componentTrois = new ObjectComponent();
                                     componentTrois.setActiveField(iterableResultDeux.getField());
-                                    componentTrois.setObject(objectDeux);
+                                    componentTrois.setInstance(objectDeux);
 
                                     ArrayList objectComponentsDeux = new ArrayList();
                                     objectComponentsDeux.Add(componentDeux);
@@ -438,7 +438,7 @@ namespace Zeus{
         }
 
         ArrayList getSpecPartials(DataPartial dataPartialLocator, ArrayList dataPartials) {
-            HashSet<DataPartial> specPartials = new HashSet<>();
+            HashSet<DataPartial> specPartials = new HashSet<DataPartial>();
             for(int tao = 0; tao < dataPartials.Count; tao++){
                 int openCount = 0; int endCount = 0;
                 DataPartial dataPartial = (DataPartial) dataPartials[tao];
@@ -465,7 +465,10 @@ namespace Zeus{
 
                 if(openCount > endCount)specPartials.Add(dataPartial);
             }
-            ArrayList specPartialsReady = new ArrayList(specPartials);
+            ArrayList specPartialsReady = new ArrayList();
+            foreach(DataPartial dataPartialComponent in specPartials){
+                specPartialsReady.Add(dataPartialComponent);
+            }
 
             return specPartialsReady;
         }
@@ -504,12 +507,12 @@ namespace Zeus{
                 String basicEntry = basePartial.getEntry();
                 if(basicEntry.Contains(this.ENDEACH))endEach++;
 
-                if(openEach > 3)throw new StargzrException("too many nested <a:foreach>.");
+                if(openEach > 3)throw new UnnamedException("too many nested <a:foreach>.");
                 if(basicEntry.Contains(this.ENDEACH) && endEach == openEach && endEach != 0){
                     return qxro + 1;
                 }
             }
-            throw new StargzrException("missing end </a:foreach>");
+            throw new UnnamedException("missing end </a:foreach>");
         }
 
 
@@ -554,7 +557,7 @@ namespace Zeus{
                 Object activeMethodObject = resp.get(activeSubjectFieldElement);
                 if(activeMethodObject == null)return false;
                 MethodInfo activeMethod = activeMethodObject.GetType().GetMethod(activeMethodName);
-                Object activeObjectValue = activeMethod.Invoke(activeMethodObject);
+                Object activeObjectValue = activeMethod.Invoke(activeMethodObject, new Object[]{});
                 if(activeObjectValue == null)return false;
                 String subjectValueVar = (String)(activeObjectValue);
                 int subjectNumericValue = Int32.Parse(subjectValueVar);
@@ -659,7 +662,7 @@ namespace Zeus{
                         activeSubjectObject = resp.get(subjectField);
                         if (activeSubjectObject == null) return false;
                         MethodInfo activeMethod = activeSubjectObject.GetType().GetMethod(methodName);
-                        Object activeObjectValue = activeMethod.Invoke(activeSubjectObject);
+                        Object activeObjectValue = activeMethod.Invoke(activeSubjectObject, new Object[]{});
                         if (activeObjectValue == null) return false;
                         subjectValue = (String)(activeObjectValue);
                         int subjectNumericValue = Int32.Parse(subjectValue);
@@ -890,7 +893,7 @@ namespace Zeus{
 
         Object getIterableValueRecursive(int idx, String baseField, Object baseObj) {
             String[] fields = baseField.Split("\\.");
-            if(fields.GetLength() > 1){
+            if(fields.Length > 1){
                 idx++;
                 String key = fields[0];
                 FieldInfo fieldObj = baseObj.GetType().GetField(key);
@@ -916,7 +919,7 @@ namespace Zeus{
 
         Object getValueRecursive(int idx, String baseField, Object baseObj) {
             String[] fields = baseField.Split("\\.");
-            if(fields.GetLength() > 1){
+            if(fields.Length > 1){
                 idx++;
                 String key = fields[0];
                 FieldInfo fieldObj = baseObj.GetType().GetField(key);
@@ -997,7 +1000,7 @@ namespace Zeus{
                         String methodName = objectField.Replace("()", "");
                         MethodInfo methodObject = respValue.GetType().GetMethod(methodName);
                         if(methodObject != null) {
-                            objectValue = methodObject.Invoke(respValue);
+                            objectValue = methodObject.Invoke(respValue, new Object[]{});
                         }
                     }else if (isObjectMethod(respValue, objectField)) {
 
@@ -1038,13 +1041,13 @@ namespace Zeus{
             MethodInfo activeMethod = getObjectMethod(respValue, objectField);
             String[] parameters = getMethodParameters(objectField);
             ArrayList values = new ArrayList();
-            for(int foo = 0; foo < parameters.GetLength(); foo++){
+            for(int foo = 0; foo < parameters.Length; foo++){
                 String parameter = parameters[foo].Trim();
                 Object parameterValue = resp.get(parameter);
                 values.Add(parameterValue);
             }
 
-            Object activeObjectValue = activeMethod.Invoke(respValue, values.toArray());
+            Object activeObjectValue = activeMethod.Invoke(respValue, values.ToArray());
             return activeObjectValue;
         }
 
