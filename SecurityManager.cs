@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Zeus;
 public class SecurityManager {
@@ -34,8 +35,8 @@ public class SecurityManager {
     public bool hasRole(String role, NetworkRequest networkRequest){
         String user = getUser(networkRequest);
         if(user != null) {
-            Set<String> roles = securityAccess.getRoles(user);
-            if(roles.contains(role)){
+            HashSet<String> roles = securityAccess.getRoles(user);
+            if(roles.Contains(role)){
                 return true;
             }
         }
@@ -45,8 +46,8 @@ public class SecurityManager {
     public bool hasPermission(String permission, NetworkRequest networkRequest){
         String user = networkRequest.getUserCredential();
         if(user != null) {
-            Set<String> permissions = securityAccess.getPermissions(user);
-            if(permissions.contains(permission)){
+            HashSet<String> permissions = securityAccess.getPermissions(user);
+            if(permissions.Contains(permission)){
                 return true;
             }
         }
@@ -74,7 +75,7 @@ public class SecurityManager {
             }
 
         }catch(Exception ex){
-            ex.StackTrace();
+            Console.WriteLine(ex.StackTrace);
         }
 
         return false;
@@ -90,7 +91,7 @@ public class SecurityManager {
     }
 
     public bool isAuthenticated(NetworkRequest networkRequest){
-        if(!networkRequest.getUserCredential().equals("")){
+        if(!networkRequest.getUserCredential().Equals("")){
             return true;
         }
         return false;

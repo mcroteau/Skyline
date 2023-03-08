@@ -2,6 +2,12 @@ using System;
 
 namespace Zeus{
     public class SecurityAttribute {
+
+        public SecurityAttribute(String name, String value){
+            this.name = name;
+            this.value = value;
+        }
+
         String name;
         String value;
         String expires;
