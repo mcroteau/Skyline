@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Zeus;
 
@@ -27,7 +28,7 @@ namespace Zeus{
         String COMMENT      = "<%--";
         String HTML_COMMENT = "<!--";
 
-        public String execute(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, ArrayList viewRenderers) {
+        public String resolve(String pageElement, ViewCache viewCache, NetworkRequest req, SecurityAttributes securityAttributes, ArrayList viewRenderers) {
             String[] elementEntriesPre = pageElement.Split("\n");
             
             ArrayList elementEntries = new ArrayList();
@@ -112,10 +113,13 @@ namespace Zeus{
 
         ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
-            foreach(Type viewRendererKlass in viewRenderers){
-                ViewRenderer viewRendererInstance = (ViewRenderer) Activator.CreateInstance(typeOf(viewRendererKlass));
+            foreach(String viewRendererKlass in viewRenderers){
+                Console.WriteLine(viewRendererKlass);
+                Object viewRendererInstance = Activator.CreateInstance(typeof(viewRendererKlass), new Object[]{});
 
-                MethodInfo getKey = viewRendererKlass.GetMethod("getKey");
+                Console.WriteLine(viewRendererInstance);
+                
+                MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
                 String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});
 
                 String openRendererKey = "<" + rendererKey + ">";
@@ -125,11 +129,11 @@ namespace Zeus{
                 for(int tao = 0; tao < elementEntries.Count; tao++) {
 
                     String elementEntry = (String) elementEntries[tao];
-                    MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval");
-                    MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", NetworkRequest.GetType(), SecurityAttributes.getType());
+                    MethodInfo isEval = viewRendererInstance.GetType().GetMethod("isEval", new Type[]{});
+                    MethodInfo truthy = viewRendererInstance.GetType().GetMethod("truthy", new Type[]{NetworkRequest.GetType(), SecurityAttributes.GetType()});
 
-                    if (isEval.Invoke(viewRendererInstance, new Object[]{}) &
-                            elementEntry.Contains(openRendererKey) &
+                    if (((Boolean)(isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
+                            elementEntry.Contains(openRendererKey) &&
                             truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
 
                         for(int moa = tao; moa < elementEntries.Count; moa++){
@@ -138,18 +142,18 @@ namespace Zeus{
                             if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
-                    if (isEval.Invoke(viewRendererInstance, new Object[]{}) &
-                            elementEntry.Contains(openRendererKey) &
+                    if (((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{})) &&
+                            elementEntry.Contains(openRendererKey) &&
                             !truthy.Invoke(viewRendererInstance, new Object[]{req, securityAttributes})) {
                         for(int moa = tao; moa < elementEntries.Count; moa++){
-                            String elementEntryDeux = elementEntries.get(moa);
-                            elementEntries[mao] = "";
+                            String elementEntryDeux = (String) elementEntries[moa];
+                            elementEntries[moa] = "";
                             if(elementEntryDeux.Contains(endRendererKey))break;
                         }
                     }
-                    if(!isEval.Invoke(viewRendererInstance) &
+                    if(!(((Boolean)isEval.Invoke(viewRendererInstance, new Object[]{}))) &&
                             elementEntry.Contains(completeRendererKey)){
-                        MethodInfo render = viewRendererInstance.GetType().GetMethod("render", NetworkRequest, SecurityAttributes);
+                        MethodInfo render = viewRendererInstance.GetType().GetMethod("render", new Type[] { NetworkRequest.GetType(), SecurityAttributes.GetType()});
                         String rendered = (String) render.Invoke(viewRendererInstance, new Object[]{req, securityAttributes});
                         elementEntries[tao] =  rendered;
                     }

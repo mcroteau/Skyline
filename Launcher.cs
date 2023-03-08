@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
+using System.Collections;
 using Zeus;
 
 namespace Zeus
@@ -11,6 +12,19 @@ namespace Zeus
     {
         public static int Main(String[] args)
         {
+            ExperienceResolver experienceResolver = new ExperienceResolver();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("${name}");
+
+            ViewCache cache = new ViewCache();
+            cache.set("name", "Dirk");
+
+            ArrayList viewRenderers = new ArrayList();
+            viewRenderers.Add("UsernameRenderer");
+
+            String output = experienceResolver.resolve(sb.ToString(), cache, null, null, viewRenderers);
+            Console.WriteLine(output);
+
             //StartServer();
             return 0;
         }

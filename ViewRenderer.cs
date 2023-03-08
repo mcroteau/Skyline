@@ -5,9 +5,6 @@ namespace Zeus{
 
         String getKey();
 
-        /**
-        * @return true if conditional snipit, false if content is rendered.
-        */
         Boolean isEval();
 
         Boolean truthy(NetworkRequest networkRequest, SecurityAttributes securityAttributes);
