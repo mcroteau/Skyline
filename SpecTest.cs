@@ -15,7 +15,7 @@ namespace Zeus{
             this.securityAttributes = new SecurityAttributes("stargz.r", "secured");
         }
 
-        public void a(){
+        public void A(){
             ViewCache viewCache = this.create();
             ExperienceResolver exp = new ExperienceResolver();
             StringBuilder sb = new StringBuilder();
@@ -33,9 +33,10 @@ namespace Zeus{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"*ned.*jermaine.".Equals(resultFinal))Console.WriteLine("Fail.");
+            if("*ned.*jermaine.".Equals(resultFinal))Console.WriteLine("Pass!");
         }
 
-        public void b() {
+        public void B() {
             ViewCache resp = this.create();
             ExperienceResolver exp = new ExperienceResolver();
             StringBuilder sb = new StringBuilder();
@@ -44,9 +45,10 @@ namespace Zeus{
             sb.Append("</c:if>\n");
             String result = exp.resolve(sb.ToString(), resp, null, securityAttributes, new ArrayList()).Trim();
             if(!"Effort.".Equals(result))Console.WriteLine("Fail.");
+            if("Effort.".Equals(result))Console.WriteLine("Pass!");
         }
 
-        public void c() {
+        public void C() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
             ExperienceResolver exp = new ExperienceResolver();
@@ -55,9 +57,10 @@ namespace Zeus{
             sb.Append("</c:if>\n");
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList()).Trim();
             if(!"".Equals(result))Console.WriteLine("Fail.");
+            if("".Equals(result))Console.WriteLine("Pass!");
         }
 
-        public void d() {
+        public void D() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
             ExperienceResolver exp = new ExperienceResolver();
@@ -73,9 +76,10 @@ namespace Zeus{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"Tom.Penelope.Diego.".Equals(resultFinal))Console.WriteLine("Fail.");
+            if("Tom.Penelope.Diego.".Equals(resultFinal))Console.WriteLine("Pass!");
         }
 
-        public void e() {
+        public void E() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
             ExperienceResolver exp = new ExperienceResolver();
@@ -88,13 +92,14 @@ namespace Zeus{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"not.".Equals(resultFinal))Console.WriteLine("Fail.");
+            if("Tom.Penelope.Diego.".Equals(resultFinal))Console.WriteLine("Pass!");
         }
 
-        public void f() {
+        public void F() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
             ExperienceResolver exp = new ExperienceResolver();
-            sb.Append("<c:if spec=\"${todos.size() > 0}\">\n");
+            sb.Append("<c:if spec=\"${todos.Count > 0}\">\n");
             sb.Append(" <c:foreach items=\"${todos}\" var=\"tdo\">\n");
             sb.Append("     <c:set var=\"selected\" val=\"\" \n");
             sb.Append("     <c:if spec=\"${tdo.title == 'Exercise *1'}\">\n");
@@ -106,15 +111,16 @@ namespace Zeus{
             sb.Append("     </c:foreach>\n");
             sb.Append(" </c:foreach>\n");
             sb.Append("</c:if>\n");
-            sb.Append("<c:if spec=\"${todos.size() == 0}\">\n");
+            sb.Append("<c:if spec=\"${todos.Count == 0}\">\n");
             sb.Append("     everyonealright.\n");
             sb.Append("</c:if>\n");
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"::0->Apache*0,0->Apache*1,0->Apache*2,:selected:1->Apache*0,1->Apache*1,1->Apache*2,::2->Apache*0,2->Apache*1,2->Apache*2,".Equals(resultFinal))Console.WriteLine("Fail.");
+            if("::0->Apache*0,0->Apache*1,0->Apache*2,:selected:1->Apache*0,1->Apache*1,1->Apache*2,::2->Apache*0,2->Apache*1,2->Apache*2,".Equals(resultFinal))Console.WriteLine("Pass!");
         }
 
-        public void g() {
+        public void G() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
             ExperienceResolver exp = new ExperienceResolver();
@@ -126,7 +132,9 @@ namespace Zeus{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"condition.".Equals(resultFinal))Console.WriteLine("Fail.");
+            if("condition.".Equals(resultFinal))Console.WriteLine("*Pass!");
         }
+
         public ViewCache create() {
 
             ViewCache cache = new ViewCache();
@@ -243,11 +251,11 @@ namespace Zeus{
         }
 
         public class Actor {
-            Int32 id;
-            String name;
-            Int32 age;
-            Actor wife;
-            Pet pet;
+            public Int32 id;
+            public String name;
+            public Int32 age;
+            public Actor wife;
+            public Pet pet;
 
             public Int32 getId()
             {
@@ -301,8 +309,8 @@ namespace Zeus{
         }
 
         public class Pet {
-            Int32 id;
-            String name;
+            public Int32 id;
+            public String name;
 
             public Int32 getId()
             {
@@ -327,11 +335,11 @@ namespace Zeus{
         }
 
         public class Person {
-            Int32 id;
-            Int32 todoId;
-            String name;
-            Pet pet;
-            ArrayList pets;
+            public Int32 id;
+            public Int32 todoId;
+            public String name;
+            public Pet pet;
+            public ArrayList pets;
 
             public Int32 getId()
             {
@@ -388,11 +396,11 @@ namespace Zeus{
 
         public class Todo {
 
-            Int64 id;
-            String title;
-            Boolean complete;
-            Person person;
-            ArrayList people;
+            public Int64 id;
+            public String title;
+            public Boolean complete;
+            public Person person;
+            public ArrayList people;
 
             public Int64 getId()
             {

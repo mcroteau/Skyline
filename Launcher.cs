@@ -35,8 +35,7 @@ namespace Zeus
             Console.WriteLine(output);
 
             SpecTest specTest = new SpecTest();
-            specTest.a();
-
+            specTest.A();specTest.B();specTest.C();specTest.D();specTest.E();specTest.F();specTest.G();
 
             //StartServer();
             return 0;
