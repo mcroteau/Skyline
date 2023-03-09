@@ -663,19 +663,14 @@ namespace Zeus{
                         if (!activeSubjectObjectBoolean && falseActive) return true;
                     }
 
-                    if (subjectElement.Contains("()")) {
+                    if (subjectElement.Contains("Count")) {
                         String subjectElements = subjectElement.Replace("()", "");
                         subjectFieldElements = subjectElements.Split(DOT);
                         subjectField = subjectFieldElements[ZERO];
-                        String methodName = subjectFieldElements[ONE];
-                        activeSubjectObject = cache.get(subjectField);
-                        if (activeSubjectObject == null) return false;
-                        MethodInfo activeMethod = activeSubjectObject.GetType().GetMethod(methodName);
-                        Object activeObjectValue = activeMethod.Invoke(activeSubjectObject, new Object[]{});
-                        if (activeObjectValue == null) return false;
-                        subjectValue = (String)(activeObjectValue);
-                        int subjectNumericValue = Int32.Parse(subjectValue);
-                        int predicateNumericValue = Int32.Parse(predicateElementClean);
+                        ArrayList activeArrayList = (ArrayList)cache.get(subjectField);
+                        if (activeArrayList == null) return false;
+                        int subjectNumericValue = activeArrayList.Count;
+                        int predicateNumericValue = int.Parse(predicateElementClean);
                         if(getValidation(subjectNumericValue, predicateNumericValue, conditionalElement, expressionElement))return true;
                         return false;
                     }
@@ -686,6 +681,7 @@ namespace Zeus{
 
                     activeSubjectFieldElements = activeSubjectFields.Split(DOT);
                     activeSubjectObject = cache.get(subjectField);
+
                     if (activeSubjectObject == null) return false;
 
                     foreach(String activeFieldElement in activeSubjectFieldElements) {
@@ -913,7 +909,7 @@ namespace Zeus{
         }
 
         Object getIterableValueRecursive(int idx, String baseField, Object baseObj) {
-            String[] fields = baseField.Split("\\.");
+            String[] fields = baseField.Split(".");
             if(fields.Length > 1){
                 idx++;
                 String key = fields[0];
@@ -939,7 +935,7 @@ namespace Zeus{
         }
 
         Object getValueRecursive(int idx, String baseField, Object baseObj) {
-            String[] fields = baseField.Split("\\.");
+            String[] fields = baseField.Split(".");
             if(fields.Length > 1){
                 idx++;
                 String key = fields[0];
@@ -979,7 +975,7 @@ namespace Zeus{
                 String activeField = cleanElement;
                 String objectField = "";
                 if(cleanElement.Contains(".")) {
-                    String[] elements = cleanElement.Split("\\.", 2);
+                    String[] elements = cleanElement.Split(".", 2);
                     activeField = elements[0];
                     objectField = elements[1];
                 }
@@ -1109,7 +1105,7 @@ namespace Zeus{
         String getObjectValueForLineComponent(String objectField, Object objectInstance){
 
             if(objectField.Contains(".")){
-                String[] objectFields = objectField.Split("\\.");
+                String[] objectFields = objectField.Split(".");
 
                 Object activeObject = objectInstance;
                 foreach(String activeObjectField in objectFields){
@@ -1117,14 +1113,14 @@ namespace Zeus{
                 }
 
                 if(activeObject == null)return "";
-                return (String)(activeObject);
+                return activeObject.ToString();
             }else {
                 if(hasDeclaredField(objectField, objectInstance)) {
                     Object objectValue = getObjectValue(objectField, objectInstance);
                     if (objectValue == null) return null;
-                    return (String)(objectValue);
+                    return objectValue.ToString();
                 }else{
-                    return (String)(objectInstance);
+                    return objectInstance.ToString();
                 }
             }
         }
@@ -1138,7 +1134,6 @@ namespace Zeus{
         }
 
         Object getObjectValue(String objectField, Object objectInstance){
-            Console.WriteLine(objectField + ":" + objectInstance);
             FieldInfo fieldObject = objectInstance.GetType().GetField(objectField);
             Object objectValue = fieldObject.GetValue(objectInstance);
             return objectValue;

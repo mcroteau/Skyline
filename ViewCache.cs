@@ -6,6 +6,9 @@ namespace Zeus{
         Dictionary<String, Object> cache;
 
         public void set(String key, Object value){
+            if(this.cache.ContainsKey(key)){
+                this.cache.Remove(key);
+            }
             this.cache.Add(key, value);
         }
         public Object get(String key){
