@@ -34,6 +34,10 @@ namespace Zeus
             String output = experienceResolver.resolve(sb.ToString(), cache, null, null, null);
             Console.WriteLine(output);
 
+            SpecTest specTest = new SpecTest();
+            specTest.a();
+
+
             //StartServer();
             return 0;
         }
