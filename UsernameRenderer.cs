@@ -1,10 +1,10 @@
 using System;
-using Zeus;
-using Zeus.Model;
-using Zeus.Security;
-using Zeus.Implement;
+using Tiger;
+using Tiger.Model;
+using Tiger.Security;
+using Tiger.Implement;
 
-namespace Zeus{
+namespace Tiger{
     public class UsernameRenderer : ViewRenderer {
         public String getKey(){
             return "zeus:user";

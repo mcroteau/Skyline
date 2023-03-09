@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-using Zeus;
-using Zeus.Model;
-using Zeus.Security;
-using Zeus.Implement;
+using Tiger;
+using Tiger.Model;
+using Tiger.Security;
+using Tiger.Implement;
 
-namespace Zeus.Model {
+namespace Tiger.Model {
     public class RouteAttributes {
 
         public RouteAttributes(){

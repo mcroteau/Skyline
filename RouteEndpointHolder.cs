@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Zeus.Model;
+using Tiger.Model;
 
-namespace Zeus{
+namespace Tiger{
     public class RouteEndpointHolder {
         Dictionary<String, RouteEndpoint> routeEndpoints;
 

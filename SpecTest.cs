@@ -3,11 +3,11 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Zeus;
-using Zeus.Model;
-using Zeus.Security;
+using Tiger;
+using Tiger.Model;
+using Tiger.Security;
 
-namespace Zeus{
+namespace Tiger{
 
     public class SpecTest{
 

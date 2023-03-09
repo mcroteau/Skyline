@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Zeus.Security;
+using Tiger.Security;
 
-namespace Zeus.Model {
+namespace Tiger.Model {
 
     public class NetworkResponse {
         public NetworkResponse(){

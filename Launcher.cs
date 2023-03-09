@@ -4,10 +4,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 using System.Collections;
-using Zeus;
-using Zeus.Model;
+using Tiger;
+using Tiger.Model;
 
-namespace Zeus
+namespace Tiger
 {
     class Launcher
     {

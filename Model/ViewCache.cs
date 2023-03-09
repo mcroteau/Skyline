@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zeus.Model {
+namespace Tiger.Model {
     public class ViewCache {
         Dictionary<String, Object> cache;
 

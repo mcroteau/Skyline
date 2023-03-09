@@ -1,6 +1,6 @@
 using System;
 
-namespace Zeus{
+namespace Tiger{
     public class SchemaConfig {
         String schema;
         String environment;

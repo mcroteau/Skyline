@@ -1,6 +1,6 @@
 using System;
 
-namespace Zeus.Model {
+namespace Tiger.Model {
     public class RouteAttribute {
 
         String qualifiedName;

@@ -5,12 +5,12 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Zeus;
-using Zeus.Model;
-using Zeus.Implement;
-using Zeus.Security;
+using Tiger;
+using Tiger.Model;
+using Tiger.Implement;
+using Tiger.Security;
 
-namespace Zeus{
+namespace Tiger{
 
     public class ExperienceResolver {
 
@@ -121,7 +121,7 @@ namespace Zeus{
         // ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
         //     foreach(String viewRendererKlass in viewRenderers){
-        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Zeus", viewRendererKlass);
+        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Tiger", viewRendererKlass);
                 
         //         MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
         //         String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});

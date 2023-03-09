@@ -2,11 +2,11 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using Zeus;
-using Zeus.Model;
-using Zeus.Implement;
+using Tiger;
+using Tiger.Model;
+using Tiger.Implement;
 
-namespace Zeus.Security{
+namespace Tiger.Security{
     public class SecurityManager {
         public SecurityManager(SecurityAccess securityAccess) {
             this.securityAccess = securityAccess;

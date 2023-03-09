@@ -1,10 +1,10 @@
 using System;
 
-using Zeus;
-using Zeus.Model;
-using Zeus.Security;
+using Tiger;
+using Tiger.Model;
+using Tiger.Security;
 
-namespace Zeus.Implement {
+namespace Tiger.Implement {
     public interface ViewRenderer {
 
         String getKey();

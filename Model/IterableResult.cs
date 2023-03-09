@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Zeus.Model {
+namespace Tiger.Model {
     public class IterableResult {
         String field;
         String key;
