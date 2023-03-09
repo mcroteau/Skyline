@@ -1,6 +1,6 @@
 using System;
 
-namespace Zeus{
+namespace Zeus.Model {
     public class RouteAttribute {
 
         String qualifiedName;

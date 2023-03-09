@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Zeus{
+namespace Zeus.Model {
     public class RouteEndpoint {
         public RouteEndpoint(){
             this.routeAttributes = new Dictionary<String, RouteAttribute>();

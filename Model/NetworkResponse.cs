@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zeus{
+using Zeus.Security;
+
+namespace Zeus.Model {
 
     public class NetworkResponse {
         public NetworkResponse(){

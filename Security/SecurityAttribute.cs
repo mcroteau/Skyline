@@ -1,6 +1,6 @@
 using System;
 
-namespace Zeus{
+namespace Zeus.Security {
     public class SecurityAttribute {
 
         public SecurityAttribute(String name, String value){

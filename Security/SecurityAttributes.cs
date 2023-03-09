@@ -1,4 +1,4 @@
-namespace Zeus{
+namespace Zeus.Security {
     public class SecurityAttributes {
         public SecurityAttributes(string securityElement, string securedAttribute) {
             this.securityElement = securityElement;

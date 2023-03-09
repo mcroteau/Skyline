@@ -4,6 +4,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using Zeus;
+using Zeus.Model;
+using Zeus.Security;
 
 namespace Zeus{
 

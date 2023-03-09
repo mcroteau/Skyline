@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Zeus.Model;
+
 namespace Zeus{
     public class RouteEndpointHolder {
         Dictionary<String, RouteEndpoint> routeEndpoints;

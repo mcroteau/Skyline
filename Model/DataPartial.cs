@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Zeus {
+namespace Zeus.Model {
         
     public class DataPartial {
         int idx;

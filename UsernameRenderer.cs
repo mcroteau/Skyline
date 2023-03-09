@@ -1,5 +1,8 @@
 using System;
 using Zeus;
+using Zeus.Model;
+using Zeus.Security;
+using Zeus.Implement;
 
 namespace Zeus{
     public class UsernameRenderer : ViewRenderer {

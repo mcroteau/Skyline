@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zeus{
+using Zeus;
+using Zeus.Model;
+using Zeus.Security;
+using Zeus.Implement;
+
+namespace Zeus.Model {
     public class RouteAttributes {
 
         public RouteAttributes(){

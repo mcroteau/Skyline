@@ -1,6 +1,10 @@
 using System;
 
-namespace Zeus{
+using Zeus;
+using Zeus.Model;
+using Zeus.Security;
+
+namespace Zeus.Implement {
     public interface ViewRenderer {
 
         String getKey();

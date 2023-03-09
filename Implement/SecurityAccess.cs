@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zeus{
+namespace Zeus.Implement {
 
     public interface SecurityAccess {
         /**

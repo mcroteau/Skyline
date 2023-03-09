@@ -1,2 +1,2 @@
-mcs -out:Launcher.exe -pkg:dotnet *.cs
+mcs -out:Launcher.exe -recurse:'*.cs'
 mono Launcher.exe

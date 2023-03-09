@@ -1,6 +1,6 @@
 using System;
 
-namespace Zeus{
+namespace Zeus.Model {
     public class RequestComponent {
         String name;
         String value;
