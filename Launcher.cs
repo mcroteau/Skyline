@@ -38,7 +38,7 @@ namespace Tiger
             SpecTest specTest = new SpecTest();
             specTest.A();specTest.B();specTest.C();specTest.D();specTest.E();specTest.F();specTest.G();
 
-            //StartServer();
+            StartServer();
             return 0;
         }
 
