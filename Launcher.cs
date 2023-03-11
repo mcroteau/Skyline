@@ -39,7 +39,8 @@ namespace Tiger
             SpecTest specTest = new SpecTest();
             specTest.A();specTest.B();specTest.C();specTest.D();specTest.E();specTest.F();specTest.G();
 
-            StartServer();
+            AeonFlux aeonFlux = new AeonFlux(1301);
+            aeonFlux.Start();
             return 0;
         }
 
@@ -65,8 +66,8 @@ namespace Tiger
                 listener.Listen(1);
 
                 Console.WriteLine("Waiting for a connection...");
-
-                ThreadPool.SetMaxThreads(1000, 0);
+                
+                ThreadPool.SetMinThreads(1000, 1000);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
                 
             }
@@ -90,8 +91,7 @@ namespace Tiger
 
             var utf8 = new UTF8Encoding();
             
-            while (true)
-            {
+            while (true){
                 bytes = new byte[1024];
                 int bytesRec = handler.Receive(bytes);
                 Console.WriteLine(bytesRec);
@@ -104,12 +104,8 @@ namespace Tiger
             handler.Send(resp);
             handler.Close();
 
-            Console.WriteLine(data);
-
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
         }    
-
-
     
         static string GetBytesToStringConverted(byte[] bytes){
             MemoryStream stream = new MemoryStream(bytes);
