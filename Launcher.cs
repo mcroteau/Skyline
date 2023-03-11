@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 using System.Collections;
+using System.Threading;
 using Tiger;
 using Tiger.Model;
 
@@ -42,6 +43,8 @@ namespace Tiger
             return 0;
         }
 
+        static Socket listener;
+
         public static void StartServer()
         {
             // Get Host IP Address that is used to establish a connection
@@ -54,7 +57,7 @@ namespace Tiger
             try {
 
                 // Create a Socket that will use Tcp protocol
-                Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 // A Socket must be associated with an endpoint using the Bind method
                 listener.Bind(localEndPoint);
                 // Specify how many requests a Socket can listen before it gives Server busy response.
@@ -62,35 +65,10 @@ namespace Tiger
                 listener.Listen(1);
 
                 Console.WriteLine("Waiting for a connection...");
-                Socket handler = listener.Accept();
 
-                // Incoming data from the client.
-                string data = null;
-                byte[] bytes = null;
-
-                var utf8 = new UTF8Encoding();
+                ThreadPool.SetMaxThreads(1000, 0);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
                 
-                while (true)
-                {
-                    bytes = new byte[1024];
-                    int bytesRec = handler.Receive(bytes);
-                    Console.WriteLine(bytesRec);
-                    string info = GetBytesToStringConverted(bytes);
-                    Console.WriteLine("{0}", info);
-                    if(bytesRec < bytes.Length)break;
-                }
-                
-                DataPartial dataPartial = new DataPartial();
-                dataPartial.setEntry("spock");
-                Console.WriteLine(dataPartial.getEntry());
-
-                byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-                handler.Send(resp);
-                
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-
-                Console.WriteLine(data);
             }
             catch (Exception e)
             {
@@ -100,7 +78,39 @@ namespace Tiger
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
         }
-        
+
+        static void ExecuteRequest(Object stateInfo){
+            
+            Console.WriteLine("Hello from the thread pool.");
+            Socket handler = listener.Accept();
+
+            // Incoming data from the client.
+            string data = null;
+            byte[] bytes = null;
+
+            var utf8 = new UTF8Encoding();
+            
+            while (true)
+            {
+                bytes = new byte[1024];
+                int bytesRec = handler.Receive(bytes);
+                Console.WriteLine(bytesRec);
+                string info = GetBytesToStringConverted(bytes);
+                Console.WriteLine("{0}", info);
+                if(bytesRec < bytes.Length)break;
+            }
+
+            byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
+            handler.Send(resp);
+            handler.Close();
+
+            Console.WriteLine(data);
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+        }    
+
+
+    
         static string GetBytesToStringConverted(byte[] bytes){
             MemoryStream stream = new MemoryStream(bytes);
             StreamReader streamReader = new StreamReader(stream);
