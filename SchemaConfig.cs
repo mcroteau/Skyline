@@ -1,6 +1,6 @@
 using System;
 
-namespace Tiger{
+namespace AeonFlux{
     public class SchemaConfig {
         String schema;
         String environment;

@@ -2,11 +2,11 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using Tiger;
-using Tiger.Model;
-using Tiger.Implement;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux.Implement;
 
-namespace Tiger.Security{
+namespace AeonFlux.Security{
     public class SecurityManager {
         public SecurityManager(SecurityAccess securityAccess) {
             this.securityAccess = securityAccess;

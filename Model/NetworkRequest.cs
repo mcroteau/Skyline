@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Tiger.Security;
+using AeonFlux.Security;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
     public class NetworkRequest {
         public NetworkRequest() {
             this.headers = new Dictionary<String, String>();

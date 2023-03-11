@@ -1,4 +1,4 @@
-namespace Tiger.Security {
+namespace AeonFlux.Security {
     public class SecurityAttributes {
         public SecurityAttributes(string securityElement, string securedAttribute) {
             this.securityElement = securityElement;

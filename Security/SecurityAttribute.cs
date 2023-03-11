@@ -1,6 +1,6 @@
 using System;
 
-namespace Tiger.Security {
+namespace AeonFlux.Security {
     public class SecurityAttribute {
 
         public SecurityAttribute(String name, String value){

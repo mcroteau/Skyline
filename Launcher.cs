@@ -5,10 +5,11 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using System.Threading;
-using Tiger;
-using Tiger.Model;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux;
 
-namespace Tiger{
+namespace AeonFlux{
     class Launcher{
         public static int Main(String[] args){
             AeonFlux aeonFlux = new AeonFlux(1301);

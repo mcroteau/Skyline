@@ -3,11 +3,11 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Tiger;
-using Tiger.Model;
-using Tiger.Security;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux.Security;
 
-namespace Tiger.Specs{
+namespace AeonFlux.Specs{
 
     public class SpecTest{
 

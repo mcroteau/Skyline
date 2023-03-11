@@ -1,7 +1,7 @@
 using System;
 using LiteDB;
 
-namespace Tiger{
+namespace AeonFlux{
     public class DataAccess{
         
         LiteDatabase db;

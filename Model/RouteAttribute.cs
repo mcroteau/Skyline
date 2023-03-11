@@ -1,6 +1,6 @@
 using System;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
     public class RouteAttribute {
 
         String qualifiedName;

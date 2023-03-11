@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Tiger.Model;
+using AeonFlux.Model;
 
-namespace Tiger{
+namespace AeonFlux{
     public class RouteEndpointHolder {
         Dictionary<String, RouteEndpoint> routeEndpoints;
 

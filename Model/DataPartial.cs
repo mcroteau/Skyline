@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
         
     public class DataPartial {
         int idx;

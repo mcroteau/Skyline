@@ -1,7 +1,7 @@
 using System;
-using Tiger.Schemes;
+using AeonFlux.Schemes;
 
-namespace Tiger{
+namespace AeonFlux{
     public class ViewConfig{
         public ViewConfig(){
             this.viewsPath = "webapp";

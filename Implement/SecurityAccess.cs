@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tiger.Implement {
+namespace AeonFlux.Implement {
 
     public interface SecurityAccess {
         /**

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
     public class ViewCache {
         Dictionary<String, Object> cache;
 

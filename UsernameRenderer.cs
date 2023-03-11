@@ -1,10 +1,10 @@
 using System;
-using Tiger;
-using Tiger.Model;
-using Tiger.Security;
-using Tiger.Implement;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux.Security;
+using AeonFlux.Implement;
 
-namespace Tiger{
+namespace AeonFlux{
     public class UsernameRenderer : ViewRenderer {
         public String getKey(){
             return "zeus:user";

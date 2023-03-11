@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-using Tiger;
-using Tiger.Model;
-using Tiger.Security;
-using Tiger.Implement;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux.Security;
+using AeonFlux.Implement;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
     public class RouteAttributes {
 
         public RouteAttributes(){

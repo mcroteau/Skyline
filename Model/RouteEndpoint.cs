@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Tiger.Model {
+namespace AeonFlux.Model {
     public class RouteEndpoint {
         public RouteEndpoint(){
             this.routeAttributes = new Dictionary<String, RouteAttribute>();

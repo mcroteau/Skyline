@@ -1,52 +1,17 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
-using Tiger;
-using Tiger.Specs;
+using AeonFlux;
+using AeonFlux.Specs;
 
 namespace AeonFlux{
     public class AeonHelper{
 
         public String getGuid(int n) {
-            String CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-            StringBuilder guid = new StringBuilder();
-            int divisor = n/4;
-            Random rnd = new Random();
-            for(int z = 0; z < n;  z++) {
-                if( z % divisor == 0 && z > 0) {
-                    guid.append("-");
-                }
-                int index = (int) (rnd.nextFloat() * CHARS.length());
-                guid.append(CHARS.charAt(index));
-            }
-            return guid.toString();
-        }
-
-        public String getDefaultGuid(int n) {
-            String CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-            StringBuilder guid = new StringBuilder();
-            Random rnd = new Random();
-            for(int z = 0; z < n;  z++) {
-                int index = (int) (rnd.nextFloat() * CHARS.length());
-                guid.append(CHARS.charAt(index));
-            }
-            return guid.toString();
-        }
-
-        public String getSecurityGuid(int n) {
-            String CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-            StringBuilder guid = new StringBuilder();
-            int divisor = n/4;
-            Random rnd = new Random();
-            for(int z = 0; z < n;  z++) {
-                if( z % divisor == 0 && z > 0) {
-                    guid.append(".");
-                }
-                int index = (int) (rnd.nextFloat() * CHARS.length());
-                guid.append(CHARS.charAt(index));
-            }
-            return guid.toString();
+            Guid g = Guid.NewGuid();
+            return g.ToString();
         }
 
         public int getTime(int days){
@@ -56,15 +21,15 @@ namespace AeonFlux{
 
         public String getSecurityAttribute(Dictionary<String, String> headers, String id){
             String value = null;
-            String cookies = headers.get("cookie");
+            String cookies = headers.GetValueOrDefault("cookie", "");
             if(cookies != null) {
-                String[] bits = cookies.split(";");
+                String[] bits = cookies.Split(";");
                 foreach(String completes in bits) {
-                    String[] parts = completes.split("=");
-                    String key = parts[0].trim();
-                    if (parts.length == 2) {
-                        if (key.equals(id)) {
-                            value = parts[1].trim();
+                    String[] parts = completes.Split("=");
+                    String key = parts[0].Trim();
+                    if (parts.Length == 2) {
+                        if (key.Equals(id)) {
+                            value = parts[1].Trim();
                         }
                     }
                 }
@@ -73,22 +38,23 @@ namespace AeonFlux{
         }
 
         public String getRedirect(String uri){
-            String[] redirectBits = uri.split(":");
-            if(redirectBits.length > 1)return redirectBits[1];
+            String[] redirectBits = uri.Split(":");
+            if(redirectBits.Length > 1)return redirectBits[1];
             return null;
         }
 
         public byte[] getViewFileCopy(String viewKey, Dictionary<String, byte[]> viewBytesMap) {
             if(viewBytesMap.ContainsKey(viewKey)){
-                byte[] byteArray = viewBytesMap.Get(viewKey);
-                byte[] byteArrayCopy = new byte[byteArray.GetLength()];
+                byte[] byteArray = viewBytesMap.GetValueOrDefault(viewKey, new byte[]{});
+                byte[] byteArrayCopy = new byte[byteArray.GetLength(0)];
                 int indx = 0;
                 foreach(byte b in byteArray){
                     byteArrayCopy[indx] = b;
                     indx++;
                 }
+                return byteArrayCopy;
             }
-            return byteArrayCopy;
+            return new byte[]{};
         }
 
         public Dictionary<String, byte[]> getViewBytesMap(ViewConfig viewConfig) {
@@ -132,7 +98,7 @@ namespace AeonFlux{
                     viewFilesBytesMap.Add(viewKey, viewFileBytes);
 
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    Console.WriteLine(ex.Message);
                 }
             }
             return viewFilesBytesMap;

@@ -1,6 +1,6 @@
 using System;
 
-namespace Tiger{
+namespace AeonFlux{
 
     public class PersistenceConfig {
         public PersistenceConfig(){

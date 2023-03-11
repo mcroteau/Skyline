@@ -1,10 +1,10 @@
 using System;
 
-using Tiger;
-using Tiger.Model;
-using Tiger.Security;
+using AeonFlux;
+using AeonFlux.Model;
+using AeonFlux.Security;
 
-namespace Tiger.Implement {
+namespace AeonFlux.Implement {
     public interface ViewRenderer {
 
         String getKey();

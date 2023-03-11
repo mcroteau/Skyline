@@ -6,8 +6,8 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 
-using Tiger;
-using Tiger.Specs;
+using AeonFlux;
+using AeonFlux.Specs;
 
 namespace AeonFlux{
 
@@ -92,7 +92,7 @@ namespace AeonFlux{
                 Console.WriteLine("Ready!");
 
             }catch(Exception ex){
-                ex.printStackTrace();
+                Console.WriteLine(ex.Message);
             }
         }
 
