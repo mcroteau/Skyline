@@ -32,7 +32,7 @@ namespace Tiger.Implement {
         */
         HashSet<String> getPermissions(String user);
 
-        void setDao(Dao dao);
+        void setDataAccess(DataAccess dao);
     }
 
 }

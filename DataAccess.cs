@@ -2,11 +2,11 @@ using System;
 using LiteDB;
 
 namespace Tiger{
-    public class Dao{
+    public class DataAccess{
         
         LiteDatabase db;
 
-        public Dao(string databaseUri){
+        public DataAccess(string databaseUri){
             this.db = new LiteDatabase(databaseUri);
         }
 

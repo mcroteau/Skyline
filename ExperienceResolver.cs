@@ -5,12 +5,12 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Tiger;
-using Tiger.Model;
-using Tiger.Implement;
-using Tiger.Security;
+using Hippo;
+using Hippo.Model;
+using Hippo.Implement;
+using Hippo.Security;
 
-namespace Tiger{
+namespace Hippo{
 
     public class ExperienceResolver {
 
@@ -121,7 +121,7 @@ namespace Tiger{
         // ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
         //     foreach(String viewRendererKlass in viewRenderers){
-        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Tiger", viewRendererKlass);
+        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Hippo", viewRendererKlass);
                 
         //         MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
         //         String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});

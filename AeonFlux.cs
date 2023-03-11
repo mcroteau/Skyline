@@ -6,39 +6,29 @@ public class AeonFlux {
 
     int port;
     String PROPERTIES;
-    String RENDERING_SCHEME;
 
     ViewConfig viewConfig;
     PropertiesConfig propertiesConfig;
     Integer numberOfPartitions = 3;
     Integer numberOfRequestExecutors = 7;
-    PersistenceConfig persistenceConfig;
-    Class<?> securityAccessKlass;
+    String securityAccessKlass;
+
+    Socket listener;
 
     public AeonFlux(){
         this.port = 1301;
         this.PROPERTIES = "system.properties";
         this.viewConfig = new ViewConfig();
-        this.viewRenderers = new ArrayList();
     }
 
     public AeonFlux(int port){
         this.port = port;
         this.PROPERTIES = "system.properties";
         this.viewConfig = new ViewConfig();
-        this.viewRenderers = new ArrayList<>();
     }
 
     public void Start(){
         try {
-
-            if (persistenceConfig != null &&
-                    persistenceConfig.getSchemaConfig() != null &&
-                    persistenceConfig.getSchemaConfig().getEnvironment().equals(Environments.DEVELOPMENT)) {
-                DatabaseEnvironmentManager databaseEnvironmentManager = new DatabaseEnvironmentManager();
-                databaseEnvironmentManager.setPersistenceConfig(persistenceConfig);
-                databaseEnvironmentManager.configure();
-            }
 
             StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
             startupAnnotationInspector.inspect();
@@ -54,29 +44,79 @@ public class AeonFlux {
             RouteAttributes routeAttributes = routeAttributesResolver.resolve();
             AnnotationComponent serverStartup = componentsHolder.getServerStartup();
 
-            StargzrResources stargzrResources = new StargzrResources();
+            AeonHelper aeonHelper = new AeonHelper();
 
             String resourcesDirectory = viewConfig.getResourcesPath();
-            ConcurrentMap<String, byte[]> viewBytesMap = stargzrResources.getViewBytesMap(viewConfig);
+            Dictionary<String, byte[]> viewBytesMap = aeonHelper.getViewBytesMap(viewConfig);
 
             Log.info("Running startup routine, please wait...");
             if (serverStartup != null) {
-                Method startupMethod = serverStartup.getKlass().getMethod("startup");
-                Object startupObject = serverStartup.getKlass().getConstructor().newInstance();
-                startupMethod.invoke(startupObject);
+                Method startupMethod = serverStartup.GetType().getMethod("startup");
+                Object startupObject = serverStartup.GetType().getConstructor().newInstance();
+                startupMethod.Invoke(startupObject);
             }
 
             Log.info("Registering network request negotiators, please wait...\n");
-            ServerSocket serverSocket = new ServerSocket(port);
-            serverSocket.setPerformancePreferences(0, 1, 2);
-            ExecutorService executors = Executors.newFixedThreadPool(numberOfPartitions);
-            executors.execute(new PartitionExecutor(viewConfig.getRenderingScheme(), numberOfRequestExecutors, resourcesDirectory, routeAttributes, viewConfig, viewBytesMap, serverSocket, persistenceConfig, viewRenderers, securityAccessKlass));
+IPHostEntry host = Dns.GetHostEntry("localhost");
+            IPAddress ipAddress = host.AddressList[0];
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 8900);
 
-            Log.info("Ready!");
+            try {
 
-        }catch(IOException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException | StargzrException ex){
+                // Create a Socket that will use Tcp protocol
+                listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                // A Socket must be associated with an endpoint using the Bind method
+                listener.Bind(localEndPoint);
+                // Specify how many requests a Socket can listen before it gives Server busy response.
+                // We will listen 10 requests at a time
+                listener.Listen(1);
+                
+                ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
+                
+                for(int partitions = 0; partitions < numberOfPartitions; partitions++){
+                    Console.WriteLine("registered request executor..");
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+                }
+                
+            }catch (Exception e){
+                Console.WriteLine(e.ToString());
+            }
+
+            Console.WriteLine("Ready!");
+
+        }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+    public void ExecuteRequest(Object stateInfo){
+        
+        Console.WriteLine("Hello from the thread pool.");
+        Socket handler = listener.Accept();
+
+        // Incoming data from the client.
+        string data = null;
+        byte[] bytes = null;
+
+        var utf8 = new UTF8Encoding();
+        
+        while (true){
+            bytes = new byte[1024 * 3];
+            int bytesRec = handler.Receive(bytes);
+            string info = GetBytesToStringConverted(bytes);
+            if(bytesRec < bytes.Length)break;
+        }
+
+        byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
+        handler.Send(resp);
+        handler.Close();
+
+        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+    }    
+
+    static string GetBytesToStringConverted(byte[] bytes){
+        MemoryStream stream = new MemoryStream(bytes);
+        StreamReader streamReader = new StreamReader(stream);
+        return streamReader.ReadToEnd();
     }
 
     public void setPropertiesConfig(PropertiesConfig propertiesConfig){

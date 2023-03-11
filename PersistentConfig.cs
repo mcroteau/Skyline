@@ -6,25 +6,11 @@ namespace Tiger{
         public PersistenceConfig(){
             this.debug = false;
         }
-        SchemaConfig schemaConfig;
         Boolean debug;
-        String url;
-        String driver;
-        String user;
-        String password;
-        int connections;
+        String environment;
+        String modelsPath;
 
-        public SchemaConfig getSchemaConfig()
-        {
-            return this.schemaConfig;
-        }
-
-        public void setSchemaConfig(SchemaConfig schemaConfig)
-        {
-            this.schemaConfig = schemaConfig;
-        }
-
-        public Boolean isDebug()
+        public Boolean getDebug()
         {
             return this.debug;
         }
@@ -34,56 +20,27 @@ namespace Tiger{
             this.debug = debug;
         }
 
-        public String getUrl()
+        public String getEnvironment()
         {
-            return this.url;
+            return this.environment;
         }
 
-        public void setUrl(String url)
+        public void setEnvironment(String environment)
         {
-            this.url = url;
+            this.environment = environment;
         }
 
-        public String getDriver()
+        public String getModelsPath()
         {
-            return this.driver;
+            return this.modelsPath;
         }
 
-        public void setDriver(String driver)
+        public void setModelsPath(String modelsPath)
         {
-            this.driver = driver;
+            this.modelsPath = modelsPath;
         }
 
-        public String getUser()
-        {
-            return this.user;
-        }
 
-        public void setUser(String user)
-        {
-            this.user = user;
-        }
-
-        public String getPassword()
-        {
-            return this.password;
-        }
-
-        public void setPassword(String password)
-        {
-            this.password = password;
-        }
-
-        public int getConnections()
-        {
-            return this.connections;
-        }
-
-        public void setConnections(int connections)
-        {
-            this.connections = connections;
-        }
 
     }
-
 }
