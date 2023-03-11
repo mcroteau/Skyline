@@ -85,67 +85,48 @@ public class AeonHelper{
                 indx++;
             }
         }
-
         return byteArrayCopy;
-
-        // Stream dest = new Stream();
-        // Stream source = File.OpenRead(path)) {
-        //     byte[] buffer = new byte[1024 * 3];
-        //     int bytesRead;
-        //     while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
-        //         dest.Write(buffer, 0, bytesRead);
-        //     }
-        // }
-
     }
 
-    public ConcurrentMap<String, byte[]> getViewBytesMap(ViewConfig viewConfig) {
-        ConcurrentMap<String, byte[]> viewFilesBytesMap = new ConcurrentHashMap<>();
+    public Dictionary<String, byte[]> getViewBytesMap(ViewConfig viewConfig) {
+        Dictionary<String, byte[]> viewFilesBytesMap = new Dictionary<String, byte[]>();
 
-        Path viewsPath = Paths.get("src", "main", viewConfig.getViewsPath());
-        File viewsDirectory = new File(viewsPath.toString());
-
-        if(viewsDirectory.isDirectory()) {
-            File[] viewFiles = viewsDirectory.listFiles();
+        if(Directory.Exists(viewConfig.getViewsPath())){
+            File[] viewFiles = Directory.GetFiles(viewConfig.getViewsPath());
             getFileBytesMap(viewFiles, viewConfig, viewFilesBytesMap);
         }
 
-        Path resourcesPath = Paths.get("src", "main", viewConfig.getViewsPath(), viewConfig.getResourcesPath());
-        File resourcesDirectory = new File(resourcesPath.toString());
-
-        if(resourcesDirectory.isDirectory()) {
-            File[] resourceFiles = resourcesDirectory.listFiles();
+        if(resourcesDirectory.isDirectory(viewConfig.getResourcesPath())) {
+            File[] resourceFiles = Directory.GetFiles(viewConfig.getResourcesPath());
             getFileBytesMap(resourceFiles, viewConfig, viewFilesBytesMap);
         }
 
         return viewFilesBytesMap;
     }
 
-    Dictionary<String, byte[]> getFileBytesMap(File[] viewFiles, ViewConfig viewConfig, Dictionary<String, byte[]> viewFilesBytesMap){
-        foreach(File viewFile in viewFiles) {
-
-            if(viewFile.isDirectory()){
-                File[] directoryFiles = viewFile.listFiles();
+    Dictionary<String, byte[]> getFileBytesMap(String[] viewFiles, ViewConfig viewConfig, Dictionary<String, byte[]> viewFilesBytesMap){
+        foreach(String viewFile in viewFiles) {
+            
+            if(Directory.Exists(viewFile)){
+                String[] directoryFiles = Directory.GetFiles(viewFile);
                 getFileBytesMap(directoryFiles, viewConfig, viewFilesBytesMap);
                 continue;
             }
 
-            InputStream fileInputStream = new FileInputStream(viewFile);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] bytes = new byte[1024];
-            int bytesRead;
             try {
-                while ((bytesRead = fileInputStream.read(bytes, 0, bytes.length)) != -1) {
-                    outputStream.write(bytes, 0, bytesRead);
+
+                Stream dest = new Stream();
+                Stream source = File.OpenRead(viewFile); 
+                byte[] buffer = new byte[1024 * 3];
+                int bytesRead;
+                while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
+                    dest.Write(buffer, 0, bytesRead);
                 }
-
-                fileInputStream.close();
-                outputStream.flush();
-                outputStream.close();
-
-                byte[] viewFileBytes = outputStream.toByteArray();
-                String viewKey = viewFile.toString().replace("src" + File.separator + "main" + File.separator + viewConfig.getViewsPath(), "");
-                viewFilesBytesMap.put(viewKey, viewFileBytes);
+            
+                MemoryStream memoryStream = dest.CopyTo(memoryStream);
+                byte[] viewFileBytes = memoryStream.ToArray();
+                String viewKey = viewFile.toString().replace(viewConfig.getViewsPath(), "");
+                viewFilesBytesMap.Add(viewKey, viewFileBytes);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
