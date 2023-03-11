@@ -69,24 +69,18 @@ namespace AeonFlux{
 
                 IPHostEntry host = Dns.GetHostEntry("localhost");
                 IPAddress ipAddress = host.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 8900);
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
-                try {
-
-                    listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                    listener.Bind(localEndPoint);
-                    listener.Listen(1);
-                    
-                    ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
-                    
-                    Console.WriteLine("Registering network request negotiators, please wait...");
-                    for(int partitions = 0; partitions < numberOfPartitions; partitions++){
-                        Console.WriteLine("registered request executor..");
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
-                    }
-                    
-                }catch (Exception e){
-                    Console.WriteLine(e.ToString());
+                listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                listener.Bind(localEndPoint);
+                listener.Listen(1);
+                
+                ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
+                
+                Console.WriteLine("Registering network request negotiators, please wait...");
+                for(int partitions = 0; partitions < numberOfPartitions; partitions++){
+                    Console.WriteLine("registered request executor..");
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
                 }
 
                 Console.WriteLine("Ready!");
@@ -94,6 +88,8 @@ namespace AeonFlux{
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
             }
+
+            Console.ReadKey();
         }
 
         public void ExecuteRequest(Object stateInfo){

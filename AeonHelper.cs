@@ -65,7 +65,7 @@ namespace AeonFlux{
                 getFileBytesMap(viewFiles, viewConfig, viewFilesBytesMap);
             }
 
-            if(resourcesDirectory.isDirectory(viewConfig.getResourcesPath())) {
+            if(Directory.Exists(viewConfig.getResourcesPath())) {
                 String[] resourceFiles = Directory.GetFiles(viewConfig.getResourcesPath());
                 getFileBytesMap(resourceFiles, viewConfig, viewFilesBytesMap);
             }
@@ -84,17 +84,16 @@ namespace AeonFlux{
 
                 try {
 
-                    Stream dest = new Stream();
                     Stream source = File.OpenRead(viewFile); 
+                    MemoryStream dest = new MemoryStream();
                     byte[] buffer = new byte[1024 * 3];
                     int bytesRead;
                     while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
                         dest.Write(buffer, 0, bytesRead);
                     }
                 
-                    MemoryStream memoryStream = dest.CopyTo(memoryStream);
-                    byte[] viewFileBytes = memoryStream.ToArray();
-                    String viewKey = viewFile.toString().replace(viewConfig.getViewsPath(), "");
+                    byte[] viewFileBytes = dest.ToArray();
+                    String viewKey = viewFile.ToString().Replace(viewConfig.getViewsPath(), "");
                     viewFilesBytesMap.Add(viewKey, viewFileBytes);
 
                 } catch (IOException ex) {
