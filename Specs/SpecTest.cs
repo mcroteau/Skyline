@@ -7,7 +7,7 @@ using Tiger;
 using Tiger.Model;
 using Tiger.Security;
 
-namespace Tiger{
+namespace Tiger.Specs{
 
     public class SpecTest{
 
