@@ -12,12 +12,10 @@ using AeonFlux;
 namespace AeonFlux{
     class Launcher{
         public static int Main(String[] args){
-
             AeonFlux aeonFlux = new AeonFlux(1301);
             aeonFlux.setNumberOfPartitions(300);
             aeonFlux.setNumberOfRequestExecutors(700);
             aeonFlux.Start();
-            
             return 0;
         }
 

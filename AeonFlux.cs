@@ -40,7 +40,7 @@ namespace AeonFlux{
             try {
 
                 runViewValidationSpecs();
-
+                AeonHelper aeonHelper = new AeonHelper();
                 // StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
                 // startupAnnotationInspector.inspect();
                 // ComponentsHolder componentsHolder = startupAnnotationInspector.getComponentsHolder();
@@ -55,7 +55,7 @@ namespace AeonFlux{
                 // RouteAttributes routeAttributes = routeAttributesResolver.resolve();
                 // AnnotationComponent serverStartup = componentsHolder.getServerStartup();
 
-                // AeonHelper aeonHelper = new AeonHelper();
+                // 
 
                 // String resourcesDirectory = viewConfig.getResourcesPath();
                 // Dictionary<String, byte[]> viewBytesMap = aeonHelper.getViewBytesMap(viewConfig);
