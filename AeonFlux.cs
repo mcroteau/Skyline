@@ -76,14 +76,19 @@ namespace AeonFlux{
                 listener.Listen(1);
                 
                 ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
-                
                 Console.WriteLine("Registering network request negotiators, please wait...");
+                
+                Thread thread = null;
                 for(int partitions = 0; partitions < numberOfPartitions; partitions++){
-                    Console.WriteLine("registered request executor..");
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
-                }
+                    thread = new Thread(() => {
+                        Console.Write("Registered {0} network request negotiators \r", partitions * numberOfRequestExecutors);
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+                    });
+                    thread.Start();
+                }               
+                thread.Join();
 
-                Console.WriteLine("Ready!");
+                Console.WriteLine("\n\nReady!");
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
