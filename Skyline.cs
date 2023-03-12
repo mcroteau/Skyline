@@ -14,6 +14,7 @@ namespace Skyline{
     public class Skyline {
 
         int port;
+        String sourcesPath;
         String PROPERTIES;
 
         // ViewConfig viewConfig;
@@ -26,12 +27,14 @@ namespace Skyline{
 
         public Skyline(){
             this.port = 1301;
+            this.sourcesPath = "Source";
             this.PROPERTIES = "system.properties";
             // this.viewConfig = new ViewConfig();
         }
 
         public Skyline(int port){
             this.port = port;
+            this.sourcesPath = "Source";
             this.PROPERTIES = "system.properties";
             // this.viewConfig = new ViewConfig();
         }
@@ -43,9 +46,8 @@ namespace Skyline{
                 specTest.Run();
 
                 SkylineUtilities skylineUtilities = new SkylineUtilities();
-                // StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
-                // startupAnnotationInspector.inspect();
-                // ComponentsHolder componentsHolder = startupAnnotationInspector.getComponentsHolder();
+                StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(sourcesPath, new ComponentsHolder());
+                ComponentsHolder componentsHolder = startupAnnotationInspector.inspect();
 
                 // if (propertiesConfig == null) {
                 //     propertiesConfig = new PropertiesConfig();
@@ -134,6 +136,10 @@ namespace Skyline{
         // public void setViewConfig(ViewConfig viewConfig) {
         //     this.viewConfig = viewConfig;
         // }
+
+        public void SetSourcesPath(String sourcesPath){
+            this.sourcesPath = sourcesPath;
+        }
 
         public void SetSecurityAccess(String securityAccessKlass) {
             this.securityAccessKlass = securityAccessKlass;
