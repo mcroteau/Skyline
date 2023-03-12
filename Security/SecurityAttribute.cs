@@ -1,6 +1,6 @@
 using System;
 
-namespace AeonFlux.Security {
+namespace Skyline.Security {
     public class SecurityAttribute {
 
         public SecurityAttribute(String name, String value){

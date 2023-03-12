@@ -1,10 +1,10 @@
 using System;
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Security;
-using AeonFlux.Implement;
+using Skyline;
+using Skyline.Model;
+using Skyline.Security;
+using Skyline.Implement;
 
-namespace AeonFlux{
+namespace Skyline{
     public class UsernameRenderer : ViewRenderer {
         public String getKey(){
             return "zeus:user";

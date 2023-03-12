@@ -3,11 +3,11 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-using AeonFlux;
-using AeonFlux.Specs;
+using Skyline;
+using Skyline.Specs;
 
-namespace AeonFlux{
-    public class AeonHelper{
+namespace Skyline{
+    public class SkylineUtilities{
 
         public String getGuid(int n) {
             Guid g = Guid.NewGuid();

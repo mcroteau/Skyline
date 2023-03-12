@@ -1,6 +1,6 @@
 using System;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
     
     public class LineComponent {
 

@@ -3,18 +3,22 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Security;
+using Skyline;
+using Skyline.Model;
+using Skyline.Security;
 
-namespace AeonFlux.Specs{
+namespace Skyline.Specs{
 
     public class SpecTest{
 
         SecurityAttributes securityAttributes;
 
         public SpecTest(){
-            this.securityAttributes = new SecurityAttributes("stargz.r", "secured");
+            this.securityAttributes = new SecurityAttributes("skyline", "secured");
+        }
+
+        public void Run(){
+            A();B();C();D();E();F();G();
         }
 
         public void A(){
@@ -35,9 +39,6 @@ namespace AeonFlux.Specs{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"*ned.*jermaine.".Equals(resultFinal))Console.WriteLine("Fail.");
-            if("*ned.*jermaine.".Equals(resultFinal)){
-                Console.WriteLine("A Pass!");
-            }
         }
 
         public void B() {
@@ -49,9 +50,6 @@ namespace AeonFlux.Specs{
             sb.Append("</c:if>\n");
             String result = exp.resolve(sb.ToString(), resp, null, securityAttributes, new ArrayList()).Trim();
             if(!"Effort.".Equals(result))Console.WriteLine("Fail.");
-            if("Effort.".Equals(result)){
-                Console.WriteLine("B Pass!");
-            }
         }
 
         public void C() {
@@ -63,9 +61,6 @@ namespace AeonFlux.Specs{
             sb.Append("</c:if>\n");
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList()).Trim();
             if(!"".Equals(result))Console.WriteLine("Fail.");
-            if("".Equals(result)){
-                Console.WriteLine("C Pass!");
-            }
         }
 
         public void D() {
@@ -84,9 +79,6 @@ namespace AeonFlux.Specs{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"Tom.Penelope.Diego.".Equals(resultFinal))Console.WriteLine("Fail.");
-            if("Tom.Penelope.Diego.".Equals(resultFinal)){
-                Console.WriteLine("D Pass!");
-            }
         }
 
         public void E() {
@@ -102,9 +94,6 @@ namespace AeonFlux.Specs{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"not.".Equals(resultFinal))Console.WriteLine("Fail.");
-            if("Tom.Penelope.Diego.".Equals(resultFinal)){
-                Console.WriteLine("E Pass!");
-            }
         }
 
         public void F() {
@@ -129,9 +118,6 @@ namespace AeonFlux.Specs{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"::0->Apache*0,0->Apache*1,0->Apache*2,:selected:1->Apache*0,1->Apache*1,1->Apache*2,::2->Apache*0,2->Apache*1,2->Apache*2,".Equals(resultFinal))Console.WriteLine("Fail.");
-            if("::0->Apache*0,0->Apache*1,0->Apache*2,:selected:1->Apache*0,1->Apache*1,1->Apache*2,::2->Apache*0,2->Apache*1,2->Apache*2,".Equals(resultFinal)){
-                Console.WriteLine("F Pass!");
-            }
         }
 
         public void G() {
@@ -146,9 +132,6 @@ namespace AeonFlux.Specs{
             String result = exp.resolve(sb.ToString(), viewCache, null, securityAttributes, new ArrayList());
             String resultFinal = Regex.Replace(result, "([^\\S\\r\\n])+|(?:\\r?\\n)+", "");
             if(!"condition.".Equals(resultFinal))Console.WriteLine("Fail.");
-            if("condition.".Equals(resultFinal)){
-                Console.WriteLine("G Pass!");
-            }
         }
 
         public ViewCache create() {

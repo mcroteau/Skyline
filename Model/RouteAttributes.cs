@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Security;
-using AeonFlux.Implement;
+using Skyline;
+using Skyline.Model;
+using Skyline.Security;
+using Skyline.Implement;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
     public class RouteAttributes {
 
         public RouteAttributes(){

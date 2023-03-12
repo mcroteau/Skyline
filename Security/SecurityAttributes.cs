@@ -1,4 +1,4 @@
-namespace AeonFlux.Security {
+namespace Skyline.Security {
     public class SecurityAttributes {
         public SecurityAttributes(string securityElement, string securedAttribute) {
             this.securityElement = securityElement;

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using AeonFlux.Model;
+using Skyline.Model;
 
-namespace AeonFlux{
+namespace Skyline{
     public class RouteEndpointHolder {
         Dictionary<String, RouteEndpoint> routeEndpoints;
 

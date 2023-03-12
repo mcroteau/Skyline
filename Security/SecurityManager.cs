@@ -2,11 +2,11 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Implement;
+using Skyline;
+using Skyline.Model;
+using Skyline.Implement;
 
-namespace AeonFlux.Security{
+namespace Skyline.Security{
     public class SecurityManager {
         public SecurityManager(SecurityAccess securityAccess) {
             this.securityAccess = securityAccess;

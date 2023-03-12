@@ -1,6 +1,6 @@
 using System;
 
-namespace AeonFlux{
+namespace Skyline{
     public class SchemaConfig {
         String schema;
         String environment;

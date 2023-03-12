@@ -5,17 +5,17 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using System.Threading;
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux;
+using Skyline;
+using Skyline.Model;
+using Skyline;
 
-namespace AeonFlux{
+namespace Skyline{
     class Launcher{
         public static int Main(String[] args){
-            AeonFlux aeonFlux = new AeonFlux(1301);
-            aeonFlux.setNumberOfPartitions(300);
-            aeonFlux.setNumberOfRequestExecutors(700);
-            aeonFlux.Start();
+            Skyline skyline = new Skyline(1301);
+            skyline.SetNumberOfPartitions(300);
+            skyline.SetNumberOfRequestExecutors(700);
+            skyline.Start();
             return 0;
         }
 

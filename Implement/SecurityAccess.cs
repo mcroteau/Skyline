@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AeonFlux.Implement {
+namespace Skyline.Implement {
 
     public interface SecurityAccess {
         /**

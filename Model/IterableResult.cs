@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
     public class IterableResult {
         String field;
         String key;

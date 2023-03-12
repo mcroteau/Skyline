@@ -5,12 +5,12 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Implement;
-using AeonFlux.Security;
+using Skyline;
+using Skyline.Model;
+using Skyline.Implement;
+using Skyline.Security;
 
-namespace AeonFlux{
+namespace Skyline{
 
     public class ExperienceResolver {
 
@@ -121,7 +121,7 @@ namespace AeonFlux{
         // ArrayList getInterpretedRenderers(NetworkRequest req, SecurityAttributes securityAttributes, ArrayList elementEntries, ArrayList viewRenderers){
 
         //     foreach(String viewRendererKlass in viewRenderers){
-        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("AeonFlux", viewRendererKlass);
+        //         ViewRenderer viewRendererInstance = (ViewRenderer)Activator.CreateInstance("Skyline", viewRendererKlass);
                 
         //         MethodInfo getKey = viewRendererInstance.GetType().GetMethod("getKey");
         //         String rendererKey = (String) getKey.Invoke(viewRendererInstance, new Object[]{});

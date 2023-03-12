@@ -1,7 +1,7 @@
 using System;
-using AeonFlux.Schemes;
+using Skyline.Schemes;
 
-namespace AeonFlux{
+namespace Skyline{
     public class ViewConfig{
         public ViewConfig(){
             this.viewsPath = "webapp";

@@ -6,12 +6,12 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 
-using AeonFlux;
-using AeonFlux.Specs;
+using Skyline;
+using Skyline.Specs;
 
-namespace AeonFlux{
+namespace Skyline{
 
-    public class AeonFlux {
+    public class Skyline {
 
         int port;
         String PROPERTIES;
@@ -24,13 +24,13 @@ namespace AeonFlux{
 
         Socket listener;
 
-        public AeonFlux(){
+        public Skyline(){
             this.port = 1301;
             this.PROPERTIES = "system.properties";
             // this.viewConfig = new ViewConfig();
         }
 
-        public AeonFlux(int port){
+        public Skyline(int port){
             this.port = port;
             this.PROPERTIES = "system.properties";
             // this.viewConfig = new ViewConfig();
@@ -39,8 +39,10 @@ namespace AeonFlux{
         public void Start(){
             try {
 
-                runViewValidationSpecs();
-                AeonHelper aeonHelper = new AeonHelper();
+                SpecTest specTest = new SpecTest();
+                specTest.Run();
+
+                SkylineUtilities skylineUtilities = new SkylineUtilities();
                 // StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
                 // startupAnnotationInspector.inspect();
                 // ComponentsHolder componentsHolder = startupAnnotationInspector.getComponentsHolder();
@@ -125,11 +127,6 @@ namespace AeonFlux{
             return streamReader.ReadToEnd();
         }
 
-        public void runViewValidationSpecs(){
-            SpecTest specTest = new SpecTest();
-            specTest.A();specTest.B();specTest.C();specTest.D();specTest.E();specTest.F();specTest.G();
-        }
-
         // public void setPropertiesConfig(PropertiesConfig propertiesConfig){
         //     this.propertiesConfig = propertiesConfig;
         // }
@@ -138,15 +135,15 @@ namespace AeonFlux{
         //     this.viewConfig = viewConfig;
         // }
 
-        public void setSecurityAccess(String securityAccessKlass) {
+        public void SetSecurityAccess(String securityAccessKlass) {
             this.securityAccessKlass = securityAccessKlass;
         }
 
-        public void setNumberOfPartitions(int numberOfPartitions){
+        public void SetNumberOfPartitions(int numberOfPartitions){
             this.numberOfPartitions = numberOfPartitions;
         }
 
-        public void setNumberOfRequestExecutors(int numberOfRequestExecutors){
+        public void SetNumberOfRequestExecutors(int numberOfRequestExecutors){
             this.numberOfRequestExecutors = numberOfRequestExecutors;
         }
     }

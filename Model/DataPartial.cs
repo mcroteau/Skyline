@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
         
     public class DataPartial {
         int idx;

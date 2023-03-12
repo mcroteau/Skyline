@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
     public class ViewCache {
         Dictionary<String, Object> cache;
 

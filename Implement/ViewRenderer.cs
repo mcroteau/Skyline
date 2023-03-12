@@ -1,10 +1,10 @@
 using System;
 
-using AeonFlux;
-using AeonFlux.Model;
-using AeonFlux.Security;
+using Skyline;
+using Skyline.Model;
+using Skyline.Security;
 
-namespace AeonFlux.Implement {
+namespace Skyline.Implement {
     public interface ViewRenderer {
 
         String getKey();

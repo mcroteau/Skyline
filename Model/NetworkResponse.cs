@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using AeonFlux.Security;
+using Skyline.Security;
 
-namespace AeonFlux.Model {
+namespace Skyline.Model {
 
     public class NetworkResponse {
         public NetworkResponse(){
