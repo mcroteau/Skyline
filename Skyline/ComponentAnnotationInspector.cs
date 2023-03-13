@@ -1,6 +1,8 @@
 
 using System;
 
+using Skyline.Annotation;
+
 namespace Skyline { 
     public class ComponentAnnotationInspector {
 
@@ -10,14 +12,14 @@ namespace Skyline {
             this.componentsHolder = componentsHolder;
         }
 
-        public void inspect(){
+        public ComponentsHolder inspect(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
                 Path.DirectorySeparatorChar.ToString() + "Source" + Path.DirectorySeparatorChar.ToString();
             InspectFilePath(sourcesDirectory, sourcesDirectory);
             return componentsHolder;
         }
 
-        public void InspectFilePath(String filePath){
+        public void InspectFilePath(String sourcesDirectory, String filePath){
             if(File.Exists(filePath)){
                 
                 try {
@@ -32,8 +34,8 @@ namespace Skyline {
                     if(filePath.EndsWith(".cs")){
                         Object klassInstance = Activator.CreateInstance("Foo", klassPath).Unwrap();
                         Type klassType = klassInstance.GetType();
-                        Object attrs = klassType.GetCustomAttribute(typeof(Repository));
-                        if(attrs != null) {
+                        Object[] attrs = klassType.GetCustomAttributes(typeof(Repository), true);
+                        if(attrs.Length > 0) {
                             componentsHolder.setServerStartup(klassInstance);
                         }
                     }
@@ -55,10 +57,6 @@ namespace Skyline {
                     InspectFilePath(sourcesDirectory, directoryPath);
                 }
             }
-        }
-
-        public ComponentsHolder getComponentsHolder() {
-            return this.componentsHolder;
         }
 
     }

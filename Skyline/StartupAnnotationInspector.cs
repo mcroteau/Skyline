@@ -36,8 +36,8 @@ namespace Skyline{
                     if(filePath.EndsWith(".cs")){
                         Object klassInstance = Activator.CreateInstance("Foo", klassPath).Unwrap();
                         Type klassType = klassInstance.GetType();
-                        Object attrs = klassType.GetCustomAttribute(typeof(ServerStartup));
-                        if(attrs != null) {
+                        Object[] attrs = klassType.GetCustomAttributes(typeof(ServerStartup), true);
+                        if(attrs.Length > 0) {
                             componentsHolder.setServerStartup(klassInstance);
                         }
                     }
