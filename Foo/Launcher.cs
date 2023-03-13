@@ -7,12 +7,11 @@ using System.Collections;
 using System.Threading;
 using Skyline;
 using Skyline.Model;
-using Skyline;
 
-namespace Skyline{
+namespace Foo{
     class Launcher{
         public static int Main(String[] args){
-            Skyline skyline = new Skyline(1301);
+            SkylineServer skyline = new SkylineServer(1301);
             skyline.SetNumberOfPartitions(300);
             skyline.SetNumberOfRequestExecutors(700);
 
