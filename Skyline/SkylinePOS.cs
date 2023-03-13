@@ -14,12 +14,21 @@ using Skyline.Specs;
 namespace Skyline{
 
     public class SkylinePOS {
+        
+        String FAVICON = "/favicon.ico";
+        String BREAK = "\r\n";
+        String SPACE = " ";
+        String DOUBLEBREAK = "\r\n\r\n";
+
+        int REQUEST_METHOD = 0;
+        int REQUEST_PATH = 1;
+        int REQUEST_VERSION = 2;
 
         int port;
         String sourcesPath;
         String PROPERTIES;
 
-        // ViewConfig viewConfig;
+        ViewConfig viewConfig;
         PropertiesConfig propertiesConfig;
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 7;
@@ -31,14 +40,14 @@ namespace Skyline{
             this.port = 1301;
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
-            // this.viewConfig = new ViewConfig();
+            this.viewConfig = new ViewConfig();
         }
 
         public SkylinePOS(int port){
             this.port = port;
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
-            // this.viewConfig = new ViewConfig();
+            this.viewConfig = new ViewConfig();
         }
 
         public void Start(){
@@ -47,7 +56,7 @@ namespace Skyline{
                 SpecTest specTest = new SpecTest();
                 specTest.Run();
 
-                SkylineUtilities skylineUtilities = new SkylineUtilities();
+                ResourceUtility skylineUtilities = new ResourceUtility();
                 StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
                 ComponentsHolder componentsHolder = startupAnnotationInspector.Inspect();
 
@@ -63,8 +72,8 @@ namespace Skyline{
                     Console.WriteLine(propertyEntry.Key + ":" + propertyEntry.Value);
                 }
 
-                // String resourcesDirectory = viewConfig.getResourcesPath();
-                // Dictionary<String, byte[]> viewBytesMap = aeonHelper.getViewBytesMap(viewConfig);
+                String resourcesDirectory = viewConfig.getResourcesPath();
+                Dictionary<String, byte[]> viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
 
                 Object serverStartupInstance = componentsHolder.getServerStartup();
                 if (serverStartupInstance != null) {
@@ -85,8 +94,8 @@ namespace Skyline{
                 Thread thread = null;
                 for(int partitions = 0; partitions < numberOfPartitions; partitions++){
                     thread = new Thread(() => {
-                        ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
                         Console.Write("Registered {0} network request negotiators \r", partitions * numberOfRequestExecutors);
+                        ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
                         ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
                     });
                     thread.Start();
@@ -105,16 +114,59 @@ namespace Skyline{
         public void ExecuteRequest(Object stateInfo){
             Socket handler = listener.Accept();
 
-            string data = null;
+            String data = null;
             byte[] bytes = null;
 
             var utf8 = new UTF8Encoding();
-            
+            String completeRequestContent = new String("");
             while (true){
                 bytes = new byte[1024 * 3];
                 int bytesRec = handler.Receive(bytes);
-                string info = GetBytesToStringConverted(bytes);
+                Thread.Sleep(19);
+                completeRequestContent = GetBytesToStringConverted(bytes);
                 if(bytesRec < bytes.Length)break;
+            }
+
+            String[] requestBlocks = completeRequestContent.Split(DOUBLEBREAK, 2);
+
+            String requestHeaderElement = requestBlocks[0];
+            String[] methodPathComponentsLookup = requestHeaderElement.Split(BREAK);
+            String methodPathComponent = methodPathComponentsLookup[0];
+
+            String[] methodPathVersionComponents = methodPathComponent.Split(SPACE);
+
+            String requestAction = methodPathVersionComponents[REQUEST_METHOD];
+            String requestPath = methodPathVersionComponents[REQUEST_PATH];
+            String requestVersion = methodPathVersionComponents[REQUEST_VERSION];
+
+            if(requestPath.Equals(FAVICON)){
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+                return;
+            }
+
+            NetworkRequest networkRequest = new NetworkRequest();
+            networkRequest.setRequestAction(requestAction);
+            networkRequest.setRequestPath(requestPath);
+            NetworkResponse networkResponse = new NetworkResponse();
+
+            String[] requestHeaderElements = requestHeaderElement.Split(BREAK);
+            foreach(String headerLineElement in requestHeaderElements){
+                String[] headerLineComponents = headerLineElement.Split(":", 2);
+                Console.WriteLine("req=>" + networkRequest.getRequestPath() + "     /===> " + headerLineElement);
+                if(headerLineComponents.Length == 2) {
+                    String fieldKey = headerLineComponents[0].Trim();
+                    String content = headerLineComponents[1].Trim();
+                    networkRequest.getHeaders().Add(fieldKey.ToLower(), content);
+                }
+            }
+        
+            int attributesIndex = requestPath.IndexOf("?");
+            if(attributesIndex != -1) {
+                int attributesIndexWith = attributesIndex + 1;
+                String attributesElement = requestPath.Substring(attributesIndexWith);
+                requestPath = requestPath.Substring(0, attributesIndex);
+                networkRequest.setValues(attributesElement);
+                networkRequest.setRequestPath(requestPath);
             }
 
             byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
@@ -134,9 +186,9 @@ namespace Skyline{
             this.propertiesConfig = propertiesConfig;
         }
 
-        // public void setViewConfig(ViewConfig viewConfig) {
-        //     this.viewConfig = viewConfig;
-        // }
+        public void setViewConfig(ViewConfig viewConfig) {
+            this.viewConfig = viewConfig;
+        }
 
         public void SetSourcesPath(String sourcesPath){
             this.sourcesPath = sourcesPath;

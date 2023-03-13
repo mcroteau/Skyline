@@ -132,8 +132,20 @@ namespace Skyline.Model {
             this.userCredential = userCredential;
         }
 
-
-
+        public void setValues(String parameters) {
+            String[] keyValues = parameters.Split("&");
+            foreach(String keyValue in keyValues){
+                String[] parts = keyValue.Split("=");
+                if(parts.Length > 1){
+                    String key = parts[0];
+                    String value = parts[1];
+                    RequestComponent requestComponent = new RequestComponent();
+                    requestComponent.setName(key);
+                    requestComponent.setValue(value);
+                    requestComponents.Add(key, requestComponent);
+                }
+            }
+        }
 
 
     }

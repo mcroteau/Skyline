@@ -7,7 +7,7 @@ using Skyline;
 using Skyline.Specs;
 
 namespace Skyline{
-    public class SkylineUtilities{
+    public class ResourceUtility{
 
         public String getGuid(int n) {
             Guid g = Guid.NewGuid();
