@@ -11,7 +11,7 @@ using Skyline.Model;
 namespace Foo{
     class Launcher{
         public static int Main(String[] args){
-            SkylinePOS skyline = new SkylinePOS(4000);
+            SkylineRunnable skyline = new SkylineRunnable(3000);
             skyline.SetNumberOfPartitions(300);
             skyline.SetNumberOfRequestExecutors(700);
 
