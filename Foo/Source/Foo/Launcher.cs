@@ -11,11 +11,9 @@ using Skyline.Model;
 namespace Foo{
     class Launcher{
         public static int Main(String[] args){
-            SkylineServer skyline = new SkylineServer(1301);
+            SkylinePOS skyline = new SkylinePOS(1301);
             skyline.SetNumberOfPartitions(300);
             skyline.SetNumberOfRequestExecutors(700);
-
-            skyline.SetSourcesPath("Foo");
 
             skyline.Start();
             return 0;
