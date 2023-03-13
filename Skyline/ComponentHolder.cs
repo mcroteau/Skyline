@@ -3,40 +3,32 @@ using System.Collections.Generic;
 
 namespace Skyline {
     public class ComponentsHolder{
-        Type serverStartup;
-        Type routeRegistration;
+        Object serverStartup;
+        Object routeRegistration;
         Dictionary<String, String> repositories;
 
-        public Type getServerStartup()
-        {
+        public Object getServerStartup() {
             return this.serverStartup;
         }
 
-        public void setServerStartup(Type serverStartup)
-        {
+        public void setServerStartup(Object serverStartup) {
             this.serverStartup = serverStartup;
         }
 
-        public Type getRouteRegistration()
-        {
+        public Object getRouteRegistration() {
             return this.routeRegistration;
         }
 
-        public void setRouteRegistration(Type routeRegistration)
-        {
+        public void setRouteRegistration(Object routeRegistration) {
             this.routeRegistration = routeRegistration;
         }
 
-        public Dictionary<String, String>  getRepositories()
-        {
+        public Dictionary<String, String> getRepositories() {
             return this.repositories;
         }
 
-        public void setRepositories(Dictionary<String, String> repositories)
-        {
+        public void setRepositories(Dictionary<String, String> repositories) {
             this.repositories = repositories;
         }
-
-
     }
 }
