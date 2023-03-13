@@ -1,27 +1,23 @@
-using System;
-using System.Reflection;
-using Skyline;
-using Skyline.Annotation;
 
-namespace Skyline{
-    public class StartupAnnotationInspector {
+using System;
+
+namespace Skyline { 
+    public class ComponentAnnotationInspector {
 
         ComponentsHolder componentsHolder;
 
-        public StartupAnnotationInspector(ComponentsHolder componentsHolder){
+        public ComponentAnnotationInspector(ComponentsHolder componentsHolder){
             this.componentsHolder = componentsHolder;
         }
 
-        public ComponentsHolder Inspect(){
+        public void inspect(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
                 Path.DirectorySeparatorChar.ToString() + "Source" + Path.DirectorySeparatorChar.ToString();
-            Console.WriteLine(sourcesDirectory);
             InspectFilePath(sourcesDirectory, sourcesDirectory);
             return componentsHolder;
         }
 
-        public void InspectFilePath(String sourcesDirectory, String filePath){
-
+        public void InspectFilePath(String filePath){
             if(File.Exists(filePath)){
                 
                 try {
@@ -36,7 +32,7 @@ namespace Skyline{
                     if(filePath.EndsWith(".cs")){
                         Object klassInstance = Activator.CreateInstance("Foo", klassPath).Unwrap();
                         Type klassType = klassInstance.GetType();
-                        Object attrs = klassType.GetCustomAttribute(typeof(ServerStartup));
+                        Object attrs = klassType.GetCustomAttribute(typeof(Repository));
                         if(attrs != null) {
                             componentsHolder.setServerStartup(klassInstance);
                         }
@@ -60,5 +56,11 @@ namespace Skyline{
                 }
             }
         }
+
+        public ComponentsHolder getComponentsHolder() {
+            return this.componentsHolder;
+        }
+
     }
+
 }

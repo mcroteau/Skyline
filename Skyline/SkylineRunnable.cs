@@ -10,6 +10,7 @@ using System.Reflection;
 using Skyline;
 using Skyline.Model;
 using Skyline.Specs;
+using Skyline.Security;
 
 namespace Skyline{
 
@@ -30,6 +31,8 @@ namespace Skyline{
 
         ViewConfig viewConfig;
         PropertiesConfig propertiesConfig;
+        RouteAttributes routeAttributes;
+
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 7;
         String securityAccessKlass;
@@ -66,7 +69,7 @@ namespace Skyline{
                 }
 
                 RouteAttributesResolver routeAttributesResolver = new RouteAttributesResolver(propertiesConfig);
-                RouteAttributes routeAttributes = routeAttributesResolver.resolve();
+                routeAttributes = routeAttributesResolver.resolve();
 
                 foreach(var propertyEntry in routeAttributes.getAttributes()){
                     Console.WriteLine(propertyEntry.Key + ":" + propertyEntry.Value);
@@ -145,12 +148,9 @@ namespace Skyline{
                 return;
             }
 
+            RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
-            routeNegotiatorFactory.setPersistenceConfig(persistenceConfig);
-            routeNegotiatorFactory.setSecurityAccessKlass(securityAccessKlass);
-            routeNegotiatorFactory.setRouteAttributes(routeAttributes);
-            routeNegotiatorFactory.setServerResources(resourceUtility);
-
+            routeNegotiatorFactory.setRouteAttributes(routeAttributesCopy);
             RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
             SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
 

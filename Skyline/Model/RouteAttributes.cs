@@ -9,18 +9,22 @@ using Skyline.Implement;
 namespace Skyline.Model {
     public class RouteAttributes {
 
+        public RouteAttributes(RouteAttributes routeAttributes){
+            this.attributes = routeAttributes.getAttributes();
+            this.viewRenderers = routeAttributes.getViewRenderers();
+            this.routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
+        }
+
         public RouteAttributes(){
             this.attributes = new Dictionary<string, string>();
             this.viewRenderers = new Dictionary<string, ViewRenderer>();
             this.routeEndpointHolder = new RouteEndpointHolder();
-            this.sessionRegistry = new Dictionary<string, bool>();
         }
 
         PersistenceConfig persistenceConfig;
 
         Dictionary<String, String> attributes;
         Dictionary<String, ViewRenderer> viewRenderers;
-        Dictionary<String, Boolean> sessionRegistry;
         RouteEndpointHolder routeEndpointHolder;
 
         String securityAccessKlass;
@@ -54,16 +58,6 @@ namespace Skyline.Model {
         public void setViewRenderers(Dictionary<String, ViewRenderer> viewRenderers)
         {
             this.viewRenderers = viewRenderers;
-        }
-
-        public Dictionary<String, bool> getSessionRegistry()
-        {
-            return this.sessionRegistry;
-        }
-
-        public void setSessionRegistry(Dictionary<String, bool> sessionRegistry)
-        {
-            this.sessionRegistry = sessionRegistry;
         }
 
         public RouteEndpointHolder getRouteEndpointHolder()

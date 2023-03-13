@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 using Skyline;
 using Skyline.Model;
@@ -32,13 +33,12 @@ namespace Skyline{
                         String securityElementValue = securedElement + "." + securityElementPrincipalPre + "; path=/";
                         SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributeKey, securityElementValue);
 
-                        networkResponse.getSecurityAttributes().remove("skyline.security");
-                        networkResponse.getSecurityAttributes().put("skyline.security", securityAttribute);
+                        networkResponse.getSecurityAttributes().Remove("skyline.security");
+                        networkResponse.getSecurityAttributes().Add("skyline.security", securityAttribute);
 
                         byte[] securityElementPrincipalBytes = Convert.FromBase64String(securityElementPrincipalPre);
                         String securityElementPrincipal = Encoding.UTF8.GetString(securityElementPrincipalBytes);
-                        String s = new String(securityElementPrincipalBytes);
-
+  
                         networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
                         networkRequest.setUserCredential(securityElementPrincipal);
                     }
