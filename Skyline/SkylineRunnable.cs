@@ -13,7 +13,7 @@ using Skyline.Specs;
 
 namespace Skyline{
 
-    public class SkylinePOS {
+    public class SkylineRunnable {
         
         String FAVICON = "/favicon.ico";
         String BREAK = "\r\n";
@@ -36,14 +36,14 @@ namespace Skyline{
 
         Socket listener;
 
-        public SkylinePOS(){
+        public SkylineRunnable(){
             this.port = 1301;
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
         }
 
-        public SkylinePOS(int port){
+        public SkylineRunnable(int port){
             this.port = port;
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
@@ -127,6 +127,7 @@ namespace Skyline{
                 if(bytesRec < bytes.Length)break;
             }
 
+            ResourceUtility resourceUtility = new ResourceUtility();
             String[] requestBlocks = completeRequestContent.Split(DOUBLEBREAK, 2);
 
             String requestHeaderElement = requestBlocks[0];
@@ -143,6 +144,15 @@ namespace Skyline{
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
                 return;
             }
+
+            RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
+            routeNegotiatorFactory.setPersistenceConfig(persistenceConfig);
+            routeNegotiatorFactory.setSecurityAccessKlass(securityAccessKlass);
+            routeNegotiatorFactory.setRouteAttributes(routeAttributes);
+            routeNegotiatorFactory.setServerResources(resourceUtility);
+
+            RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
+            SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
 
             NetworkRequest networkRequest = new NetworkRequest();
             networkRequest.setRequestAction(requestAction);
@@ -168,6 +178,12 @@ namespace Skyline{
                 networkRequest.setValues(attributesElement);
                 networkRequest.setRequestPath(requestPath);
             }
+
+            
+            SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
+            securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
+            securityAttributeResolver.resolve(networkRequest, networkResponse);
+
 
             byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             handler.Send(resp);
