@@ -11,6 +11,7 @@ namespace Skyline{
 
         ResourceUtility resourceUtility;
         RouteAttributes routeAttributes;
+        ApplicationAttributes applicationAttributes;
         SecurityAttributes securityAttributes;
 
         public RouteEndpointNegotiator create() {
@@ -26,6 +27,7 @@ namespace Skyline{
                 this.securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
                 RouteEndpointResolver routeEndpointResolver = new RouteEndpointResolver();
+                routeEndpointResolver.setApplicationAttributes(applicationAttributes);
                 RouteEndpointHolder routeEndpointHolder = routeEndpointResolver.resolve();
                 routeAttributes.setRouteEndpointHolder(routeEndpointHolder);
 
@@ -57,6 +59,14 @@ namespace Skyline{
 
         public void setRouteAttributes(RouteAttributes routeAttributes) {
             this.routeAttributes = routeAttributes;
+        }
+
+        public ApplicationAttributes getApplicationAttributes() {
+            return this.applicationAttributes;
+        }
+
+        public void setApplicationAttributes(ApplicationAttributes applicationAttributes) {
+            this.applicationAttributes = applicationAttributes;
         }
     }
 }

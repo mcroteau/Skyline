@@ -116,7 +116,7 @@ namespace Skyline{
         }
 
         public void ExecuteNetworkRequest(Object stateInfo){
-            Socket requestHandler = listener.Accept();
+            Socket networkRequestHandler = listener.Accept();
 
             String data = null;
             byte[] bytes = null;
@@ -125,7 +125,7 @@ namespace Skyline{
             String completeRequestContent = new String("");
             while (true){
                 bytes = new byte[1024 * 3];
-                int bytesRec = requestHandler.Receive(bytes);
+                int bytesRec = networkRequestHandler.Receive(bytes);
                 Thread.Sleep(19);
                 completeRequestContent = GetBytesToStringConverted(bytes);
                 if(bytesRec < bytes.Length)break;
@@ -154,6 +154,7 @@ namespace Skyline{
 
             RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
             routeNegotiatorFactory.setRouteAttributes(routeAttributesCopy);
+            routeNegotiatorFactory.SetApplicationAttributes(applicationAttributes);
             RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
             SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
 
@@ -168,31 +169,32 @@ namespace Skyline{
             networkRequestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
             networkRequestHeaderResolver.setNetworkRequest(networkRequest);
             networkRequestHeaderResolver.resolve();
-        
-            
-            
+
+            RouteResult routeResult = routeEndpointNegotiator.performNetworkRequest(RENDERER, resourcesDirectory, flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewRenderers, viewBytesMap);
+
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
 
 
 
-            // requestHandler.Send((requestVersion + " ").getBytes());
-            // requestHandler.Send(routeResult.getResponseCode().getBytes());
-            // requestHandler.Send(BREAK.getBytes());
+
+            // networkRequestHandler.Send((requestVersion + " ").getBytes());
+            // networkRequestHandler.Send(routeResult.getResponseCode().getBytes());
+            // networkRequestHandler.Send(BREAK.getBytes());
 
             // if(networkRequest.isRedirect()) {
-            //     requestHandler.Send("Content-Type:text/html".getBytes());
-            //     requestHandler.Send(BREAK.getBytes());
-            //     requestHandler.Send("Set-Cookie:".getBytes());
-            //     requestHandler.Send(sessionValues.toString().getBytes());
-            //     requestHandler.Send(BREAK.getBytes());
-            //     requestHandler.Send(("Location: " +  networkRequest.getRedirectLocation() + SPACE).getBytes());
-            //     requestHandler.Send(BREAK.getBytes());
-            //     requestHandler.Send("Content-Length: -1".getBytes());
-            //     requestHandler.Send(DOUBLEBREAK.getBytes());
+            //     networkRequestHandler.Send("Content-Type:text/html".getBytes());
+            //     networkRequestHandler.Send(BREAK.getBytes());
+            //     networkRequestHandler.Send("Set-Cookie:".getBytes());
+            //     networkRequestHandler.Send(sessionValues.toString().getBytes());
+            //     networkRequestHandler.Send(BREAK.getBytes());
+            //     networkRequestHandler.Send(("Location: " +  networkRequest.getRedirectLocation() + SPACE).getBytes());
+            //     networkRequestHandler.Send(BREAK.getBytes());
+            //     networkRequestHandler.Send("Content-Length: -1".getBytes());
+            //     networkRequestHandler.Send(DOUBLEBREAK.getBytes());
 
-            //     requestHandler.close();
+            //     networkRequestHandler.close();
             //     socketClient.close();
 
             //     networkRequestFactory.execute();
@@ -200,14 +202,14 @@ namespace Skyline{
             // }
 
 
-            // requestHandler.Send("Content-Type:".getBytes());
-            // requestHandler.Send(routeResult.getContentType().getBytes());
-            // requestHandler.Send(BREAK.getBytes());
+            // networkRequestHandler.Send("Content-Type:".getBytes());
+            // networkRequestHandler.Send(routeResult.getContentType().getBytes());
+            // networkRequestHandler.Send(BREAK.getBytes());
 
-            // requestHandler.Send("Set-Cookie:".getBytes());
-            // requestHandler.Send(sessionValues.toString().getBytes());
-            // requestHandler.Send(DOUBLEBREAK.getBytes());
-            // requestHandler.Send(routeResult.getResponseBytes());
+            // networkRequestHandler.Send("Set-Cookie:".getBytes());
+            // networkRequestHandler.Send(sessionValues.toString().getBytes());
+            // networkRequestHandler.Send(DOUBLEBREAK.getBytes());
+            // networkRequestHandler.Send(routeResult.getResponseBytes());
 
             byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             requestHandler.Send(resp);
