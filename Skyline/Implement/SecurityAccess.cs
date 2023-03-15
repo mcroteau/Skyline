@@ -32,7 +32,7 @@ namespace Skyline.Implement {
         */
         HashSet<String> getPermissions(String user);
 
-        void setDataAccess(DataAccess dao);
+        void setDataTransferObject(DataTransferObject dto);
     }
 
 }

@@ -146,5 +146,15 @@ namespace Skyline.Model {
                 }
             }
         }
+
+        public void setAttributes(){
+            int attributesIndex = this.networkRequestPath.IndexOf("?");
+            if(attributesIndex != -1) {
+                int attributesIndexWith = attributesIndex + 1;
+                String attributesElement = this.networkRequestPath.Substring(attributesIndexWith);
+                this.networkRequestPath = this.networkRequestPath.Substring(0, attributesIndex);
+                setValues(attributesElement);
+            }
+        }
     }
 }

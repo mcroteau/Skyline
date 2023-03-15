@@ -32,6 +32,7 @@ namespace Skyline{
         ViewConfig viewConfig;
         PropertiesConfig propertiesConfig;
         RouteAttributes routeAttributes;
+        ApplicationAttributes applicationAttributes;
 
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 7;
@@ -99,7 +100,7 @@ namespace Skyline{
                     thread = new Thread(() => {
                         Console.Write("Registered {0} network request negotiators \r", partitions * numberOfRequestExecutors);
                         ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
                     });
                     thread.Start();
                 }               
@@ -114,8 +115,8 @@ namespace Skyline{
             Console.ReadKey();
         }
 
-        public void ExecuteRequest(Object stateInfo){
-            Socket handler = listener.Accept();
+        public void ExecuteNetworkRequest(Object stateInfo){
+            Socket requestHandler = listener.Accept();
 
             String data = null;
             byte[] bytes = null;
@@ -124,7 +125,7 @@ namespace Skyline{
             String completeRequestContent = new String("");
             while (true){
                 bytes = new byte[1024 * 3];
-                int bytesRec = handler.Receive(bytes);
+                int bytesRec = requestHandler.Receive(bytes);
                 Thread.Sleep(19);
                 completeRequestContent = GetBytesToStringConverted(bytes);
                 if(bytesRec < bytes.Length)break;
@@ -139,57 +140,80 @@ namespace Skyline{
 
             String[] methodPathVersionComponents = methodPathComponent.Split(SPACE);
 
-            String requestAction = methodPathVersionComponents[REQUEST_METHOD];
-            String requestPath = methodPathVersionComponents[REQUEST_PATH];
-            String requestVersion = methodPathVersionComponents[REQUEST_VERSION];
+            String networkRequestAction = methodPathVersionComponents[REQUEST_METHOD];
+            String networkRequestPath = methodPathVersionComponents[REQUEST_PATH];
+            String networkRequestVersion = methodPathVersionComponents[REQUEST_VERSION];
 
-            if(requestPath.Equals(FAVICON)){
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+            if(networkRequestPath.Equals(FAVICON)){
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
                 return;
             }
 
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
+            ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
+
             RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
             routeNegotiatorFactory.setRouteAttributes(routeAttributesCopy);
             RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
             SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
 
             NetworkRequest networkRequest = new NetworkRequest();
-            networkRequest.setRequestAction(requestAction);
-            networkRequest.setRequestPath(requestPath);
+            networkRequest.setRequestAction(networkRequestAction);
+            networkRequest.setRequestPath(networkRequestPath);
+            networkRequest.setAttributes();
+
             NetworkResponse networkResponse = new NetworkResponse();
 
-            String[] requestHeaderElements = requestHeaderElement.Split(BREAK);
-            foreach(String headerLineElement in requestHeaderElements){
-                String[] headerLineComponents = headerLineElement.Split(":", 2);
-                Console.WriteLine("req=>" + networkRequest.getRequestPath() + "     /===> " + headerLineElement);
-                if(headerLineComponents.Length == 2) {
-                    String fieldKey = headerLineComponents[0].Trim();
-                    String content = headerLineComponents[1].Trim();
-                    networkRequest.getHeaders().Add(fieldKey.ToLower(), content);
-                }
-            }
+            NetworkRequestHeaderResolver networkRequestHeaderResolver = new NetworkRequestHeaderResolver();
+            networkRequestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
+            networkRequestHeaderResolver.setNetworkRequest(networkRequest);
+            networkRequestHeaderResolver.resolve();
         
-            int attributesIndex = requestPath.IndexOf("?");
-            if(attributesIndex != -1) {
-                int attributesIndexWith = attributesIndex + 1;
-                String attributesElement = requestPath.Substring(attributesIndexWith);
-                requestPath = requestPath.Substring(0, attributesIndex);
-                networkRequest.setValues(attributesElement);
-                networkRequest.setRequestPath(requestPath);
-            }
-
+            
             
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
 
 
-            byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-            handler.Send(resp);
-            handler.Close();
 
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteRequest));
+            // requestHandler.Send((requestVersion + " ").getBytes());
+            // requestHandler.Send(routeResult.getResponseCode().getBytes());
+            // requestHandler.Send(BREAK.getBytes());
+
+            // if(networkRequest.isRedirect()) {
+            //     requestHandler.Send("Content-Type:text/html".getBytes());
+            //     requestHandler.Send(BREAK.getBytes());
+            //     requestHandler.Send("Set-Cookie:".getBytes());
+            //     requestHandler.Send(sessionValues.toString().getBytes());
+            //     requestHandler.Send(BREAK.getBytes());
+            //     requestHandler.Send(("Location: " +  networkRequest.getRedirectLocation() + SPACE).getBytes());
+            //     requestHandler.Send(BREAK.getBytes());
+            //     requestHandler.Send("Content-Length: -1".getBytes());
+            //     requestHandler.Send(DOUBLEBREAK.getBytes());
+
+            //     requestHandler.close();
+            //     socketClient.close();
+
+            //     networkRequestFactory.execute();
+            //     return;
+            // }
+
+
+            // requestHandler.Send("Content-Type:".getBytes());
+            // requestHandler.Send(routeResult.getContentType().getBytes());
+            // requestHandler.Send(BREAK.getBytes());
+
+            // requestHandler.Send("Set-Cookie:".getBytes());
+            // requestHandler.Send(sessionValues.toString().getBytes());
+            // requestHandler.Send(DOUBLEBREAK.getBytes());
+            // requestHandler.Send(routeResult.getResponseBytes());
+
+            byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
+            requestHandler.Send(resp);
+            requestHandler.Close();
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
         }    
 
         static String GetBytesToStringConverted(byte[] bytes){
@@ -220,6 +244,10 @@ namespace Skyline{
 
         public void SetNumberOfRequestExecutors(int numberOfRequestExecutors){
             this.numberOfRequestExecutors = numberOfRequestExecutors;
+        }
+
+        public void SetApplicationAttributes(ApplicationAttributes applicationAttributes){
+            this.applicationAttributes = applicationAttributes;
         }
     }
 }

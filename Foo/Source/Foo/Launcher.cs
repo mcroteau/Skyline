@@ -15,6 +15,9 @@ namespace Foo{
             skyline.SetNumberOfPartitions(300);
             skyline.SetNumberOfRequestExecutors(700);
 
+            ApplicationAttributes applicationAttributes = new ApplicationAttributes();
+            skyline.setApplicationAttributes(applicationAttributes);
+            
             skyline.Start();
             return 0;
         }
