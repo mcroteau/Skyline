@@ -16,8 +16,8 @@ namespace Foo{
             skyline.SetNumberOfRequestExecutors(700);
 
             ApplicationAttributes applicationAttributes = new ApplicationAttributes();
-            skyline.setApplicationAttributes(applicationAttributes);
-            
+            skyline.SetApplicationAttributes(applicationAttributes);
+
             skyline.Start();
             return 0;
         }

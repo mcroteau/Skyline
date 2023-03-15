@@ -1,5 +1,6 @@
 using System;
 using Skyline;
+using Skyline.Model;
 
 namespace Foo{
     
@@ -7,7 +8,9 @@ namespace Foo{
     public class IndexController{
         
         ApplicationAttributes applicationAttributes;
-        
+
+        public IndexController(){}
+
         public IndexController(ApplicationAttributes applicationAttributes){
             this.applicationAttributes = applicationAttributes;
         }

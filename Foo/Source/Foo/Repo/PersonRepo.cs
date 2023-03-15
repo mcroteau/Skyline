@@ -1,22 +1,23 @@
 
 using System;
+using System.Collections.Generic;
 
+using LiteDB;
+using Skyline.Model;
+using Skyline.Annotation;
 
-namespace Foo{
+namespace Foo.Repo{
 
     [Repository]
     public class PersonRepo{
-        LiteDB db;
+        LiteDatabase db;
+
+        public PersonRepo(){}
 
         public PersonRepo(ApplicationAttributes applicationAttributes){
-            String connectionDatabase = applicationAttributes.getAttributes().GetValue("db.url");
-            db = new LiteDatabase("~/FooDb");
+            String connectionDatabase = (String)applicationAttributes.getAttributes().GetValueOrDefault("db.url", "");
+            this.db = new LiteDatabase("~/FooDb");
         }
-
-        public void save(Person person){
-            db
-        }
-
     }
 
 }

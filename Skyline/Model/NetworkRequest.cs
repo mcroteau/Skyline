@@ -148,11 +148,11 @@ namespace Skyline.Model {
         }
 
         public void setAttributes(){
-            int attributesIndex = this.networkRequestPath.IndexOf("?");
+            int attributesIndex = this.requestPath.IndexOf("?");
             if(attributesIndex != -1) {
                 int attributesIndexWith = attributesIndex + 1;
-                String attributesElement = this.networkRequestPath.Substring(attributesIndexWith);
-                this.networkRequestPath = this.networkRequestPath.Substring(0, attributesIndex);
+                String attributesElement = this.requestPath.Substring(attributesIndexWith);
+                this.requestPath = this.requestPath.Substring(0, attributesIndex);
                 setValues(attributesElement);
             }
         }
