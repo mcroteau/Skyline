@@ -7,9 +7,11 @@ namespace Skyline{
 
     public class RouteEndpointNegotiator{
 
-        SecurityAttributes securityAttributes;
-        ComponentsHolder componentsHolder;
         RouteAttributes routeAttributes;
+        ComponentsHolder componentsHolder;
+        ApplicationAttributes applicationAttributes;
+        SecurityAttributes securityAttributes;
+
 
         public SecurityAttributes getSecurityAttributes() {
             return this.securityAttributes;
@@ -33,6 +35,14 @@ namespace Skyline{
 
         public void setRouteAttributes(RouteAttributes routeAttributes) {
             this.routeAttributes = routeAttributes;
+        }
+
+        public ApplicationAttributes getApplicationAttributes() {
+            return this.applicationAttributes;
+        }
+
+        public void setApplicationAttributes(ApplicationAttributes applicationAttributes) {
+            this.applicationAttributes = applicationAttributes;
         }
 
     }

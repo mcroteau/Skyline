@@ -14,81 +14,65 @@ namespace Skyline.Model {
 
         MethodInfo routeMethod;
 
-        String klass;
+        Object klassInstance;
         Boolean regex;
 
         Dictionary<String, RouteAttribute> routeAttributes;
 
-        public String getRoutePath()
-        {
+        public String getRoutePath() {
             return this.routePath;
         }
 
-        public void setRoutePath(String routePath)
-        {
+        public void setRoutePath(String routePath) {
             this.routePath = routePath;
         }
 
-        public String getRegexRoutePath()
-        {
+        public String getRegexRoutePath() {
             return this.regexRoutePath;
         }
 
-        public void setRegexRoutePath(String regexRoutePath)
-        {
+        public void setRegexRoutePath(String regexRoutePath) {
             this.regexRoutePath = regexRoutePath;
         }
 
-        public String getRouteVerb()
-        {
+        public String getRouteVerb() {
             return this.routeVerb;
         }
 
-        public void setRouteVerb(String routeVerb)
-        {
+        public void setRouteVerb(String routeVerb) {
             this.routeVerb = routeVerb;
         }
 
-        public MethodInfo getRouteMethod()
-        {
+        public MethodInfo getRouteMethod() {
             return this.routeMethod;
         }
 
-        public void setRouteMethod(MethodInfo routeMethod)
-        {
+        public void setRouteMethod(MethodInfo routeMethod) {
             this.routeMethod = routeMethod;
         }
 
-        public String getKlass()
-        {
-            return this.klass;
+        public Object getKlassInstance() {
+            return this.klassInstance;
         }
 
-        public void setKlass(String klass)
-        {
-            this.klass = klass;
+        public void setKlassInstance(Object klassInstance) {
+            this.klassInstance = klassInstance;
         }
 
-        public Boolean getRegex()
-        {
+        public Boolean getRegex() {
             return this.regex;
         }
 
-        public void setRegex(Boolean regex)
-        {
+        public void setRegex(Boolean regex) {
             this.regex = regex;
         }
 
-        public Dictionary<String, RouteAttribute> getRouteAttributes()
-        {
+        public Dictionary<String, RouteAttribute> getRouteAttributes() {
             return this.routeAttributes;
         }
 
-        public void setRouteAttributes(Dictionary<String, RouteAttribute> routeAttributes)
-        {
+        public void setRouteAttributes(Dictionary<String, RouteAttribute> routeAttributes) {
             this.routeAttributes = routeAttributes;
         }
-
-
     }
 }

@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 
-using Skyline.Model;
-
-namespace Skyline{
+namespace Skyline.Model{
     public class RouteEndpointHolder {
+
         Dictionary<String, RouteEndpoint> routeEndpoints;
+        
+        public RouteEndpointHolder(){
+            this.routeEndpoints = new Dictionary<String, RouteEndpoint>();
+        }
 
         public Dictionary<String, RouteEndpoint> getRouteEndpoints() {
-            return routeEndpoints;
+            return this.routeEndpoints;
         }
 
         public void setRouteEndpoints(Dictionary<String, RouteEndpoint> routeEndpoints) {
             this.routeEndpoints = routeEndpoints;
-        }
-
-        public RouteEndpointHolder(){
-            this.routeEndpoints = new Dictionary<string, RouteEndpoint>();
         }
     }
 }

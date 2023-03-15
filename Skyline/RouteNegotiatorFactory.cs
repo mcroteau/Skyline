@@ -26,14 +26,16 @@ namespace Skyline{
                 String securityElement = "s.k.y.l.i.n.e";
                 this.securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
-                RouteEndpointResolver routeEndpointResolver = new RouteEndpointResolver();
+                RouteEndpointResolver routeEndpointResolver = new RouteEndpointResolver(new RouteEndpointHolder());
                 routeEndpointResolver.setApplicationAttributes(applicationAttributes);
                 RouteEndpointHolder routeEndpointHolder = routeEndpointResolver.resolve();
                 routeAttributes.setRouteEndpointHolder(routeEndpointHolder);
 
-                ComponentAnnotationInspector componentAnnotationInspector = new ComponentAnnotationInspector(new ComponentsHolder());
-                ComponentsHolder componentsHolder = componentAnnotationInspector.inspect();
+                ComponentAnnotationResolver componentAnnotationResolver = new ComponentAnnotationResolver(new ComponentsHolder());
+                componentAnnotationResolver.setApplicationAttributes(applicationAttributes);
+                ComponentsHolder componentsHolder = componentAnnotationResolver.resolve();
 
+                routeEndpointNegotiator.setApplicationAttributes(applicationAttributes);
                 routeEndpointNegotiator.setSecurityAttributes(securityAttributes);
                 routeEndpointNegotiator.setRouteAttributes(routeAttributes);
                 routeEndpointNegotiator.setComponentsHolder(componentsHolder);

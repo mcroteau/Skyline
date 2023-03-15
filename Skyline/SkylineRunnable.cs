@@ -61,8 +61,8 @@ namespace Skyline{
                 specTest.Run();
 
                 ResourceUtility skylineUtilities = new ResourceUtility();
-                StartupAnnotationInspector startupAnnotationInspector = new StartupAnnotationInspector(new ComponentsHolder());
-                ComponentsHolder componentsHolder = startupAnnotationInspector.Inspect();
+                StartupAnnotationResolver startupAnnotationResolver = new StartupAnnotationResolver(new ComponentsHolder());
+                ComponentsHolder componentsHolder = startupAnnotationResolver.resolve();
 
                 if (propertiesConfig == null) {
                     propertiesConfig = new PropertiesConfig();
@@ -165,12 +165,12 @@ namespace Skyline{
 
             NetworkResponse networkResponse = new NetworkResponse();
 
-            NetworkRequestHeaderResolver networkRequestHeaderResolver = new NetworkRequestHeaderResolver();
-            networkRequestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
-            networkRequestHeaderResolver.setNetworkRequest(networkRequest);
-            networkRequestHeaderResolver.resolve();
+            RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
+            requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
+            requestHeaderResolver.setNetworkRequest(networkRequest);
+            requestHeaderResolver.resolve();
 
-            RouteResult routeResult = routeEndpointNegotiator.performNetworkRequest(RENDERER, resourcesDirectory, flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewRenderers, viewBytesMap);
+            RouteResult routeResult = routeEndpointNegotiator.performNetworkRequest("reload-request", resourcesDirectory, flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewRenderers, viewBytesMap);
 
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
@@ -212,8 +212,8 @@ namespace Skyline{
             // networkRequestHandler.Send(routeResult.getResponseBytes());
 
             byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-            requestHandler.Send(resp);
-            requestHandler.Close();
+            networkRequestHandler.Send(resp);
+            networkRequestHandler.Close();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
         }    

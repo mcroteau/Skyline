@@ -4,15 +4,15 @@ using Skyline;
 using Skyline.Annotation;
 
 namespace Skyline{
-    public class StartupAnnotationInspector {
+    public class StartupAnnotationResolver {
 
         ComponentsHolder componentsHolder;
 
-        public StartupAnnotationInspector(ComponentsHolder componentsHolder){
+        public StartupAnnotationResolver(ComponentsHolder componentsHolder){
             this.componentsHolder = componentsHolder;
         }
 
-        public ComponentsHolder Inspect(){
+        public ComponentsHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
                 Path.DirectorySeparatorChar.ToString() + "Source" + Path.DirectorySeparatorChar.ToString();
             Console.WriteLine(sourcesDirectory);
@@ -31,10 +31,12 @@ namespace Skyline{
                     String klassPathSlashesRemoved =  klassPathParts[1].Replace("\\", ".");
                     String klassPathPeriod = klassPathSlashesRemoved.Replace("/", ".");
                     String klassPathBefore = klassPathPeriod.Replace("."+ "class", "");
+                    int separatorIndex = klassPathBefore.IndexOf(".");
+                    String assembly = klassPathBefore.Substring(separatorIndex);
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){
-                        Object klassInstance = Activator.CreateInstance("Foo", klassPath).Unwrap();
+                        Object klassInstance = Activator.CreateInstance(assembly, klassPath).Unwrap();
                         Type klassType = klassInstance.GetType();
                         Object[] attrs = klassType.GetCustomAttributes(typeof(ServerStartup), true);
                         if(attrs.Length > 0) {
