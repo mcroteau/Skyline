@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace Skyline {
     public class ComponentsHolder{
+
+        public ComponentsHolder(){
+            this.repositories = new Dictionary<String, Object>();
+        }
+
         Object serverStartup;
         Object routeRegistration;
         Dictionary<String, Object> repositories;

@@ -4,14 +4,14 @@ namespace Skyline.Annotation{
     
     [System.AttributeUsage(System.AttributeTargets.Method)] 
     public class Post : Attribute{
-        public String value;
+        public String route;
 
-        public String getValue() {
-            return this.value;
+        public String getRoute() {
+            return this.route;
         }
 
-        public void setValue(String value) {
-            this.value = value;
+        public void setRoute(String route) {
+            this.route = route;
         }
     }
 }   

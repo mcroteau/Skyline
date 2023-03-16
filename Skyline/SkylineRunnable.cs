@@ -37,13 +37,15 @@ namespace Skyline{
         ViewCache viewCache;
         FlashMessage flashMessage;
         Dictionary<String, byte[]> viewBytesMap;
+        
+        ComponentsHolder componentsHolder;
+        RouteEndpointHolder routeEndpointHolder;
 
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 7;
         String securityAccessKlass;
 
         Socket listener;
-
 
         String securedAttribute = "attribute";
         String securityElement = "s.k.y.l.i.n.e";
@@ -91,18 +93,15 @@ namespace Skyline{
 
                 ResourceUtility resourceUtility = new ResourceUtility();
 
-                String securedAttribute = "attribute";
-                String securityElement = "s.k.y.l.i.n.e";
-                this.securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
-
                 RouteEndpointResolver routeEndpointResolver = new RouteEndpointResolver(new RouteEndpointHolder());
                 routeEndpointResolver.setApplicationAttributes(applicationAttributes);
-                RouteEndpointHolder routeEndpointHolder = routeEndpointResolver.resolve();
+                routeEndpointHolder = routeEndpointResolver.resolve();
+
                 routeAttributes.setRouteEndpointHolder(routeEndpointHolder);
 
                 ComponentAnnotationResolver componentAnnotationResolver = new ComponentAnnotationResolver(new ComponentsHolder());
                 componentAnnotationResolver.setApplicationAttributes(applicationAttributes);
-                ComponentsHolder componentsHolder = componentAnnotationResolver.resolve();
+                componentsHolder = componentAnnotationResolver.resolve();
 
                 IPHostEntry host = Dns.GetHostEntry("localhost");
                 IPAddress ipAddress = host.AddressList[0];

@@ -51,7 +51,7 @@ namespace Skyline{
                                 Get get = 
                                     (Get) Attribute.GetCustomAttribute(klassType, typeof (Get));
                                 if(get != null){
-                                    routePath = get.getValue();
+                                    routePath = get.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
@@ -60,7 +60,7 @@ namespace Skyline{
                                 Post post = 
                                     (Post) Attribute.GetCustomAttribute(klassType, typeof (Post));
                                 if(get != null){
-                                    routePath = post.getValue();
+                                    routePath = post.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
@@ -69,7 +69,7 @@ namespace Skyline{
                                 Delete delete = 
                                     (Delete) Attribute.GetCustomAttribute(klassType, typeof (Delete));
                                 if(delete != null){
-                                    routePath = delete.getValue();
+                                    routePath = delete.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);

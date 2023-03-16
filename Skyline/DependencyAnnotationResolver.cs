@@ -40,12 +40,11 @@ namespace Skyline {
                         Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
                         Object[] attrs = klassInstanceValidate.GetType().GetCustomAttributes(typeof(Repository), true);
                         if(attrs.Length > 0) {
-                            Object klassInstance = Activator.CreateInstance(klassInstanceValidate.GetType(), new Object[]{applicationAttributes}, new Object[]{});
-                            String[] componentElements = klassInstance.GetType().Name.ToString().Split(".");
+                            Object repositoryKlassInstance = Activator.CreateInstance(klassInstanceValidate.GetType(), new Object[]{applicationAttributes}, new Object[]{});
+                            String[] componentElements = repositoryKlassInstance.GetType().Name.ToString().Split(".");
                             String dependencyKey = componentElements[componentElements.Length -1].ToLower();
-                            componentsHolder.getRepositories().Add(dependencyKey, klassInstance);
+                            componentsHolder.getRepositories().Add(dependencyKey, repositoryKlassInstance);
                         }
-
                     }
 
                 }catch (Exception ex){

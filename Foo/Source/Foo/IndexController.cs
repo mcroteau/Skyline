@@ -1,10 +1,12 @@
 using System;
+
 using Skyline;
 using Skyline.Model;
+using Skyline.Annotation;
 
 namespace Foo{
     
-    // [NetworkController]
+    [NetworkController]
     public class IndexController{
         
         ApplicationAttributes applicationAttributes;
@@ -15,11 +17,12 @@ namespace Foo{
             this.applicationAttributes = applicationAttributes;
         }
 
-        // [Text]
-        // [Get(route="/")]
-        // public String index(){
-        //     return "hi";
-        // }
+        [Text]
+        [Get(route="/")]
+        public String index(){
+            Console.WriteLine("idx.");
+            return "hi";
+        }
     }
 
 }
