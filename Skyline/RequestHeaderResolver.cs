@@ -3,7 +3,7 @@ using System;
 using Skyline.Model;
 
 namespace Skyline{
-    public class NetworkRequestHeaderResolver{
+    public class RequestHeaderResolver{
         String BREAK = "\r\n";
         String networkRequestHeaderElement;
         NetworkRequest networkRequest;

@@ -32,7 +32,8 @@ namespace Skyline {
                     String klassPathPeriod = klassPathSlashesRemoved.Replace("/", ".");
                     String klassPathBefore = klassPathPeriod.Replace("."+ "class", "");
                     int separatorIndex = klassPathBefore.IndexOf(".");
-                    String assembly = klassPathBefore.Substring(separatorIndex);
+                    String assemblyCopy = klassPathBefore;
+                    String assembly = assemblyCopy.Substring(0, separatorIndex);
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){

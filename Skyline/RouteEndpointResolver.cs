@@ -33,7 +33,8 @@ namespace Skyline{
                     String klassPathPeriod = klassPathSlashesRemoved.Replace("/", ".");
                     String klassPathBefore = klassPathPeriod.Replace("."+ "class", "");
                     int separatorIndex = klassPathBefore.IndexOf(".");
-                    String assembly = klassPathBefore.Substring(separatorIndex);
+                    String assemblyCopy = klassPathBefore;
+                    String assembly = assemblyCopy.Substring(0, separatorIndex);
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){
@@ -41,34 +42,35 @@ namespace Skyline{
                         Type klassType = klassInstance.GetType();
                         Object[] attrs = klassType.GetCustomAttributes(typeof(Controller), true);
                         if(attrs.Length > 0) {
-                            MethodInfo[] routeMethods = klass.getDeclaredMethods();
+                            MethodInfo[] routeMethods = klassType.GetMethods();
+                            String routeKey = new String("");
+                            String routePath = new String("");
                             foreach(MethodInfo routeMethod in routeMethods){
                             
                                 Get get = 
                                     (Get) Attribute.GetCustomAttribute(klassType, typeof (Get));
                                 if(get != null){
-                                    String routePath = get.getValue();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, klassPath);
-                                    String routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
+                                    routePath = get.getValue();
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, klassInstance);
+                                    routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
                                 Post post = 
                                     (Post) Attribute.GetCustomAttribute(klassType, typeof (Post));
                                 if(get != null){
-                                    String routePath = post.getValue();
-                                    String routePath = annotation.value();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, klassPath);
-                                    String routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
+                                    routePath = post.getValue();
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, klassInstance);
+                                    routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
                                 Delete delete = 
                                     (Delete) Attribute.GetCustomAttribute(klassType, typeof (Delete));
                                 if(delete != null){
-                                    String routePath = delete.getValue();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, klassPath);
-                                    String routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
+                                    routePath = delete.getValue();
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, klassInstance);
+                                    routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
                             }
@@ -94,15 +96,15 @@ namespace Skyline{
             }
         }
 
-        RouteEndpoint getCompleteRouteEndpoint(String routeVerb, String routePath, MethodInfo routeMethod, String klassPath) {
+        RouteEndpoint getCompleteRouteEndpoint(String routeVerb, String routePath, MethodInfo routeMethod, Object klassInstance) {
             RouteEndpoint routeEndpoint = new RouteEndpoint();
             routeEndpoint.setRouteVerb(routeVerb);
-            routeEndpoint.setRoutePath(routePath.toLowerCase());
+            routeEndpoint.setRoutePath(routePath.ToLower());
             routeEndpoint.setRouteMethod(routeMethod);
-            routeEndpoint.setKlass(klassPath);
+            routeEndpoint.setKlassInstance(klassInstance);
 
-            String routeRegex = new String();
-            String[] routeParts = routePath.split("/");
+            String routeRegex = new String("");
+            String[] routeParts = routePath.Split("/");
             foreach(String routePart in routeParts){
                 if(routePart.Equals(""))continue;
                 routeRegex += "/";
@@ -118,16 +120,16 @@ namespace Skyline{
             if(routeEndpoint.getRegexRoutePath().Contains("["))routeEndpoint.setRegex(true);
             if(!routeEndpoint.getRegexRoutePath().Contains("["))routeEndpoint.setRegex(false);
 
-            ParameterInfo[] variableParametersList = routeMethod.getMethodParameters();
+            ParameterInfo[] variableParametersList = routeMethod.GetParameters();
 
             int index = 0;
             foreach(ParameterInfo variableParameterAttribute in variableParametersList){
                 RouteAttribute routeAttribute = new RouteAttribute();
-                String variableAttributeKey = variableParameterAttribute.getName().ToLower();
+                String variableAttributeKey = variableParameterAttribute.Name.ToLower();
                 routeAttribute.setRoutePosition(index);
-                routeAttribute.setTypeKlass(variableParameterAttribute.getType().getTypeName());
-                routeAttribute.setQualifiedName(variableParameterAttribute.getName().ToLower());
-                if(!variableParameterAttribute.getType().getTypeName().Contains("Skyline")){
+                routeAttribute.setTypeKlass(variableParameterAttribute.GetType().ToString());
+                routeAttribute.setQualifiedName(variableParameterAttribute.Name.ToLower());
+                if(!variableParameterAttribute.GetType().ToString().Contains("Skyline")){
                     routeEndpoint.setRegex(true);
                     routeAttribute.setRouteVariable(true);
                 }else{
@@ -138,11 +140,11 @@ namespace Skyline{
             }
 
             Dictionary<int, Boolean> processed = new Dictionary<int, Boolean>();
-            foreach(var routeAttributeEntry in processed){
+            foreach(var routeAttributeEntry in routeEndpoint.getRouteAttributes()){
                 int pathIndex = 0;
                 foreach(String routePart in routeParts){
                     if(routePart.Equals(""))continue;
-                    RouteAttribute routeAttribute = routeAttributeEntry.getValue();
+                    RouteAttribute routeAttribute = (RouteAttribute) routeAttributeEntry.Value;
                     if(routePart.Contains("{") && routePart.Contains("}") && routeAttribute.getRouteVariable()){
                         if(!processed.ContainsKey(routeAttribute.getRoutePosition())){
                             processed.Add(routeAttribute.getRoutePosition(), true);

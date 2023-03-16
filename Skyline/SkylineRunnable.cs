@@ -34,6 +34,10 @@ namespace Skyline{
         RouteAttributes routeAttributes;
         ApplicationAttributes applicationAttributes;
 
+        ViewCache viewCache;
+        FlashMessage flashMessage;
+        Dictionary<String, byte[]> viewBytesMap;
+
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 7;
         String securityAccessKlass;
@@ -45,6 +49,8 @@ namespace Skyline{
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
+            this.viewCache = new ViewCache();
+            this.flashMessage = new FlashMessage();
         }
 
         public SkylineRunnable(int port){
@@ -52,6 +58,8 @@ namespace Skyline{
             this.sourcesPath = "Source";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
+            this.viewCache = new ViewCache();
+            this.flashMessage = new FlashMessage();
         }
 
         public void Start(){
@@ -77,7 +85,7 @@ namespace Skyline{
                 }
 
                 String resourcesDirectory = viewConfig.getResourcesPath();
-                Dictionary<String, byte[]> viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
+                viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
 
                 Object serverStartupInstance = componentsHolder.getServerStartup();
                 if (serverStartupInstance != null) {
@@ -154,7 +162,7 @@ namespace Skyline{
 
             RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
             routeNegotiatorFactory.setRouteAttributes(routeAttributesCopy);
-            routeNegotiatorFactory.SetApplicationAttributes(applicationAttributes);
+            routeNegotiatorFactory.setApplicationAttributes(applicationAttributes);
             RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
             SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
 
@@ -170,14 +178,16 @@ namespace Skyline{
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
 
-            RouteResult routeResult = routeEndpointNegotiator.performNetworkRequest("reload-request", resourcesDirectory, flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewRenderers, viewBytesMap);
+            RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
+            networkRequest.setRouteAttributes(routeAttributesFinal);
+            SecurityManager securityManager = routeAttributesFinal.getSecurityManager();
+            if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
+
+            RouteResult routeResult = routeEndpointNegotiator.negotiate("reload-request", viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
-
-
-
 
             // networkRequestHandler.Send((requestVersion + " ").getBytes());
             // networkRequestHandler.Send(routeResult.getResponseCode().getBytes());
@@ -195,9 +205,10 @@ namespace Skyline{
             //     networkRequestHandler.Send(DOUBLEBREAK.getBytes());
 
             //     networkRequestHandler.close();
-            //     socketClient.close();
-
-            //     networkRequestFactory.execute();
+            //
+            //     viewCache = new ViewCache();
+            //     flashMessage = new FlashMessage();
+            //     ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
             //     return;
             // }
 
