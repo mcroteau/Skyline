@@ -37,12 +37,15 @@ namespace Skyline {
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){
-                        Object klassInstance = Activator.CreateInstance(assembly, klassPath, new Object[]{applicationAttributes}).Unwrap();
-                        Type klassType = klassInstance.GetType();
-                        Object[] attrs = klassType.GetCustomAttributes(typeof(Repository), true);
+                        Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
+                        Object[] attrs = klassInstanceValidate.GetType().GetCustomAttributes(typeof(Repository), true);
                         if(attrs.Length > 0) {
-                            componentsHolder.setServerStartup(klassInstance);
+                            Object klassInstance = Activator.CreateInstance(klassInstanceValidate.GetType(), new Object[]{applicationAttributes}, new Object[]{});
+                            String[] componentElements = klassInstance.GetType().Name.ToString().Split(".");
+                            String dependencyKey = componentElements[componentElements.Length -1].ToLower();
+                            componentsHolder.getRepositories().Add(dependencyKey, klassInstance);
                         }
+
                     }
 
                 }catch (Exception ex){

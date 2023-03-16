@@ -5,7 +5,7 @@ namespace Skyline {
     public class ComponentsHolder{
         Object serverStartup;
         Object routeRegistration;
-        Dictionary<String, String> repositories;
+        Dictionary<String, Object> repositories;
 
         public Object getServerStartup() {
             return this.serverStartup;
@@ -23,11 +23,11 @@ namespace Skyline {
             this.routeRegistration = routeRegistration;
         }
 
-        public Dictionary<String, String> getRepositories() {
+        public Dictionary<String, Object> getRepositories() {
             return this.repositories;
         }
 
-        public void setRepositories(Dictionary<String, String> repositories) {
+        public void setRepositories(Dictionary<String, Object> repositories) {
             this.repositories = repositories;
         }
     }

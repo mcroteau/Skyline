@@ -44,6 +44,10 @@ namespace Skyline{
 
         Socket listener;
 
+
+        String securedAttribute = "attribute";
+        String securityElement = "s.k.y.l.i.n.e";
+
         public SkylineRunnable(){
             this.port = 1301;
             this.sourcesPath = "Source";
@@ -69,9 +73,7 @@ namespace Skyline{
                 specTest.Run();
 
                 ResourceUtility skylineUtilities = new ResourceUtility();
-                StartupAnnotationResolver startupAnnotationResolver = new StartupAnnotationResolver(new ComponentsHolder());
-                ComponentsHolder componentsHolder = startupAnnotationResolver.resolve();
-
+                
                 if (propertiesConfig == null) {
                     propertiesConfig = new PropertiesConfig();
                     propertiesConfig.setPropertiesFile(PROPERTIES);
@@ -87,11 +89,20 @@ namespace Skyline{
                 String resourcesDirectory = viewConfig.getResourcesPath();
                 viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
 
-                Object serverStartupInstance = componentsHolder.getServerStartup();
-                if (serverStartupInstance != null) {
-                    MethodInfo startupMethod = serverStartupInstance.GetType().GetMethod("Start");
-                    startupMethod.Invoke(serverStartupInstance, new Type[]{}); 
-                }
+                ResourceUtility resourceUtility = new ResourceUtility();
+
+                String securedAttribute = "attribute";
+                String securityElement = "s.k.y.l.i.n.e";
+                this.securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
+
+                RouteEndpointResolver routeEndpointResolver = new RouteEndpointResolver(new RouteEndpointHolder());
+                routeEndpointResolver.setApplicationAttributes(applicationAttributes);
+                RouteEndpointHolder routeEndpointHolder = routeEndpointResolver.resolve();
+                routeAttributes.setRouteEndpointHolder(routeEndpointHolder);
+
+                ComponentAnnotationResolver componentAnnotationResolver = new ComponentAnnotationResolver(new ComponentsHolder());
+                componentAnnotationResolver.setApplicationAttributes(applicationAttributes);
+                ComponentsHolder componentsHolder = componentAnnotationResolver.resolve();
 
                 IPHostEntry host = Dns.GetHostEntry("localhost");
                 IPAddress ipAddress = host.AddressList[0];
@@ -160,12 +171,6 @@ namespace Skyline{
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
 
-            RouteNegotiatorFactory routeNegotiatorFactory = new RouteNegotiatorFactory();
-            routeNegotiatorFactory.setRouteAttributes(routeAttributesCopy);
-            routeNegotiatorFactory.setApplicationAttributes(applicationAttributes);
-            RouteEndpointNegotiator routeEndpointNegotiator = routeNegotiatorFactory.create();
-            SecurityAttributes securityAttributes = routeNegotiatorFactory.getSecurityAttributes();
-
             NetworkRequest networkRequest = new NetworkRequest();
             networkRequest.setRequestAction(networkRequestAction);
             networkRequest.setRequestPath(networkRequestPath);
@@ -177,6 +182,14 @@ namespace Skyline{
             requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
+
+            SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
+
+            RouteEndpointNegotiator routeEndpointNegotiator = new RouteEndpointNegotiator();
+            routeEndpointNegotiator.setApplicationAttributes(applicationAttributes);
+            routeEndpointNegotiator.setSecurityAttributes(securityAttributes);
+            routeEndpointNegotiator.setRouteAttributes(routeAttributes);
+            routeEndpointNegotiator.setComponentsHolder(componentsHolder);
 
             RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
             networkRequest.setRouteAttributes(routeAttributesFinal);

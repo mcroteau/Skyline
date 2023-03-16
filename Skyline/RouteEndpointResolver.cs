@@ -38,10 +38,11 @@ namespace Skyline{
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){
-                        Object klassInstance = Activator.CreateInstance(assembly, klassPath, new Object[]{applicationAttributes}).Unwrap();
-                        Type klassType = klassInstance.GetType();
-                        Object[] attrs = klassType.GetCustomAttributes(typeof(Controller), true);
+                        Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
+                        Type klassType = klassInstanceValidate.GetType();
+                        Object[] attrs = klassType.GetCustomAttributes(typeof(Repository), true);
                         if(attrs.Length > 0) {
+                            Object klassInstance = Activator.CreateInstance(klassType, new Object[]{applicationAttributes}, new Object[]{});
                             MethodInfo[] routeMethods = klassType.GetMethods();
                             String routeKey = new String("");
                             String routePath = new String("");
