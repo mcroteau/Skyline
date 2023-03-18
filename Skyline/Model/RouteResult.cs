@@ -30,11 +30,11 @@ namespace Skyline.Model{
             this.completeRequest = completeRequest;
         }
 
-        public byte[] getResponseBytes() {
+        public byte[] getResponseOutput() {
             return this.responseBytes;
         }
 
-        public void setResponseBytes(byte[] responseBytes) {
+        public void setResponseOutput(byte[] responseBytes) {
             this.responseBytes = responseBytes;
         }
 

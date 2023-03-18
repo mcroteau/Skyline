@@ -43,10 +43,9 @@ namespace Skyline {
         }
 
         public String resolve() {
-            String key = getExt(routeEndpointPath).ToLower();
-            String keyValue = MIME_MAP.Get(key);
+            String key = getExt(routeEndpointPath).ToString().ToLower();
             if(MIME_MAP.ContainsKey(key)){
-                return keyValue;
+                return MIME_MAP[key];
             }
             return "text/plain";
         }

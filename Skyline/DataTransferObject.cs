@@ -1,8 +1,11 @@
 using System;
-using LiteDB;
+
+using Skyline.Model;
 
 namespace Skyline{
     public class DataTransferObject{
-                 
+        public DataTransferObject(PersistenceConfig persistenceConfig){
+
+        }      
     }
 }

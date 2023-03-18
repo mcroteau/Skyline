@@ -40,37 +40,39 @@ namespace Skyline{
                     if(filePath.EndsWith(".cs")){
                         Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
                         Type klassType = klassInstanceValidate.GetType();
-                        Object[] attrs = klassType.GetCustomAttributes(typeof(Repository), true);
+                        Object[] attrs = klassType.GetCustomAttributes(typeof(NetworkController), true);
                         if(attrs.Length > 0) {
-                            Object klassInstance = Activator.CreateInstance(klassType, new Object[]{applicationAttributes}, new Object[]{});
                             MethodInfo[] routeMethods = klassType.GetMethods();
                             String routeKey = new String("");
                             String routePath = new String("");
                             foreach(MethodInfo routeMethod in routeMethods){
                             
-                                Get get = 
-                                    (Get) Attribute.GetCustomAttribute(klassType, typeof (Get));
-                                if(get != null){
+                                Object[] gets = routeMethod.GetCustomAttributes(typeof (Get), true);
+                                if(gets.Length > 0){
+                                    Get get = (Get) gets[0];
+                                    Console.WriteLine("a:" + (get != null));
+                                    
+                                    Console.WriteLine("add " + get.getRoute());
                                     routePath = get.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, klassInstance);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassPath);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
-                                Post post = 
-                                    (Post) Attribute.GetCustomAttribute(klassType, typeof (Post));
-                                if(get != null){
+                                Object[] posts = routeMethod.GetCustomAttributes(typeof (Post), true);
+                                if(posts.Length > 0){
+                                    Post post = (Post) posts[0];
                                     routePath = post.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, klassInstance);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, assembly, klassPath);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
-                                Delete delete = 
-                                    (Delete) Attribute.GetCustomAttribute(klassType, typeof (Delete));
-                                if(delete != null){
+                                Object[] deletes = routeMethod.GetCustomAttributes(typeof (Delete), true);
+                                if(deletes.Length > 0){
+                                    Delete delete = (Delete) deletes[0];
                                     routePath = delete.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, klassInstance);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, assembly, klassPath);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
@@ -97,12 +99,13 @@ namespace Skyline{
             }
         }
 
-        RouteEndpoint getCompleteRouteEndpoint(String routeVerb, String routePath, MethodInfo routeMethod, Object klassInstance) {
+        RouteEndpoint getCompleteRouteEndpoint(String routeVerb, String routePath, MethodInfo routeMethod, String klassAssembly, String klassReference) {
             RouteEndpoint routeEndpoint = new RouteEndpoint();
             routeEndpoint.setRouteVerb(routeVerb);
             routeEndpoint.setRoutePath(routePath.ToLower());
             routeEndpoint.setRouteMethod(routeMethod);
-            routeEndpoint.setKlassInstance(klassInstance);
+            routeEndpoint.setKlassAssembly(klassAssembly);
+            routeEndpoint.setKlassReference(klassReference);
 
             String routeRegex = new String("");
             String[] routeParts = routePath.Split("/");

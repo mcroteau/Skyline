@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 using Skyline.Model;
 
@@ -7,6 +8,7 @@ namespace Skyline {
     public class RouteEndpointLocator{
 
         String routeEndpointPath;
+        String routeEndpointAction;
         RouteEndpoint routeEndpoint;
         RouteEndpointHolder routeEndpointHolder;
 
@@ -17,20 +19,18 @@ namespace Skyline {
                     int endIndex = routeEndpointPath.IndexOf("/", indexWith);
                     routeEndpointPath = routeEndpointPath.Substring(0, endIndex);
                 }
-                if (routeEndpointHolder.getRouteEndpoints().ContainsKey(routeEndpointAction + ":" + routeEndpointPath)) {
-                    routeEndpoint = routeEndpointHolder.getRouteEndpoints().GetOrDefault(routeEndpointAction + ":" + routeEndpointPath, null);
+                String compositeKey = routeEndpointAction + ":" + routeEndpointPath;
+                if (routeEndpointHolder.getRouteEndpoints().ContainsKey(compositeKey)) {
+                    routeEndpoint = routeEndpointHolder.getRouteEndpoints()[compositeKey];
                 }
             }
 
             if(routeEndpoint == null) {
                 foreach(var routeEndpointEntry in routeEndpointHolder.getRouteEndpoints()) {
-                    RouteEndpoint activeRouteEndpoint = routeEndpointEntry.value;
-
-                    Regex regexLocator = new Regex(activeRouteEndpoint.getRegexRoutePath(), RegexOptions.IgnoreCase);
-                    Match matcher = regexLocator.Match(routeEndpointPath);
-                    if(matcher.Success &&
+                    RouteEndpoint activeRouteEndpoint = routeEndpointEntry.Value;
+                    if(Regex.IsMatch(routeEndpointPath, activeRouteEndpoint.getRegexRoutePath(), RegexOptions.IgnoreCase)  &&
                             routeVariablesMatch(routeEndpointPath, activeRouteEndpoint) &&
-                                activeRouteEndpoint.isRegex()){
+                                activeRouteEndpoint.getRegex()){
                         return activeRouteEndpoint;
                     }
                 }
@@ -49,6 +49,10 @@ namespace Skyline {
             this.routeEndpointHolder = routeEndpointHolder;
         }
 
+        public void setRouteEndpointAction(String routeEndpointAction){
+            this.routeEndpointAction = routeEndpointAction;
+        }
+
         public void setRouteEndpointPath(String routeEndpointPath) {
             this.routeEndpointPath = routeEndpointPath;
         }
@@ -56,8 +60,6 @@ namespace Skyline {
         public void setRouteEndpoint(RouteEndpoint routeEndpoint) {
             this.routeEndpoint = routeEndpoint;
         }
-
-
 
     }
 

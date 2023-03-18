@@ -19,7 +19,7 @@ namespace Foo{
 
         [Text]
         [Get(route="/")]
-        public String index(){
+        public String index(ViewCache viewCache, NetworkRequest req, NetworkResponse resp){
             Console.WriteLine("idx.");
             return "hi";
         }

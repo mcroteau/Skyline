@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 using Skyline.Model;
 using Skyline.Security;
@@ -28,10 +29,10 @@ namespace Skyline{
                 byte[] responseOutput = new byte[]{};
 
                 String routeEndpointPath = networkRequest.getRequestPath();
-                String routeEndpointAction = networkRequest.getRequestAction().toLowerCase();
+                String routeEndpointAction = networkRequest.getRequestAction().ToLower();
 
-                if(routeEndpointPath.equals("/launcher.status")){
-                    return new RouteResult("200 OK".getBytes(), "200 OK", "text/plain");
+                if(routeEndpointPath.Equals("/launcher.status")){
+                    return new RouteResult(utf8.GetBytes("200 OK"), "200 OK", "text/plain");
                 }
 
                 ResourceUtility resourceUtility = new ResourceUtility();
@@ -66,30 +67,45 @@ namespace Skyline{
 
                 }
 
+                foreach(var entry in routeEndpointHolder.getRouteEndpoints()){
+                    Console.WriteLine("0 : '{0}'", entry.Key);
+                }
+
+                Console.WriteLine("0.1 : {0}", routeEndpointHolder.getRouteEndpoints().ContainsKey("/"));
+
                 RouteEndpointNormalizer routeEndpointNormalizer = new RouteEndpointNormalizer();
                 routeEndpointNormalizer.setRouteEndpointPath(routeEndpointPath);
                 routeEndpointNormalizer.setRouteEndpointAction(routeEndpointAction);
-                routeEndpointPath = routeEndpointNormalizer.normalize();
-                RouteEndpoint routeEndpoint = routeEndpointHolder.getRouteEndpoints().get(routeKey);
+                routeEndpointPath = routeEndpointNormalizer.normalize();//:looking for key
+                Console.WriteLine("1 {0}", routeEndpointPath);
+                RouteEndpoint routeEndpoint = routeEndpointHolder.getRouteEndpoints()[routeEndpointAction + ":" + routeEndpointPath];
 
                 RouteEndpointLocator routeEndpointLocator = new RouteEndpointLocator();
                 routeEndpointLocator.setRouteEndpointHolder(routeEndpointHolder);
+                routeEndpointLocator.setRouteEndpointAction(routeEndpointAction);
                 routeEndpointLocator.setRouteEndpointPath(routeEndpointPath);
                 routeEndpointLocator.setRouteEndpoint(routeEndpoint);
                 routeEndpoint = routeEndpointLocator.locate();
 
+                Console.WriteLine("2");
+
                 MethodComponents methodComponents = getMethodAttributesComponents(routeEndpointPath, viewCache, flashMessage, networkRequest, networkResponse, securityManager, routeEndpoint);
                 MethodInfo routeEndpointInstanceMethod = routeEndpoint.getRouteMethod();
-
-                String title, keywords, description = "";
+         
+                String headline, keywords, description = "";
                 Attributes attributes = (Attributes) Attribute.GetCustomAttribute(routeEndpointInstanceMethod.GetType(), typeof (Attributes));
                 if(attributes != null){
-                    title = attributes.getTitle();
+                    headline = attributes.getHeadline();
                     keywords = attributes.getKeywords();
                     description = attributes.getDescription();
                 }
 
-                Object routeEndpointInstance = Activator.CreateInstance(routeEndpoint.getKlassInstance().GetType(), new Object[]{applicationAttributes}, new Object[]{});
+                Console.WriteLine("2.1 {0}", routeEndpoint.getKlassReference());
+                Object routeEndpointInstanceRef = Activator.CreateInstance(routeEndpoint.getKlassAssembly(), routeEndpoint.getKlassReference()).Unwrap();
+                Object routeEndpointInstance = Activator.CreateInstance(routeEndpointInstanceRef.GetType(), new Object[]{applicationAttributes}, new Object[]{});
+                
+                Console.WriteLine("2.2 {0}", routeEndpointInstance);
+
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
                 if(persistenceConfig != null) {
                     DataTransferObject repoDto = new DataTransferObject(persistenceConfig);
@@ -99,15 +115,17 @@ namespace Skyline{
 
                         Bind bind = (Bind) Attribute.GetCustomAttribute(routeFieldInfo.GetType(), typeof (Bind));
                         if (bind != null) {
-                            String fieldInfoKey = routeFieldInfo.getName().ToLower();
+                            String fieldInfoKey = routeFieldInfo.Name.ToLower();
                             if (componentsHolder.getRepositories().ContainsKey(fieldInfoKey)) {
-                                Type repositoryKlassType = componentsHolder.getRepositories().GetOrDefault(fieldInfoKey, null);
+                                Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
                                 Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{repoDto, applicationAttributes}, new Object[]{});
-                                routeFieldInfo.Set(routeEndpointInstance, repositoryKlassInstance);
+                                routeFieldInfo.SetValue(routeEndpointInstance, repositoryKlassInstance);
                             }
                         }
                     }
                 }
+
+                Console.WriteLine("3");
 
     //             if(routeEndpointInstanceMethod.isAnnotationPresent(Before.class)){
     //                 Before beforeAnnotation = routeEndpointInstanceMethod.getAnnotation(Before.class);
@@ -137,18 +155,18 @@ namespace Skyline{
     //                 for(Class<?> routePrincipalKlass : routePrincipalKlasses) {
     //                     RouteEndpointBefore routePrincipal = (RouteEndpointBefore) routePrincipalKlass.getConstructor().newInstance();
     //                     beforeResult = routePrincipal.before(flashMessage, viewCache, networkRequest, networkResponse, securityManager, beforeAttributes);
-    //                     if(!beforeResult.getRedirectUri().equals("")){
+    //                     if(!beforeResult.getRedirectUri().Equals("")){
     //                         RedirectInfo redirectInfo = new RedirectInfo();
     //                         redirectInfo.setMethodName(routeEndpointInstanceMethod.getName());
     //                         redirectInfo.setKlassName(routeInstance.getClass().getName());
 
-    //                         if(beforeResult.getRedirectUri() == null || beforeResult.getRedirectUri().equals("")){
+    //                         if(beforeResult.getRedirectUri() == null || beforeResult.getRedirectUri().Equals("")){
     //                             throw new StargzrException("redirect uri is empty on " + routePrincipalKlass.getName());
     //                         }
 
     //                         String redirectRouteUri = resourceUtility.getRedirect(beforeResult.getRedirectUri());
 
-    //                         if(!beforeResult.getMessage().equals("")){
+    //                         if(!beforeResult.getMessage().Equals("")){
     //                             viewCache.set("message", beforeResult.getMessage());
     //                         }
 
@@ -158,40 +176,44 @@ namespace Skyline{
     //                     }
     //                 }
 
-    //                 if(!beforeResult.getRedirectUri().equals("")){
-    //                     return new RouteResult("303".getBytes(), "303", "text/html");
+    //                 if(!beforeResult.getRedirectUri().Equals("")){
+    //                     return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
     //                 }
     //             }
 
-                Object routeResponseObject = routeEndpointInstanceMethod.Invoke(routeInstance, methodComponents.getRouteMethodAttributesList().ToArray());
+
+                Console.WriteLine("4 {0}" + methodComponents.getRouteMethodAttributesList());
+
+                Object[] methodAttributes = methodComponents.getRouteMethodAttributesList().ToArray();
+                Object routeResponseObject = routeEndpointInstanceMethod.Invoke(routeEndpointInstance, methodAttributes);
                 String methodResponse = routeResponseObject.ToString();
                 if(methodResponse == null){
-                    return new RouteResult(utf8.GetByte("404"), "404", "text/html");
+                    return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
                 }
 
             //     if(methodResponse.startsWith("redirect:")) {
             //         RedirectInfo redirectInfo = new RedirectInfo();
             //         redirectInfo.setMethodName(routeEndpointInstanceMethod.getName());
-            //         redirectInfo.setKlassName(routeInstance.getClass().getName());
+            //         redirectInfo.setKlassName(routeEndpointInstance.getClass().getName());
             //         String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
             //         networkRequest.setRedirect(true);
             //         networkRequest.setRedirectLocation(redirectRouteUri);
-            //         return new RouteResult("303".getBytes(), "303", "text/html");
+            //         return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
             //     }
 
             //     if(routeEndpointInstanceMethod.isAnnotationPresent(JsonOutput.class)){
-            //         return new RouteResult(methodResponse.getBytes(), "200 OK", "application/json");
+            //         return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "application/json");
             //     }
 
             //     if(routeEndpointInstanceMethod.isAnnotationPresent(Text.class)){
-            //         return new RouteResult(methodResponse.getBytes(), "200 OK", "text/html");
+            //         return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "text/html");
             //     }
 
-            //     if(renderer.equals("cache-request")) {
+            //     if(renderer.Equals("cache-request")) {
 
             //         ByteArrayOutputStream unebaos = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
             //         if(unebaos == null){
-            //             return new RouteResult("404".getBytes(), "404", "text/html");
+            //             return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
             //         }
             //         completePageRendered = unebaos.toString();
 
@@ -226,7 +248,7 @@ namespace Skyline{
             //     }
             //     if(designUri != null) {
             //         String designContent;
-            //         if(renderer.equals("cache-request")) {
+            //         if(renderer.Equals("cache-request")) {
 
             //             ByteArrayOutputStream baos = resourceUtility.getViewFileCopy(designUri, viewBytesMap);
             //             designContent = baos.toString();
@@ -250,11 +272,11 @@ namespace Skyline{
             //         }
 
             //         if(designContent == null){
-            //             return new RouteResult("design not found.".getBytes(), "200 OK", "text/html");
+            //             return new RouteResult(utf8.GetBytes("design not found."), "200 OK", "text/html");
             //         }
 
             //         if(!designContent.contains("<c:content/>")){
-            //             return new RouteResult("Your html template file is missing <c:content/>".getBytes(), "200 OK", "text/html");
+            //             return new RouteResult(utf8.GetBytes("Your template file is missing <c:content/>"), "200 OK", "text/html");
             //         }
 
             //         String[] bits = designContent.split("<c:content/>");
@@ -276,14 +298,15 @@ namespace Skyline{
             //         }
 
             //         completePageRendered = experienceManager.execute(completePageRendered, viewCache, networkRequest, securityAttributes, viewRenderers);
-            //         return new RouteResult(completePageRendered.getBytes(), "200 OK", "text/html");
+            //         return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
 
             //     }else{
             //         completePageRendered = experienceManager.execute(completePageRendered, viewCache, networkRequest, securityAttributes, viewRenderers);
-            //         return new RouteResult(completePageRendered.getBytes(), "200 OK", "text/html");
+            //         return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
             //     }
 
             }catch(Exception ex){
+                Console.WriteLine(ex.Message);
                 return new RouteResult(utf8.GetBytes("issue. " + ex.Message), "500", "text/plain");
             }
 
@@ -293,78 +316,82 @@ namespace Skyline{
         MethodComponents getMethodAttributesComponents(String routeEndpointPath, ViewCache viewCache, FlashMessage flashMessage, NetworkRequest networkRequest, NetworkResponse networkResponse, SecurityManager securityManager, RouteEndpoint routeEndpoint) {
             MethodComponents methodComponents = new MethodComponents();
             ParameterInfo[] endpointMethodAttributes = routeEndpoint.getRouteMethod().GetParameters();
-            Integer index = 0;
-            Integer pathVariableIndex = 0;
-            String routeEndpointPathClean = routeEndpointPath.ReplaceFirst("/", "");
+            int index = 0;
+            int pathVariableIndex = 0;
+            int firstIndex = routeEndpointPath.IndexOf("/");
+            int firstIndexWith = firstIndex + 1;
+            String routeEndpointPathClean = routeEndpointPath.Substring(firstIndexWith);
             String[] routePathUriAttributes = routeEndpointPathClean.Split("/");
             foreach(ParameterInfo endpointMethodAttribute in endpointMethodAttributes){
-                String methodAttributeKey = endpointMethodAttribute.getName().ToLower();
-                String description = endpointMethodAttribute.getDeclaringExecutable().getName().toLowerCase();
+                String methodAttributeKey = endpointMethodAttribute.Name.ToLower();
+                String description = endpointMethodAttribute.Name.ToLower();
 
-                RouteAttribute routeAttribute = routeEndpoint.getRouteAttributes().GetOrDefault(methodAttributeKey, null);
+                RouteAttribute routeAttribute = routeEndpoint.getRouteAttributes()[methodAttributeKey];
                 MethodAttribute methodAttribute = new MethodAttribute();
                 methodAttribute.setDescription(description);
 
+                Console.WriteLine("3.1 {0}" + endpointMethodAttribute.ParameterType.ToString());
+
                 pathVariableIndex = routeAttribute.getRoutePosition() != null ? routeAttribute.getRoutePosition() : 0;
-                if(endpointMethodAttribute.GetType().Name.Equals("Skyline.Security.SecurityManager")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Security.SecurityManager")){
                     methodAttribute.setDescription("securitymanager");
                     methodAttribute.setAttribute(securityManager);
                     methodComponents.getRouteMethodAttributes().Add("securitymanager", methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(securityManager);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("Skyline.Model.NetworkRequest")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Model.NetworkRequest")){
                     methodAttribute.setDescription("networkrequest");
                     methodAttribute.setAttribute(networkRequest);
                     methodComponents.getRouteMethodAttributes().Add("networkrequest", methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(networkRequest);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("Skyline.Model.NetworkResponse")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Model.NetworkResponse")){
                     methodAttribute.setDescription("networkresponse");
                     methodAttribute.setAttribute(networkResponse);
                     methodComponents.getRouteMethodAttributes().Add("networkresponse", methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(networkResponse);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("Skyline.Model.FlashMessage")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Model.FlashMessage")){
                     methodAttribute.setDescription("flashmessage");
                     methodAttribute.setAttribute(flashMessage);
                     methodComponents.getRouteMethodAttributes().Add("flashmessage", methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(flashMessage);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("Skyline.Model.ViewCache")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Model.ViewCache")){
                     methodAttribute.setDescription("viewcache");
                     methodAttribute.setAttribute(viewCache);
                     methodComponents.getRouteMethodAttributes().Add("viewcache", methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(viewCache);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("System.Int32")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int32")){
                     Int32 attributeValue = Int32.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("System.Int64")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int64")){
                     Int64 attributeValue = Int64.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("System.Int128")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int128")){
                     Int128 attributeValue = Int128.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("java.lang.Boolean")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean")){
                     Boolean attributeValue = Boolean.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                 }
-                if(endpointMethodAttribute.GetType().Name.Equals("java.lang.String")){
+                if(endpointMethodAttribute.ParameterType.ToString().Equals("System.String")){
                     String attributeValue = new String(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
@@ -372,6 +399,12 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                 }
             }
+
+            Console.WriteLine("here.");
+            foreach(Object obj in methodComponents.getRouteMethodAttributesList()){
+                Console.WriteLine("3.10" + obj);
+            }
+            
             return methodComponents;
         }
 

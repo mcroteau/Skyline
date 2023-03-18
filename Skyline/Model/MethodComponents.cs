@@ -8,7 +8,7 @@ namespace Skyline.Model{
         public MethodComponents(){
             this.routeMethodAttributeVariablesList = new ArrayList();
             this.routeMethodAttributesList = new ArrayList();
-            this.routeMethodAttributes = new HashMap();
+            this.routeMethodAttributes = new Dictionary<String, MethodAttribute>();
         }
 
         ArrayList routeMethodAttributesList;

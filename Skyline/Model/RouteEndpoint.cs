@@ -14,6 +14,7 @@ namespace Skyline.Model {
 
         MethodInfo routeMethod;
         String klassReference;
+        String klassAssembly;
         Boolean regex;
 
         Dictionary<String, RouteAttribute> routeAttributes;
@@ -56,6 +57,14 @@ namespace Skyline.Model {
 
         public void setKlassReference(String klassReference) {
             this.klassReference = klassReference;
+        }
+
+        public String getKlassAssembly() {
+            return this.klassAssembly;
+        }
+
+        public void setKlassAssembly(String klassAssembly) {
+            this.klassAssembly = klassAssembly;
         }
 
         public Boolean getRegex() {
