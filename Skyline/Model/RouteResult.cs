@@ -17,6 +17,7 @@ namespace Skyline.Model{
         Boolean completeRequest;
         byte[] responseBytes;
         String contentType;
+        int statusCode;
         String responseCode;
 
         Dictionary<String, Object> redirectAttributes;
@@ -43,6 +44,16 @@ namespace Skyline.Model{
 
         public void setContentType(String contentType) {
             this.contentType = contentType;
+        }
+
+        public int getStatusCode() {
+            return this.statusCode;
+        }
+
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+            if(this.statusCode == 200)this.responseCode = "200 OK";
+            if(this.statusCode != 200)this.responseCode = this.statusCode.ToString();
         }
 
         public String getResponseCode() {

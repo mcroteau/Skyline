@@ -13,8 +13,7 @@ namespace Skyline.Model {
         String routeVerb;
 
         MethodInfo routeMethod;
-
-        Object klassInstance;
+        String klassReference;
         Boolean regex;
 
         Dictionary<String, RouteAttribute> routeAttributes;
@@ -51,12 +50,12 @@ namespace Skyline.Model {
             this.routeMethod = routeMethod;
         }
 
-        public Object getKlassInstance() {
-            return this.klassInstance;
+        public String getKlassReference() {
+            return this.klassReference;
         }
 
-        public void setKlassInstance(Object klassInstance) {
-            this.klassInstance = klassInstance;
+        public void setKlassReference(String klassReference) {
+            this.klassReference = klassReference;
         }
 
         public Boolean getRegex() {

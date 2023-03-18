@@ -12,7 +12,7 @@ using Skyline.Security;
 
 namespace Skyline{
 
-    public class ExperienceResolver {
+    public class ApplicationExperienceResolver {
 
         int ZERO = 0;
         int ONE  = 1;

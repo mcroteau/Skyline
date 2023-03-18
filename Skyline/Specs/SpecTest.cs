@@ -23,7 +23,7 @@ namespace Skyline.Specs{
 
         public void A(){
             ViewCache viewCache = this.create();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             StringBuilder sb = new StringBuilder();
             sb.Append("<c:if spec=\"${tom.name == ''}\">\n");
             sb.Append("    *!.\n");
@@ -43,7 +43,7 @@ namespace Skyline.Specs{
 
         public void B() {
             ViewCache resp = this.create();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             StringBuilder sb = new StringBuilder();
             sb.Append("<c:if spec=\"${message != ''}\">\n");
             sb.Append("${message}\n");
@@ -55,7 +55,7 @@ namespace Skyline.Specs{
         public void C() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             sb.Append("<c:if spec=\"${blank != ''}\">\n");
             sb.Append("nothing.\n");
             sb.Append("</c:if>\n");
@@ -66,7 +66,7 @@ namespace Skyline.Specs{
         public void D() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             sb.Append("<c:if spec=\"${tom.name == 'Tom'}\">\n");
             sb.Append("Tom.\n");
             sb.Append("</c:if>\n");
@@ -84,7 +84,7 @@ namespace Skyline.Specs{
         public void E() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             sb.Append("<c:if spec=\"${not == null}\">\n");
             sb.Append("not.\n");
             sb.Append("</c:if>\n");
@@ -99,7 +99,7 @@ namespace Skyline.Specs{
         public void F() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             sb.Append("<c:if spec=\"${todos.Count > 0}\">\n");
             sb.Append(" <c:foreach items=\"${todos}\" var=\"tdo\">\n");
             sb.Append("     <c:set var=\"selected\" val=\"\" \n");
@@ -123,7 +123,7 @@ namespace Skyline.Specs{
         public void G() {
             ViewCache viewCache = this.create();
             StringBuilder sb = new StringBuilder();
-            ExperienceResolver exp = new ExperienceResolver();
+            ApplicationExperienceResolver exp = new ApplicationExperienceResolver();
             sb.Append("<c:if spec=\"${tom.name == 'Tom'}\">\n");
             sb.Append("     <c:if spec=\"${condition}\">\n");
             sb.Append("         condition.\n");

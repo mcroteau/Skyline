@@ -8,18 +8,18 @@ namespace Skyline{
     
     public class RouteEndpointResolver{
 
-        RouteEndpointHolder routeEndpointNegotiatorHolder;
+        RouteEndpointHolder routeEndpointHolder;
         ApplicationAttributes applicationAttributes;
 
-        public RouteEndpointResolver(RouteEndpointHolder routeEndpointNegotiatorHolder){
-            this.routeEndpointNegotiatorHolder = routeEndpointNegotiatorHolder;
+        public RouteEndpointResolver(RouteEndpointHolder routeEndpointHolder){
+            this.routeEndpointHolder = routeEndpointHolder;
         }
 
         public RouteEndpointHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
             Path.DirectorySeparatorChar.ToString() + "Source" + Path.DirectorySeparatorChar.ToString();
             InspectFilePath(sourcesDirectory, sourcesDirectory);
-            return routeEndpointNegotiatorHolder;
+            return routeEndpointHolder;
         }
 
         public void InspectFilePath(String sourcesDirectory, String filePath){
@@ -54,7 +54,7 @@ namespace Skyline{
                                     routePath = get.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
-                                    routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
+                                    routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
                                 Post post = 
@@ -63,7 +63,7 @@ namespace Skyline{
                                     routePath = post.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
-                                    routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
+                                    routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
 
                                 Delete delete = 
@@ -72,7 +72,7 @@ namespace Skyline{
                                     routePath = delete.getRoute();
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, klassInstance);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
-                                    routeEndpointNegotiatorHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
+                                    routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
                             }
                         }
