@@ -13,6 +13,7 @@ namespace Skyline.Model {
             this.attributes = routeAttributes.getAttributes();
             this.viewRenderers = routeAttributes.getViewRenderers();
             this.routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
+            this.persistenceConfig = routeAttributes.getPersistenceConfig();
         }
 
         public RouteAttributes(){

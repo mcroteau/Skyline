@@ -105,19 +105,24 @@ namespace Skyline{
                 Console.WriteLine("2.2 {0}", routeEndpointInstance);
 
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
+                                Console.WriteLine("here.." + persistenceConfig);
                 if(persistenceConfig != null) {
-                    DataTransferObject repoDto = new DataTransferObject(persistenceConfig);
-
+                    DataTransferObject dto = new DataTransferObject(persistenceConfig);
+Console.WriteLine("here.." + dto);
                     FieldInfo[] routeFields = routeEndpointInstance.GetType().GetFields();
+Console.WriteLine("here.." + routeFields.Length);
                     foreach(FieldInfo routeFieldInfo in routeFields) {
-
-                        Bind bind = (Bind) Attribute.GetCustomAttribute(routeFieldInfo.GetType(), typeof (Bind));
-                        if (bind != null) {
+                        Object[] binds = routeFieldInfo.GetCustomAttributes(typeof (Bind), true);
+                        if(binds.Length > 0){
                             String fieldInfoKey = routeFieldInfo.Name.ToLower();
                             if (componentsHolder.getRepositories().ContainsKey(fieldInfoKey)) {
+                                Console.WriteLine("a..");
                                 Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
-                                Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{repoDto, applicationAttributes}, new Object[]{});
+                                Console.WriteLine("b.." + repositoryKlassType);
+                                Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto, applicationAttributes}, new Object[]{});
+                                Console.WriteLine("c.." + repositoryKlassInstance);
                                 routeFieldInfo.SetValue(routeEndpointInstance, repositoryKlassInstance);
+                                Console.WriteLine("d..");
                             }
                         }
                     }

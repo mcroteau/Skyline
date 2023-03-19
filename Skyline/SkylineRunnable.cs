@@ -31,6 +31,7 @@ namespace Skyline{
 
         ViewConfig viewConfig;
         PropertiesConfig propertiesConfig;
+        PersistenceConfig persistenceConfig;
         RouteAttributes routeAttributes;
         ApplicationAttributes applicationAttributes;
 
@@ -81,8 +82,10 @@ namespace Skyline{
                     propertiesConfig.setPropertiesFile(PROPERTIES);
                 }
 
-                RouteAttributesResolver routeAttributesResolver = new RouteAttributesResolver(propertiesConfig);
+                RouteAttributesResolver routeAttributesResolver = new RouteAttributesResolver();
+                routeAttributesResolver.setPropertiesConfig(propertiesConfig);
                 routeAttributes = routeAttributesResolver.resolve();
+                routeAttributes.setPersistenceConfig(persistenceConfig);
 
                 foreach(var propertyEntry in routeAttributes.getAttributes()){
                     Console.WriteLine(propertyEntry.Key + ":" + propertyEntry.Value);
@@ -245,6 +248,10 @@ namespace Skyline{
             MemoryStream stream = new MemoryStream(bytes);
             StreamReader streamReader = new StreamReader(stream);
             return streamReader.ReadToEnd();
+        }
+
+        public void setPersistenceConfig(PersistenceConfig persistenceConfig){
+            this.persistenceConfig = persistenceConfig;
         }
 
         public void setPropertiesConfig(PropertiesConfig propertiesConfig){

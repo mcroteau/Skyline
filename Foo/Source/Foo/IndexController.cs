@@ -4,12 +4,17 @@ using Skyline;
 using Skyline.Model;
 using Skyline.Annotation;
 
+using Foo.Repo;
+
 namespace Foo{
     
     [NetworkController]
     public class IndexController{
         
         ApplicationAttributes applicationAttributes;
+
+        [Bind]
+        public PersonRepo personRepo;
 
         public IndexController(){}
 
@@ -21,6 +26,8 @@ namespace Foo{
         [Get(route="/")]
         public String index(ViewCache viewCache, NetworkRequest req, NetworkResponse resp){
             Console.WriteLine("idx.");
+            Console.WriteLine(applicationAttributes.getAttributes()["abc"]);
+            personRepo.print();
             return "hi";
         }
 

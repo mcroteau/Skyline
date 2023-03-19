@@ -14,8 +14,11 @@ namespace Foo{
             SkylineRunnable skyline = new SkylineRunnable(3000);
             skyline.SetNumberOfPartitions(300);
             skyline.SetNumberOfRequestExecutors(700);
+            PersistenceConfig persistenceConfig = new PersistenceConfig();
+            skyline.setPersistenceConfig(persistenceConfig);
 
             ApplicationAttributes applicationAttributes = new ApplicationAttributes();
+            applicationAttributes.getAttributes().Add("abc", "123");
             skyline.SetApplicationAttributes(applicationAttributes);
 
             skyline.Start();

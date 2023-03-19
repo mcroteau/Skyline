@@ -5,10 +5,6 @@ namespace Skyline{
     public class RouteAttributesResolver{
         PropertiesConfig propertiesConfig;
 
-        public RouteAttributesResolver(PropertiesConfig propertiesConfig){
-            this.propertiesConfig = propertiesConfig;
-        }
-
         public RouteAttributes resolve(){
             RouteAttributes routeAttributes = new RouteAttributes();
             String propertiesPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString()  + 
@@ -24,5 +20,9 @@ namespace Skyline{
 
             return routeAttributes;
         }    
+                
+        public void setPropertiesConfig(PropertiesConfig propertiesConfig) {
+            this.propertiesConfig = propertiesConfig;
+        }
     }
 }
