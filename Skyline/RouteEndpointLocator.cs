@@ -9,26 +9,39 @@ namespace Skyline {
 
         String routeEndpointPath;
         String routeEndpointAction;
-        RouteEndpoint routeEndpoint;
         RouteEndpointHolder routeEndpointHolder;
 
         public RouteEndpoint locate(){
-            if(routeEndpoint == null) {
-                if (routeEndpointPath.Length > 1 && routeEndpointPath.EndsWith("/")) {
-                    int indexWith = routeEndpointPath.Length - 1;
-                    int endIndex = routeEndpointPath.IndexOf("/", indexWith);
-                    routeEndpointPath = routeEndpointPath.Substring(0, endIndex);
-                }
-                String compositeKey = routeEndpointAction + ":" + routeEndpointPath;
-                if (routeEndpointHolder.getRouteEndpoints().ContainsKey(compositeKey)) {
-                    routeEndpoint = routeEndpointHolder.getRouteEndpoints()[compositeKey];
-                }
+
+            RouteEndpoint routeEndpoint = null;
+
+            if (routeEndpointPath.Length > 1 && routeEndpointPath.EndsWith("/")) {
+                int indexWith = routeEndpointPath.Length - 1;
+                int endIndex = routeEndpointPath.IndexOf("/", indexWith);
+                routeEndpointPath = routeEndpointPath.Substring(0, endIndex);
             }
+
+            String compositeEndpointKey = routeEndpointAction + ":" + routeEndpointPath;
+            Console.WriteLine("z:" + compositeEndpointKey);
+
+            if (routeEndpointHolder.getRouteEndpoints().ContainsKey(compositeEndpointKey)) {
+                routeEndpoint = routeEndpointHolder.getRouteEndpoints()[compositeEndpointKey];
+            }
+            
+            Console.WriteLine("z:" + (routeEndpoint == null));
 
             if(routeEndpoint == null) {
                 foreach(var routeEndpointEntry in routeEndpointHolder.getRouteEndpoints()) {
                     RouteEndpoint activeRouteEndpoint = routeEndpointEntry.Value;
-                    if(Regex.IsMatch(routeEndpointPath, activeRouteEndpoint.getRegexRoutePath(), RegexOptions.IgnoreCase)  &&
+
+                    var regex = new Regex("/");
+                    var routeEndpointRegex = regex.Replace(activeRouteEndpoint.getRegexRoutePath(), "", 1);
+
+                    Console.WriteLine("3.0: " + routeEndpointPath + ":" + routeEndpointRegex + ":" + activeRouteEndpoint.getRegexRoutePath());
+                    Match match = Regex.Match(routeEndpointPath, routeEndpointRegex);
+                    Console.WriteLine("3.01:" + routeEndpointPath.Equals("/") + ":" + routeEndpointPath + ":" + activeRouteEndpoint.getRoutePath() + ":" + activeRouteEndpoint.getRegexRoutePath());
+                    if(!routeEndpointRegex.Equals("/") && 
+                        match.Success && 
                             routeVariablesMatch(routeEndpointPath, activeRouteEndpoint) &&
                                 activeRouteEndpoint.getRegex()){
                         return activeRouteEndpoint;
@@ -55,10 +68,6 @@ namespace Skyline {
 
         public void setRouteEndpointPath(String routeEndpointPath) {
             this.routeEndpointPath = routeEndpointPath;
-        }
-
-        public void setRouteEndpoint(RouteEndpoint routeEndpoint) {
-            this.routeEndpoint = routeEndpoint;
         }
 
     }

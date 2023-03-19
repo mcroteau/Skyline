@@ -78,16 +78,14 @@ namespace Skyline{
                 routeEndpointNormalizer.setRouteEndpointAction(routeEndpointAction);
                 routeEndpointPath = routeEndpointNormalizer.normalize();//:looking for key
                 Console.WriteLine("1 {0}", routeEndpointPath);
-                RouteEndpoint routeEndpoint = routeEndpointHolder.getRouteEndpoints()[routeEndpointAction + ":" + routeEndpointPath];
 
                 RouteEndpointLocator routeEndpointLocator = new RouteEndpointLocator();
                 routeEndpointLocator.setRouteEndpointHolder(routeEndpointHolder);
                 routeEndpointLocator.setRouteEndpointAction(routeEndpointAction);
                 routeEndpointLocator.setRouteEndpointPath(routeEndpointPath);
-                routeEndpointLocator.setRouteEndpoint(routeEndpoint);
-                routeEndpoint = routeEndpointLocator.locate();
+                RouteEndpoint routeEndpoint = routeEndpointLocator.locate();
 
-                Console.WriteLine("2");
+                Console.WriteLine("2" + routeEndpoint);
 
                 MethodComponents methodComponents = getMethodAttributesComponents(routeEndpointPath, viewCache, flashMessage, networkRequest, networkResponse, securityManager, routeEndpoint);
                 MethodInfo routeEndpointInstanceMethod = routeEndpoint.getRouteMethod();
@@ -331,8 +329,9 @@ namespace Skyline{
                 methodAttribute.setDescription(description);
 
                 Console.WriteLine("3.1 {0}" + endpointMethodAttribute.ParameterType.ToString());
+                
+                Console.WriteLine("3.10 {0}", pathVariableIndex);
 
-                pathVariableIndex = routeAttribute.getRoutePosition() != null ? routeAttribute.getRoutePosition() : 0;
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Security.SecurityManager")){
                     methodAttribute.setDescription("securitymanager");
                     methodAttribute.setAttribute(securityManager);
@@ -369,6 +368,7 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
+                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int64")){
                     Int64 attributeValue = Int64.Parse(routePathUriAttributes[pathVariableIndex]);
@@ -376,27 +376,34 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
+                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int128")){
+                    Console.WriteLine("3.20" + routePathUriAttributes[pathVariableIndex]);
                     Int128 attributeValue = Int128.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
+                    pathVariableIndex++;
                 }
+                Console.WriteLine("3.2:" + endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean"));
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean")){
                     Boolean attributeValue = Boolean.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
+                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.String")){
+                    Console.WriteLine("3.21");
                     String attributeValue = new String(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
+                    pathVariableIndex++;
                 }
             }
 

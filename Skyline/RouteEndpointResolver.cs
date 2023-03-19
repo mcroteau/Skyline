@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Reflection;
 
 using Skyline.Model;
@@ -46,14 +47,12 @@ namespace Skyline{
                             String routeKey = new String("");
                             String routePath = new String("");
                             foreach(MethodInfo routeMethod in routeMethods){
-                            
+                                Console.WriteLine(routeMethod);
                                 Object[] gets = routeMethod.GetCustomAttributes(typeof (Get), true);
                                 if(gets.Length > 0){
                                     Get get = (Get) gets[0];
-                                    Console.WriteLine("a:" + (get != null));
-                                    
-                                    Console.WriteLine("add " + get.getRoute());
                                     routePath = get.getRoute();
+                                    Console.WriteLine("add " + routePath + ":" + get.getRoute());
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassPath);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
@@ -109,8 +108,8 @@ namespace Skyline{
 
             String routeRegex = new String("");
             String[] routeParts = routePath.Split("/");
+            Console.WriteLine("1.0" + routeParts.Length + ":" + routePath);
             foreach(String routePart in routeParts){
-                if(routePart.Equals(""))continue;
                 routeRegex += "/";
                 if(routePart.Contains("{") && routePart.Contains("}")){
                     routeRegex += "[a-zA-Z0-9-_]*";
@@ -119,6 +118,9 @@ namespace Skyline{
                 }
             }
 
+            if(routeRegex.Equals(""))routeRegex += "/";
+
+            Console.WriteLine(routeRegex);
             routeEndpoint.setRegexRoutePath(routeRegex);
 
             if(routeEndpoint.getRegexRoutePath().Contains("["))routeEndpoint.setRegex(true);
@@ -143,6 +145,7 @@ namespace Skyline{
                 index++;
             }
 
+            Dictionary<String, RouteAttribute> routeAttributesFinal = new Dictionary<String, RouteAttribute>();
             Dictionary<int, Boolean> processed = new Dictionary<int, Boolean>();
             foreach(var routeAttributeEntry in routeEndpoint.getRouteAttributes()){
                 int pathIndex = 0;
@@ -153,11 +156,13 @@ namespace Skyline{
                         if(!processed.ContainsKey(routeAttribute.getRoutePosition())){
                             processed.Add(routeAttribute.getRoutePosition(), true);
                             routeAttribute.setRoutePosition(pathIndex);
+                            routeEndpoint.getRouteAttributes()[routeAttributeEntry.Key] = routeAttribute;
                         }
                     }
                     pathIndex++;
                 }
             }
+
 
             return routeEndpoint;
         }
