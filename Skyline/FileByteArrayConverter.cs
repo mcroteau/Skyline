@@ -2,17 +2,17 @@ using System;
 using System.IO;
 
 namespace Skyline{
-    public class FileToByteArrayConverter{
-        String fileName;
+    public class FileByteArrayConverter{
+        String file;
         ViewConfig viewConfig;
 
         public byte[] convert(){
-            String filePath = "Webapp" + Path.DirectorySeparatorChar.ToString() + 
-                        viewConfig.getResourcesPath() + Path.DirectorySeparatorChar.ToString() + fileName;
+            String filePath = "Webapp" + Path.DirectorySeparatorChar.ToString()
+                + Path.DirectorySeparatorChar.ToString() + file;
             
             FileStream fileInputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileInputStream);
-            long byteLength = new System.IO.FileInfo(fileName).Length;
+            long byteLength = new System.IO.FileInfo(filePath).Length;
             byte[] fileContent = binaryReader.ReadBytes((Int32)byteLength);
             
             fileInputStream.Close();
@@ -22,12 +22,12 @@ namespace Skyline{
             return fileContent;
         }
 
-        public String getFileName() {
-            return this.fileName;
+        public String getFile() {
+            return this.file;
         }
 
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
+        public void setFile(String file) {
+            this.file = file;
         }
 
         public ViewConfig getViewConfig() {

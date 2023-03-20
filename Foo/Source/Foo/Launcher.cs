@@ -21,6 +21,10 @@ namespace Foo{
             applicationAttributes.getAttributes().Add("abc", "123");
             skyline.SetApplicationAttributes(applicationAttributes);
 
+            ViewConfig viewConfig = new ViewConfig();
+            viewConfig.setResourcesPath("Assets");
+            skyline.setViewConfig(viewConfig);
+
             skyline.Start();
             return 0;
         }

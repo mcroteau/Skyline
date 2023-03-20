@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 using Skyline;
 using Skyline.Model;
@@ -21,14 +22,19 @@ namespace Foo{
         public IndexController(ApplicationAttributes applicationAttributes){
             this.applicationAttributes = applicationAttributes;
         }
-
-        [Text]
+        
+        [Layout(file="/Pages/Default.asp")]
         [Get(route="/")]
-        public String index(ViewCache viewCache, NetworkRequest req, NetworkResponse resp){
-            Console.WriteLine("idx.");
-            Console.WriteLine(applicationAttributes.getAttributes()["abc"]);
-            personRepo.print();
-            return "hi";
+        public String index(ViewCache cache, NetworkRequest req, NetworkResponse resp){
+            cache.set("message", "here...");
+
+            ArrayList items = new ArrayList();
+            items.Add("Cinco DeMayos");
+            items.Add("Burgers n' Fries");
+            items.Add("Canolis");
+            cache.set("items", items);
+
+            return "/Pages/Index.asp";
         }
 
         [Text]

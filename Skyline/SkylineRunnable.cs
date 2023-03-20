@@ -204,41 +204,48 @@ namespace Skyline{
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
 
-            // networkRequestHandler.Send((requestVersion + " ").getBytes());
-            // networkRequestHandler.Send(routeResult.getResponseCode().getBytes());
-            // networkRequestHandler.Send(BREAK.getBytes());
 
-            // if(networkRequest.isRedirect()) {
-            //     networkRequestHandler.Send("Content-Type:text/html".getBytes());
-            //     networkRequestHandler.Send(BREAK.getBytes());
-            //     networkRequestHandler.Send("Set-Cookie:".getBytes());
-            //     networkRequestHandler.Send(sessionValues.toString().getBytes());
-            //     networkRequestHandler.Send(BREAK.getBytes());
-            //     networkRequestHandler.Send(("Location: " +  networkRequest.getRedirectLocation() + SPACE).getBytes());
-            //     networkRequestHandler.Send(BREAK.getBytes());
-            //     networkRequestHandler.Send("Content-Length: -1".getBytes());
-            //     networkRequestHandler.Send(DOUBLEBREAK.getBytes());
+            StringBuilder sessionValues = new StringBuilder();
+            foreach(var securityAttributeEntry in networkResponse.getSecurityAttributes()){
+                SecurityAttribute securityAttribute = securityAttributeEntry.Value;
+                sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
+            }
 
-            //     networkRequestHandler.close();
-            //
-            //     viewCache = new ViewCache();
-            //     flashMessage = new FlashMessage();
-            //     ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
-            //     return;
-            // }
+            networkRequestHandler.Send(utf8.GetBytes((networkRequestVersion + " ")));
+            networkRequestHandler.Send(utf8.GetBytes(routeResult.getResponseCode()));
+            networkRequestHandler.Send(utf8.GetBytes(BREAK));
+
+            if(networkRequest.isRedirect()) {
+                networkRequestHandler.Send(utf8.GetBytes("Content-Type:text/plain"));
+                networkRequestHandler.Send(utf8.GetBytes(BREAK));
+                networkRequestHandler.Send(utf8.GetBytes("Set-Cookie:"));
+                networkRequestHandler.Send(utf8.GetBytes(sessionValues.ToString()));
+                networkRequestHandler.Send(utf8.GetBytes(BREAK));
+                networkRequestHandler.Send(utf8.GetBytes(("Location: " +  networkRequest.getRedirectLocation() + SPACE)));
+                networkRequestHandler.Send(utf8.GetBytes(BREAK));
+                networkRequestHandler.Send(utf8.GetBytes("Content-Length: -1"));
+                networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
+
+                networkRequestHandler.Close();
+            
+                viewCache = new ViewCache();
+                flashMessage = new FlashMessage();
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
+                return;
+            }
 
 
-            // networkRequestHandler.Send("Content-Type:".getBytes());
-            // networkRequestHandler.Send(routeResult.getContentType().getBytes());
-            // networkRequestHandler.Send(BREAK.getBytes());
+            networkRequestHandler.Send(utf8.GetBytes("Content-Type:"));
+            networkRequestHandler.Send(utf8.GetBytes(routeResult.getContentType()));
+            networkRequestHandler.Send(utf8.GetBytes(BREAK));
 
-            // networkRequestHandler.Send("Set-Cookie:".getBytes());
-            // networkRequestHandler.Send(sessionValues.toString().getBytes());
-            // networkRequestHandler.Send(DOUBLEBREAK.getBytes());
-            // networkRequestHandler.Send(routeResult.getResponseBytes());
+            networkRequestHandler.Send(utf8.GetBytes("Set-Cookie:"));
+            networkRequestHandler.Send(utf8.GetBytes(sessionValues.ToString()));
+            networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
+            networkRequestHandler.Send(routeResult.getResponseOutput());
 
-            byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-            networkRequestHandler.Send(resp);
+            // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
+            // networkRequestHandler.Send(resp);
             networkRequestHandler.Close();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));

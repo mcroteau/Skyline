@@ -25,6 +25,8 @@ namespace Skyline{
 
             try {
 
+                viewCache.set("message", flashMessage.getMessage());
+
                 RouteResult routeResult = new RouteResult();
                 byte[] responseOutput = new byte[]{};
 
@@ -54,8 +56,8 @@ namespace Skyline{
                         routeResult.setContentType(mime);
                     }
                     if(renderer.Equals("reload-requests")){
-                        FileToByteArrayConverter resourcesFileConverter = new FileToByteArrayConverter();
-                        resourcesFileConverter.setFileName(routeEndpointPath);
+                        FileByteArrayConverter resourcesFileConverter = new FileByteArrayConverter();
+                        resourcesFileConverter.setFile(routeEndpointPath);
                         resourcesFileConverter.setViewConfig(viewConfig);
                         responseOutput = resourcesFileConverter.convert();
 
@@ -90,7 +92,7 @@ namespace Skyline{
                 MethodComponents methodComponents = getMethodAttributesComponents(routeEndpointPath, viewCache, flashMessage, networkRequest, networkResponse, securityManager, routeEndpoint);
                 MethodInfo routeEndpointInstanceMethod = routeEndpoint.getRouteMethod();
          
-                String headline, keywords, description = "";
+                String headline = "", keywords = "", description = "";
                 Attributes attributes = (Attributes) Attribute.GetCustomAttribute(routeEndpointInstanceMethod.GetType(), typeof (Attributes));
                 if(attributes != null){
                     headline = attributes.getHeadline();
@@ -185,128 +187,112 @@ Console.WriteLine("here.." + routeFields.Length);
     //             }
 
 
-                Console.WriteLine("4 {0}" + methodComponents.getRouteMethodAttributesList());
+                Console.WriteLine("4.3" + methodComponents.getRouteMethodAttributesList());
 
                 Object[] methodAttributes = methodComponents.getRouteMethodAttributesList().ToArray();
                 Object routeResponseObject = routeEndpointInstanceMethod.Invoke(routeEndpointInstance, methodAttributes);
                 String methodResponse = routeResponseObject.ToString();
+                
+                Console.WriteLine("z:" + methodResponse);
                 if(methodResponse == null){
                     return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
                 }
 
-            //     if(methodResponse.startsWith("redirect:")) {
-            //         RedirectInfo redirectInfo = new RedirectInfo();
-            //         redirectInfo.setMethodName(routeEndpointInstanceMethod.getName());
-            //         redirectInfo.setKlassName(routeEndpointInstance.getClass().getName());
-            //         String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
-            //         networkRequest.setRedirect(true);
-            //         networkRequest.setRedirectLocation(redirectRouteUri);
-            //         return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
-            //     }
-
-            //     if(routeEndpointInstanceMethod.isAnnotationPresent(JsonOutput.class)){
-            //         return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "application/json");
-            //     }
-
-            //     if(routeEndpointInstanceMethod.isAnnotationPresent(Text.class)){
-            //         return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "text/html");
-            //     }
-
-            //     if(renderer.Equals("cache-request")) {
-
-            //         ByteArrayOutputStream unebaos = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
-            //         if(unebaos == null){
-            //             return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
-            //         }
-            //         completePageRendered = unebaos.toString();
-
-            //     }else{
-
-            //         Path webPath = Paths.get("src", "main", viewConfig.getViewsPath());
-            //         if (methodResponse.startsWith("/")) {
-            //             methodResponse = methodResponse.replaceFirst("/", "");
-            //         }
-
-            //         String htmlPath = webPath.toFile().getAbsolutePath().concat(File.separator + methodResponse);
-            //         File viewFile = new File(htmlPath);
-            //         ByteArrayOutputStream unebaos = new ByteArrayOutputStream();
-
-            //         InputStream pageInputStream = new FileInputStream(viewFile);
-            //         byte[] bytes = new byte[(int) viewFile.length()];
-            //         int pageBytesLength;
-            //         while ((pageBytesLength = pageInputStream.read(bytes)) != -1) {
-            //             unebaos.write(bytes, 0, pageBytesLength);
-            //             if(pageInputStream.available() == 0)break;
-            //         }
-            //         completePageRendered = unebaos.toString();//todo? ugly
-            //     }
+                if(methodResponse.Contains("redirect:")) {
+                    RedirectInfo redirectInfo = new RedirectInfo();
+                    redirectInfo.setMethodName(routeEndpointInstanceMethod.Name);
+                    redirectInfo.setKlassName(routeEndpointInstance.GetType().Name);
+                    String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
+                    networkRequest.setRedirect(true);
+                    networkRequest.setRedirectLocation(redirectRouteUri);
+                    return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
+                }
 
 
-            //     viewCache.set("message", flashMessage.getMessage());
+                Console.WriteLine("3.3");
+                Object[] jsons = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Json), true);
+                if(jsons.Length > 0){
+                    return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "application/json");
+                }
 
-            //     String designUri = null;
-            //     if(routeEndpointInstanceMethod.isAnnotationPresent(Design.class)){
-            //         Design annotation = routeEndpointInstanceMethod.getAnnotation(Design.class);
-            //         designUri = annotation.value();
-            //     }
-            //     if(designUri != null) {
-            //         String designContent;
-            //         if(renderer.Equals("cache-request")) {
+                Object[] texts = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Text), true);
+                if(texts.Length > 0){
+                    return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "text/html");
+                }
 
-            //             ByteArrayOutputStream baos = resourceUtility.getViewFileCopy(designUri, viewBytesMap);
-            //             designContent = baos.toString();
+                Console.WriteLine("5");
+                if(renderer.Equals("cache-request")) {
+                    byte[] viewbytes = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
+                    if(viewbytes == null){
+                        return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
+                    }
+                    completePageRendered = utf8.GetString(viewbytes);
+                }
 
-            //         }else{
 
-            //             Path designPath = Paths.get("src", "main", "webapp", designUri);
-            //             File designFile = new File(designPath.toString());
-            //             InputStream designInputStream = new FileInputStream(designFile);
+                Console.WriteLine("5.1");
+                if(renderer.Equals("reload-request")){
+                    FileByteArrayConverter viewConverter = new FileByteArrayConverter();
+                    viewConverter.setFile(methodResponse);
+                    byte[] viewBytes = viewConverter.convert();
+                    completePageRendered = utf8.GetString(viewBytes);
+                }
 
-            //             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            //             byte[] bytes = new byte[(int) designFile.length()];
-            //             int length;
-            //             while ((length = designInputStream.read(bytes)) != -1) {
-            //                 baos.write(bytes, 0, length);
-            //                 if(designInputStream.available() == 0)break;
-            //             }
-            //             designContent = baos.toString();
+                Console.WriteLine("6");
+                Object[] layouts = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Layout), true);
+                if(layouts.Length > 0){
+                    Layout layout = (Layout)layouts[0];
+                    String designUri = layout.getFile();
+                    byte[] designBytes = new byte[]{};
+                    if(renderer.Equals("cache-request")) {
+                        designBytes = resourceUtility.getViewFileCopy(designUri, viewBytesMap);
+                    }
 
-            //         }
+                    if(renderer.Equals("reload-request")){
+                        FileByteArrayConverter layoutConverter = new FileByteArrayConverter();
+                        layoutConverter.setFile(designUri);
+                        designBytes = layoutConverter.convert(); 
+                    }
 
-            //         if(designContent == null){
-            //             return new RouteResult(utf8.GetBytes("design not found."), "200 OK", "text/html");
-            //         }
+                    String designTemplate = utf8.GetString(designBytes);
+                    if(designTemplate == null){
+                        return new RouteResult(utf8.GetBytes("design not found."), "200 OK", "text/html");
+                    }
 
-            //         if(!designContent.contains("<c:content/>")){
-            //             return new RouteResult(utf8.GetBytes("Your template file is missing <c:content/>"), "200 OK", "text/html");
-            //         }
+                    if(!designTemplate.Contains("<c:content/>")){
+                        return new RouteResult(utf8.GetBytes("Template is missing <c:content/>"), "200 OK", "text/html");
+                    }
 
-            //         String[] bits = designContent.split("<c:content/>");
-            //         String header = bits[0];
-            //         String bottom = "";
-            //         if(bits.length > 1) bottom = bits[1];
+                    Console.WriteLine("8");
+                    String[] designPartials = designTemplate.Split("<c:content/>");
+                    String headerPartial = designPartials[0];
+                    String footerPartial = "";
+                    if(designPartials.Length > 1) footerPartial = designPartials[1];
 
-            //         header = header + completePageRendered;
-            //         completePageRendered = header + bottom;
+                    headerPartial = headerPartial + completePageRendered;
+                    completePageRendered = headerPartial + footerPartial;
 
-            //         if(title != null) {
-            //             completePageRendered = completePageRendered.replace("${title}", title);
-            //         }
-            //         if(keywords != null) {
-            //             completePageRendered = completePageRendered.replace("${keywords}", keywords);
-            //         }
-            //         if(description != null){
-            //             completePageRendered = completePageRendered.replace("${description}", description);
-            //         }
+                    if(headline != null) {
+                        completePageRendered = completePageRendered.Replace("${headline}", headline);
+                    }
+                    if(keywords != null) {
+                        completePageRendered = completePageRendered.Replace("${keywords}", keywords);
+                    }
+                    if(description != null){
+                        completePageRendered = completePageRendered.Replace("${description}", description);
+                    }
 
-            //         completePageRendered = experienceManager.execute(completePageRendered, viewCache, networkRequest, securityAttributes, viewRenderers);
-            //         return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
+                    completePageRendered = experienceResolver.resolve(completePageRendered, viewCache, networkRequest, securityAttributes, null);
+                    return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
 
-            //     }else{
-            //         completePageRendered = experienceManager.execute(completePageRendered, viewCache, networkRequest, securityAttributes, viewRenderers);
-            //         return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
-            //     }
+                }
+
+                if(layouts.Length == 0){
+                    Console.WriteLine("9");
+                    completePageRendered = experienceResolver.resolve(completePageRendered, viewCache, networkRequest, securityAttributes, null);
+                    return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
+                }
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
