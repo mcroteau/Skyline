@@ -4,6 +4,7 @@ using System.Collections;
 using Skyline;
 using Skyline.Model;
 using Skyline.Annotation;
+using Skyline.Security;
 
 using Foo.Repo;
 
@@ -25,8 +26,8 @@ namespace Foo{
         
         [Layout(file="/Pages/Default.asp")]
         [Get(route="/")]
-        public String index(ViewCache cache, NetworkRequest req, NetworkResponse resp){
-            cache.set("message", "here...");
+        public String index(NetworkRequest req, NetworkResponse resp, SecurityManager manager, FlashMessage flashMessage, ViewCache cache){
+            cache.set("message", "");
 
             ArrayList items = new ArrayList();
             items.Add("Cinco DeMayos");
@@ -34,21 +35,18 @@ namespace Foo{
             items.Add("Canolis");
             cache.set("items", items);
 
+            manager.signin("hi@plsar.net", "effort.", req, resp);
+
             return "/Pages/Index.asp";
         }
 
         [Text]
-        [Get(route="/{id}")]
-        public String index([Variable]Int128 id, ViewCache viewCache, NetworkRequest req, NetworkResponse resp){
-            Console.WriteLine("." + id);
-            return "hi";
-        }
-
-        [Text]
-        [Get(route="/{stateid}/{evaluate}/{id}")]
-        public String index([Variable]Int32 stateid, [Variable]Boolean evaluate, [Variable]Int32 id, ViewCache viewCache, NetworkRequest req, NetworkResponse resp){
-            Console.WriteLine(stateid + ":" + evaluate + ":" + id);
-            return "hi";
+        [Get(route="/secured")]
+        public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
+            if(!manager.isAuthenticated(req)){
+                return "redirect:/";
+            }
+            return "/Pages/Secured.asp";
         }
 
     }

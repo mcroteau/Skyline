@@ -38,11 +38,10 @@ namespace Skyline {
 
                     if(filePath.EndsWith(".cs")){
                         Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
+                        Type repositoryKlassType = klassInstanceValidate.GetType();
                         Object[] attrs = klassInstanceValidate.GetType().GetCustomAttributes(typeof(Repository), true);
                         if(attrs.Length > 0) {
-                            Object repositoryKlassInstance = Activator.CreateInstance(klassInstanceValidate.GetType(), new Object[]{applicationAttributes}, new Object[]{});
-                            Type repositoryKlassType = repositoryKlassInstance.GetType();
-                            String[] componentElements = repositoryKlassInstance.GetType().Name.ToString().Split(".");
+                            String[] componentElements = klassInstanceValidate.GetType().Name.ToString().Split(".");
                             String dependencyKey = componentElements[componentElements.Length -1].ToLower();
                             componentsHolder.getRepositories().Add(dependencyKey, repositoryKlassType);
                         }

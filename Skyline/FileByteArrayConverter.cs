@@ -9,6 +9,8 @@ namespace Skyline{
         public byte[] convert(){
             String filePath = "Webapp" + Path.DirectorySeparatorChar.ToString()
                 + Path.DirectorySeparatorChar.ToString() + file;
+
+            Console.WriteLine("filePath~" + filePath);
             
             FileStream fileInputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileInputStream);

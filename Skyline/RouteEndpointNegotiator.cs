@@ -33,18 +33,16 @@ namespace Skyline{
                 String routeEndpointPath = networkRequest.getRequestPath();
                 String routeEndpointAction = networkRequest.getRequestAction().ToLower();
 
-                if(routeEndpointPath.Equals("/launcher.status")){
-                    return new RouteResult(utf8.GetBytes("200 OK"), "200 OK", "text/plain");
-                }
-
                 ResourceUtility resourceUtility = new ResourceUtility();
                 ApplicationExperienceResolver experienceResolver = new ApplicationExperienceResolver();
 
                 RouteAttributes routeAttributes = networkRequest.getRouteAttributes();
                 RouteEndpointHolder routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
 
-                if(routeEndpointPath.StartsWith("/" + resourcesDirectory + "/")) {
+                Console.WriteLine("9.0" + resourcesDirectory);
+                if(routeEndpointPath.Contains("/" + resourcesDirectory + "/")) {
 
+                Console.WriteLine("19.0" + resourcesDirectory);
                     MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
                     mimeTypeResolver.setRouteEndpointPath(routeEndpointPath);
                     String mime = mimeTypeResolver.resolve();
@@ -54,6 +52,7 @@ namespace Skyline{
                         routeResult.setStatusCode(200);
                         routeResult.setResponseOutput(responseOutput);
                         routeResult.setContentType(mime);
+                        return routeResult;
                     }
                     if(renderer.Equals("reload-requests")){
                         FileByteArrayConverter resourcesFileConverter = new FileByteArrayConverter();
@@ -68,11 +67,6 @@ namespace Skyline{
                     }
 
                 }
-
-                foreach(var entry in routeEndpointHolder.getRouteEndpoints()){
-                    Console.WriteLine("0 : '{0}'", entry.Key);
-                }
-
                 Console.WriteLine("0.1 : {0}", routeEndpointHolder.getRouteEndpoints().ContainsKey("/"));
 
                 RouteEndpointNormalizer routeEndpointNormalizer = new RouteEndpointNormalizer();
@@ -121,7 +115,7 @@ Console.WriteLine("here.." + routeFields.Length);
                                 Console.WriteLine("a..");
                                 Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
                                 Console.WriteLine("b.." + repositoryKlassType);
-                                Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto, applicationAttributes}, new Object[]{});
+                                Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto}, new Object[]{});
                                 Console.WriteLine("c.." + repositoryKlassInstance);
                                 routeFieldInfo.SetValue(routeEndpointInstance, repositoryKlassInstance);
                                 Console.WriteLine("d..");
@@ -187,7 +181,7 @@ Console.WriteLine("here.." + routeFields.Length);
     //             }
 
 
-                Console.WriteLine("4.3" + methodComponents.getRouteMethodAttributesList());
+                Console.WriteLine("4.3" + methodComponents.getRouteMethodAttributesList().ToArray());
 
                 Object[] methodAttributes = methodComponents.getRouteMethodAttributesList().ToArray();
                 Object routeResponseObject = routeEndpointInstanceMethod.Invoke(routeEndpointInstance, methodAttributes);
@@ -221,7 +215,7 @@ Console.WriteLine("here.." + routeFields.Length);
                 }
 
                 Console.WriteLine("5");
-                if(renderer.Equals("cache-request")) {
+                if(renderer.Equals("cache-requests")) {
                     byte[] viewbytes = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
                     if(viewbytes == null){
                         return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
@@ -231,7 +225,7 @@ Console.WriteLine("here.." + routeFields.Length);
 
 
                 Console.WriteLine("5.1");
-                if(renderer.Equals("reload-request")){
+                if(renderer.Equals("reload-requests")){
                     FileByteArrayConverter viewConverter = new FileByteArrayConverter();
                     viewConverter.setFile(methodResponse);
                     byte[] viewBytes = viewConverter.convert();
@@ -245,11 +239,11 @@ Console.WriteLine("here.." + routeFields.Length);
                     Layout layout = (Layout)layouts[0];
                     String designUri = layout.getFile();
                     byte[] designBytes = new byte[]{};
-                    if(renderer.Equals("cache-request")) {
+                    if(renderer.Equals("cache-requests")) {
                         designBytes = resourceUtility.getViewFileCopy(designUri, viewBytesMap);
                     }
 
-                    if(renderer.Equals("reload-request")){
+                    if(renderer.Equals("reload-requests")){
                         FileByteArrayConverter layoutConverter = new FileByteArrayConverter();
                         layoutConverter.setFile(designUri);
                         designBytes = layoutConverter.convert(); 
@@ -282,8 +276,11 @@ Console.WriteLine("here.." + routeFields.Length);
                     if(description != null){
                         completePageRendered = completePageRendered.Replace("${description}", description);
                     }
+                    Console.WriteLine("9" + completePageRendered);
 
                     completePageRendered = experienceResolver.resolve(completePageRendered, viewCache, networkRequest, securityAttributes, null);
+                    
+                    Console.WriteLine("10" + completePageRendered);
                     return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
 
                 }
@@ -305,6 +302,7 @@ Console.WriteLine("here.." + routeFields.Length);
         MethodComponents getMethodAttributesComponents(String routeEndpointPath, ViewCache viewCache, FlashMessage flashMessage, NetworkRequest networkRequest, NetworkResponse networkResponse, SecurityManager securityManager, RouteEndpoint routeEndpoint) {
             MethodComponents methodComponents = new MethodComponents();
             ParameterInfo[] endpointMethodAttributes = routeEndpoint.getRouteMethod().GetParameters();
+            Console.WriteLine("p:" + endpointMethodAttributes);
             int index = 0;
             int pathVariableIndex = 0;
             int firstIndex = routeEndpointPath.IndexOf("/");

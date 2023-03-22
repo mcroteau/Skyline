@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace Skyline.Implement {
 
     public interface SecurityAccess {
+
         /**
         * Intended to return the user's password based
         * on the username
@@ -31,8 +32,6 @@ namespace Skyline.Implement {
         * replaced with actual id of user
         */
         HashSet<String> getPermissions(String user);
-
-        void setDataTransferObject(DataTransferObject dto);
     }
 
 }

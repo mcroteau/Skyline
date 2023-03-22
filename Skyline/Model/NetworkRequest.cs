@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Skyline.Security;
@@ -92,6 +93,29 @@ namespace Skyline.Model {
             this.requestComponents = requestComponents;
         }
 
+        public String getValue(String key){
+            if(requestComponents.ContainsKey(key)){
+                return requestComponents[key].getValue();
+            }
+            return "";
+        }
+
+        public RequestComponent getRequestComponent(String key){
+            if(requestComponents.ContainsKey(key)){
+                return requestComponents[key];
+            }
+            return null;
+        }
+
+        public ArrayList getRequestComponentsList(){
+            ArrayList components = new ArrayList();
+            foreach(var requestComponentEntry in requestComponents){
+                components.Add(requestComponentEntry.Value);
+            }
+            return components;
+        }
+
+
         public RouteAttributes getRouteAttributes()
         {
             return this.routeAttributes;
@@ -124,7 +148,10 @@ namespace Skyline.Model {
 
         public String getUserCredential()
         {
-            return this.userCredential;
+            if(this.userCredential != null){
+                return this.userCredential;
+            }
+            return "";
         }
 
         public void setUserCredential(String userCredential)
@@ -147,7 +174,7 @@ namespace Skyline.Model {
             }
         }
 
-        public void setAttributes(){
+        public void resolveRequestAttributes(){
             int attributesIndex = this.requestPath.IndexOf("?");
             if(attributesIndex != -1) {
                 int attributesIndexWith = attributesIndex + 1;

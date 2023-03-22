@@ -13,13 +13,12 @@ namespace Foo.Repo{
 
         public PersonRepo(){}
 
-        public PersonRepo(DataTransferObject dto, ApplicationAttributes applicationAttributes){}
-        
-        public PersonRepo(ApplicationAttributes applicationAttributes){}
+        public PersonRepo(DataTransferObject dto){}
 
         public void print(){
             Console.WriteLine("dto in da house!");
         }
+
     }
 
 }

@@ -62,19 +62,22 @@ namespace Skyline.Security{
             return networkRequest.getUserCredential();
         }
 
-        public Boolean signin(String username, String passwordUntouched, NetworkRequest networkRequest, NetworkResponse networkResponse) {
-            String hashed = hash(passwordUntouched);
+        public Boolean signin(String username, String hashedPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
             String password = securityAccess.getPassword(username);
 
             try{
                 if (!isAuthenticated(networkRequest) &&
-                        password.Equals(hashed)) {
-
+                        password.Equals(hashedPassword)) {
+                    Console.WriteLine("00");
                     String securityAttributePrincipal = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
+                    Console.WriteLine("00");
                     networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
+                    Console.WriteLine("00");
                     String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal + "; path=/;";
+                    Console.WriteLine("00");
                     SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-                    networkResponse.getSecurityAttributes().Add("plsar.security", securityAttribute);
+                    Console.WriteLine("00");
+                    networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
                     return true;
                 }
 
@@ -89,8 +92,7 @@ namespace Skyline.Security{
             networkRequest.setSecurityAttributeInfo("");
             String securityAttributeValue = ";Expires/MaxAge=-1;Expires=-1;MaxAge=-1;";
             SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-            networkResponse.getSecurityAttributes().Remove("generic.security");
-            networkResponse.getSecurityAttributes().Add("generic.security", securityAttribute);
+            networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
             return true;
         }
 
