@@ -12,13 +12,11 @@ namespace Foo{
     public class AuthAccess : SecurityAccess{
         
         DataTransferObject dto;
-        LiteDatabase db;
 
         public AuthAccess(){}
 
         public AuthAccess(DataTransferObject dto){
             this.dto = dto;
-            this.db = new LiteDatabase(@"Ocean.db");
         }
         
         public String getPassword(String email){
@@ -50,15 +48,6 @@ namespace Foo{
         }
 
         String getUserPassword(String email){
-            var bsonReader = db.Execute("select $ from users where email = '" + email + "'");
-            ArrayList output = new ArrayList();
-            while (bsonReader.Read())output.Add(bsonReader.Current);
-            if(output.Count > 0){
-                var userBson = output[0];
-                User user = new User();
-                Console.WriteLine(userBson);
-                return user.getPassword();
-            }
             return "";
         }
     }
