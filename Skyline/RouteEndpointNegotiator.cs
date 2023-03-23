@@ -39,10 +39,8 @@ namespace Skyline{
                 RouteAttributes routeAttributes = networkRequest.getRouteAttributes();
                 RouteEndpointHolder routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
 
-                Console.WriteLine("9.0" + resourcesDirectory);
                 if(routeEndpointPath.Contains("/" + resourcesDirectory + "/")) {
 
-                Console.WriteLine("19.0" + resourcesDirectory);
                     MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
                     mimeTypeResolver.setRouteEndpointPath(routeEndpointPath);
                     String mime = mimeTypeResolver.resolve();
@@ -67,13 +65,11 @@ namespace Skyline{
                     }
 
                 }
-                Console.WriteLine("0.1 : {0}", routeEndpointHolder.getRouteEndpoints().ContainsKey("/"));
 
                 RouteEndpointNormalizer routeEndpointNormalizer = new RouteEndpointNormalizer();
                 routeEndpointNormalizer.setRouteEndpointPath(routeEndpointPath);
                 routeEndpointNormalizer.setRouteEndpointAction(routeEndpointAction);
                 routeEndpointPath = routeEndpointNormalizer.normalize();//:looking for key
-                Console.WriteLine("1 {0}", routeEndpointPath);
 
                 RouteEndpointLocator routeEndpointLocator = new RouteEndpointLocator();
                 routeEndpointLocator.setRouteEndpointHolder(routeEndpointHolder);
@@ -81,7 +77,6 @@ namespace Skyline{
                 routeEndpointLocator.setRouteEndpointPath(routeEndpointPath);
                 RouteEndpoint routeEndpoint = routeEndpointLocator.locate();
 
-                Console.WriteLine("2" + routeEndpoint);
 
                 MethodComponents methodComponents = getMethodAttributesComponents(routeEndpointPath, viewCache, flashMessage, networkRequest, networkResponse, securityManager, routeEndpoint);
                 MethodInfo routeEndpointInstanceMethod = routeEndpoint.getRouteMethod();
@@ -94,37 +89,26 @@ namespace Skyline{
                     description = attributes.getDescription();
                 }
 
-                Console.WriteLine("2.1 {0}", routeEndpoint.getKlassReference());
                 Object routeEndpointInstanceRef = Activator.CreateInstance(routeEndpoint.getKlassAssembly(), routeEndpoint.getKlassReference()).Unwrap();
                 Object routeEndpointInstance = Activator.CreateInstance(routeEndpointInstanceRef.GetType(), new Object[]{applicationAttributes}, new Object[]{});
                 
-                Console.WriteLine("2.2 {0}", routeEndpointInstance);
-
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
-                                Console.WriteLine("here.." + persistenceConfig);
+                
                 if(persistenceConfig != null) {
                     DataTransferObject dto = new DataTransferObject(persistenceConfig);
-Console.WriteLine("here.." + dto);
                     FieldInfo[] routeFields = routeEndpointInstance.GetType().GetFields();
-Console.WriteLine("here.." + routeFields.Length);
                     foreach(FieldInfo routeFieldInfo in routeFields) {
                         Object[] binds = routeFieldInfo.GetCustomAttributes(typeof (Bind), true);
                         if(binds.Length > 0){
                             String fieldInfoKey = routeFieldInfo.Name.ToLower();
                             if (componentsHolder.getRepositories().ContainsKey(fieldInfoKey)) {
-                                Console.WriteLine("a..");
                                 Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
-                                Console.WriteLine("b.." + repositoryKlassType);
                                 Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto}, new Object[]{});
-                                Console.WriteLine("c.." + repositoryKlassInstance);
                                 routeFieldInfo.SetValue(routeEndpointInstance, repositoryKlassInstance);
-                                Console.WriteLine("d..");
                             }
                         }
                     }
                 }
-
-                Console.WriteLine("3");
 
     //             if(routeEndpointInstanceMethod.isAnnotationPresent(Before.class)){
     //                 Before beforeAnnotation = routeEndpointInstanceMethod.getAnnotation(Before.class);
@@ -181,13 +165,10 @@ Console.WriteLine("here.." + routeFields.Length);
     //             }
 
 
-                Console.WriteLine("4.3" + methodComponents.getRouteMethodAttributesList().ToArray());
-
                 Object[] methodAttributes = methodComponents.getRouteMethodAttributesList().ToArray();
                 Object routeResponseObject = routeEndpointInstanceMethod.Invoke(routeEndpointInstance, methodAttributes);
                 String methodResponse = routeResponseObject.ToString();
                 
-                Console.WriteLine("z:" + methodResponse);
                 if(methodResponse == null){
                     return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
                 }
@@ -203,7 +184,6 @@ Console.WriteLine("here.." + routeFields.Length);
                 }
 
 
-                Console.WriteLine("3.3");
                 Object[] jsons = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Json), true);
                 if(jsons.Length > 0){
                     return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "application/json");
@@ -214,7 +194,6 @@ Console.WriteLine("here.." + routeFields.Length);
                     return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "text/html");
                 }
 
-                Console.WriteLine("5");
                 if(renderer.Equals("cache-requests")) {
                     byte[] viewbytes = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
                     if(viewbytes == null){
@@ -224,7 +203,6 @@ Console.WriteLine("here.." + routeFields.Length);
                 }
 
 
-                Console.WriteLine("5.1");
                 if(renderer.Equals("reload-requests")){
                     FileByteArrayConverter viewConverter = new FileByteArrayConverter();
                     viewConverter.setFile(methodResponse);
@@ -233,7 +211,6 @@ Console.WriteLine("here.." + routeFields.Length);
                 }
 
 
-                Console.WriteLine("6");
                 Object[] layouts = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Layout), true);
                 if(layouts.Length > 0){
                     Layout layout = (Layout)layouts[0];
@@ -258,7 +235,6 @@ Console.WriteLine("here.." + routeFields.Length);
                         return new RouteResult(utf8.GetBytes("Template is missing <c:content/>"), "200 OK", "text/html");
                     }
 
-                    Console.WriteLine("8");
                     String[] designPartials = designTemplate.Split("<c:content/>");
                     String headerPartial = designPartials[0];
                     String footerPartial = "";
@@ -276,23 +252,19 @@ Console.WriteLine("here.." + routeFields.Length);
                     if(description != null){
                         completePageRendered = completePageRendered.Replace("${description}", description);
                     }
-                    Console.WriteLine("9" + completePageRendered);
 
                     completePageRendered = experienceResolver.resolve(completePageRendered, viewCache, networkRequest, securityAttributes, null);
                     
-                    Console.WriteLine("10" + completePageRendered);
                     return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
-
                 }
 
                 if(layouts.Length == 0){
-                    Console.WriteLine("9");
                     completePageRendered = experienceResolver.resolve(completePageRendered, viewCache, networkRequest, securityAttributes, null);
                     return new RouteResult(utf8.GetBytes(completePageRendered), "200 OK", "text/html");
                 }
 
             }catch(Exception ex){
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
                 return new RouteResult(utf8.GetBytes("issue. " + ex.Message), "500", "text/plain");
             }
 

@@ -35,7 +35,11 @@ namespace Foo{
             items.Add("Canolis");
             cache.set("items", items);
 
-            manager.signin("hi@plsar.net", "effort.", req, resp);
+            try{
+                manager.signin("hi@plsar.net", "effort.", req, resp);
+            }catch(Exception ex){
+                Console.WriteLine(ex.ToString());
+            }
 
             return "/Pages/Index.asp";
         }

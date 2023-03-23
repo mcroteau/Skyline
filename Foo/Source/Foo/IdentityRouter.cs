@@ -29,7 +29,6 @@ namespace Foo{
             String password = req.getValue("password");
             String hashed = manager.hash(password);
             
-            Console.WriteLine("email:" + email + " password:" + password + " hashed:" + hashed + " resp:" + resp);
             cache.set("message", "");
 
             if(manager.signin(email, hashed, req, resp)){

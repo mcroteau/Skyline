@@ -11,8 +11,7 @@ using Skyline.Schemes;
 using Skyline.Security;
 
 using Foo.Model;
-
-using LiteDB;
+using Foo.Repo;
 
 namespace Foo{
     class Launcher{
@@ -22,6 +21,12 @@ namespace Foo{
             DatabaseSetup databaseSetup = new DatabaseSetup();
             databaseSetup.clean();
             databaseSetup.setup();
+
+            PersonRepo personRepo = new PersonRepo(new DataTransferObject(new PersistenceConfig()));
+            User user = new User();
+            user.setEmail("abc@plsar.net");
+            user.setPassword("3b1a5b7b9b996e21e81ae1b12abacab5c463707ccb0206535889c815cde5f650");
+            personRepo.save(user);
 
             ApplicationAttributes applicationAttributes = new ApplicationAttributes();
             applicationAttributes.getAttributes().Add("abc", "123");

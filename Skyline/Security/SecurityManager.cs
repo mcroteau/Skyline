@@ -65,6 +65,7 @@ namespace Skyline.Security{
         public Boolean signin(String username, String hashedPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
             String password = securityAccess.getPassword(username);
 
+            Console.WriteLine(password);
             try{
                 if (!isAuthenticated(networkRequest) &&
                         password.Equals(hashedPassword)) {
@@ -82,7 +83,7 @@ namespace Skyline.Security{
                 }
 
             }catch(Exception ex){
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.ToString());
             }
 
             return false;

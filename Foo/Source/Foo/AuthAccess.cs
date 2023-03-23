@@ -1,27 +1,37 @@
 using System;
 using System.Collections;
+
 using Skyline;
+using Skyline.Model;
 using Skyline.Implement;
 
 using LiteDB;
 
 using Foo.Model;
+using Foo.Repo;
 
 namespace Foo{
 
     public class AuthAccess : SecurityAccess{
         
+        PersonRepo personRepo;
         DataTransferObject dto;
 
-        public AuthAccess(){}
+        public AuthAccess(){
+            this.personRepo = new PersonRepo(new DataTransferObject(new PersistenceConfig()));
+        }
 
         public AuthAccess(DataTransferObject dto){
-            this.dto = dto;
+            this.personRepo = new PersonRepo(dto);
         }
         
         public String getPassword(String email){
-            String password = getUserPassword(email);
-            return password;
+            Console.WriteLine("get password:" + email);
+            User user = personRepo.getEmail(email);
+            if(user != null){
+                return user.getPassword();
+            }
+            return "";
         }
 
         public HashSet<String> getRoles(String email){
@@ -45,10 +55,6 @@ namespace Foo{
             // Console.WriteLine("u:" + userPermissions.Length);
             // return new HashSet<String>(userPermissions);
             return new HashSet<String>();
-        }
-
-        String getUserPassword(String email){
-            return "";
         }
     }
 }

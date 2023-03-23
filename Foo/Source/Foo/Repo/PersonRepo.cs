@@ -20,35 +20,36 @@ namespace Foo.Repo{
 
         public PersonRepo(DataTransferObject dto){}
 
-        public long insert(User user){
+        public long save(User user){
             var connection = new SQLiteConnection("Data Source=app.db");
             connection.Open();
             
             var command = connection.CreateCommand();
+
+
+            command.CommandText =
+            @"
+                INSERT INTO users (email, password)
+                VALUES ($email, $password)
+            ";
+            command.Parameters.AddWithValue("$email", user.getEmail());
+            command.Parameters.AddWithValue("$password", user.getPassword());
+            command.ExecuteNonQuery();
 
             command.CommandText =
             @"
                 SELECT last_insert_rowid()
             ";
             long id = (long)command.ExecuteScalar();
-
-            command.CommandText =
-            @"
-                INSERT INTO user (id, email, password)
-                VALUES ($name, $password)
-            ";
-            command.Parameters.AddWithValue("$id", id);
-            command.Parameters.AddWithValue("$email", user.getEmail());
-            command.Parameters.AddWithValue("$password", user.getPassword());
-            command.ExecuteNonQuery();
-
             return id;
         }        
 
 
-        public User get(String email){
+        public User getEmail(String email){
             var connection = new SQLiteConnection("Data Source=app.db");
             connection.Open();
+
+            Console.WriteLine("za:" + email);
 
             var command = connection.CreateCommand();
             command.CommandText =
@@ -63,14 +64,61 @@ namespace Foo.Repo{
             var reader = command.ExecuteReader();
             while (reader.Read()){
                 User user = new User();
+                Console.WriteLine(reader.GetString(0));
                 user.setId(long.Parse(reader.GetString(0)));
                 user.setEmail(reader.GetString(1));
                 user.setPassword(reader.GetString(2));
                 users.Add(user);
             }
-            return users[0] as User;
+            Console.WriteLine("zq:" + users.Count);
+            if(users.Count > 0){
+                return users[0] as User;
+            }
+            return null;
         }
 
+
+        public HashSet<String> getRoles(long userId){
+            var connection = new SQLiteConnection("Data Source=app.db");
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"
+                SELECT description    
+                FROM user_roles outer join on user_roles.role_id = roles.id
+                WHERE user_id = '$userId'
+            ";
+            command.Parameters.AddWithValue("$userId", userId);
+
+            HashSet<String> userRoles = new HashSet<String>();
+            var reader = command.ExecuteReader();
+            while (reader.Read()){
+                userRoles.Add(reader.GetString(0));
+            }
+            return userRoles;
+        }
+        
+        public HashSet<String> getPermissions(long userId){
+            var connection = new SQLiteConnection("Data Source=app.db");
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"
+                SELECT permission    
+                FROM permissions
+                WHERE user_id = '$userId'
+            ";
+            command.Parameters.AddWithValue("$userId", userId);
+
+            HashSet<String> permissions = new HashSet<String>();
+            var reader = command.ExecuteReader();
+            while (reader.Read()){
+                permissions.Add(reader.GetString(0));
+            }
+            return permissions;
+        }
     }
 
 }

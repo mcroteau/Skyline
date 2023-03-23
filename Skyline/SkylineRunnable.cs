@@ -144,6 +144,7 @@ namespace Skyline{
             String data = null;
             byte[] bytes = null;
 
+
             var utf8 = new UTF8Encoding();
             String completeRequestContent = new String("");
             while (true){
@@ -154,6 +155,8 @@ namespace Skyline{
                 if(bytesRec < bytes.Length)break;
             }
 
+            byte[] requestByteArray = utf8.GetBytes(completeRequestContent);
+        
             ResourceUtility resourceUtility = new ResourceUtility();
             String[] requestBlocks = completeRequestContent.Split(DOUBLEBREAK, 2);
 
@@ -207,6 +210,10 @@ namespace Skyline{
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
 
+            RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
+            requestComponentResolver.setRequestBytes(requestByteArray);
+            requestComponentResolver.setNetworkRequest(networkRequest);
+            requestComponentResolver.resolve();
 
             StringBuilder sessionValues = new StringBuilder();
             foreach(var securityAttributeEntry in networkResponse.getSecurityAttributes()){

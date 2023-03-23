@@ -7,6 +7,7 @@ using Skyline.Security;
 namespace Skyline.Model {
     public class NetworkRequest {
         public NetworkRequest() {
+            this.userCredential = "";
             this.headers = new Dictionary<String, String>();
             this.requestComponents = new Dictionary<String, RequestComponent>();
         }
@@ -93,6 +94,10 @@ namespace Skyline.Model {
             this.requestComponents = requestComponents;
         }
 
+        public void setRequestComponent(String key, RequestComponent requestComponent){
+            this.requestComponents[key] =  requestComponent;
+        }
+        
         public String getValue(String key){
             if(requestComponents.ContainsKey(key)){
                 return requestComponents[key].getValue();
