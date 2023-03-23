@@ -6,6 +6,9 @@ namespace Skyline.Model {
         String value;
         Boolean hasFiles;
 
+        List<FileComponent> fileComponents;
+        List<String> values;
+
         public String getName()
         {
             return this.name;
@@ -36,5 +39,20 @@ namespace Skyline.Model {
             this.hasFiles = hasFiles;
         }
 
+        public List<FileComponent> getFileComponents() {
+            return this.fileComponents;
+        }
+
+        public void setFileComponents(List<FileComponent> fileComponents) {
+            this.fileComponents = fileComponents;
+        }
+
+        public List<String> getValues() {
+            return this.values;
+        }
+
+        public void setValues(List<String> values) {
+            this.values = values;
+        }
     }
 }

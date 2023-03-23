@@ -3,6 +3,9 @@ using System;
 namespace Skyline.Model{
 
     public class Component {
+        public Component(String component){
+            this.component = component;
+        }
         String component;
         int activeBeginIndex;
         int activeCloseIndex;
