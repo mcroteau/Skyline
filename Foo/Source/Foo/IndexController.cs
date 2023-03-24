@@ -44,7 +44,6 @@ namespace Foo{
             return "/Pages/Index.asp";
         }
 
-        [Text]
         [Layout(file="/Pages/Default.asp")]
         [Get(route="/secured")]
         public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager){

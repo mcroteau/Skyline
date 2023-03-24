@@ -181,10 +181,13 @@ namespace Skyline{
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
-            networkRequest.setRequestAction(networkRequestAction);
-            networkRequest.setRequestPath(networkRequestPath);
+            if(!networkRequest.isRedirect()){
+                networkRequest.setRequestAction(networkRequestAction);
+                networkRequest.setRequestPath(networkRequestPath);
+                networkRequest.resolveRequestAttributes();
+            }
+            
             networkRequest.setSecurityAttributes(securityAttributes);
-            networkRequest.resolveRequestAttributes();
 
             RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
             requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
@@ -245,6 +248,10 @@ namespace Skyline{
             
                 viewCache = new ViewCache();
                 flashMessage = new FlashMessage();
+
+                networkRequest = new NetworkRequest();
+                networkResponse = new NetworkResponse();
+
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
                 return;
             }
@@ -262,9 +269,6 @@ namespace Skyline{
             // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             // networkRequestHandler.Send(resp);
             networkRequestHandler.Close();
-
-            networkRequest = new NetworkRequest();
-            networkResponse = new NetworkResponse();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
         }    
