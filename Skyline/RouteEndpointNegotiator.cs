@@ -93,7 +93,7 @@ namespace Skyline{
                 Object routeEndpointInstance = Activator.CreateInstance(routeEndpointInstanceRef.GetType(), new Object[]{applicationAttributes}, new Object[]{});
                 
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
-                
+
                 if(persistenceConfig != null) {
                     DataTransferObject dto = new DataTransferObject(persistenceConfig);
                     dto.setApplicationAttributes(applicationAttributes);
@@ -182,6 +182,7 @@ namespace Skyline{
                     String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
                     networkRequest.setRedirect(true);
                     networkRequest.setRedirectLocation(redirectRouteUri);
+                    Console.WriteLine("\n\nredirect:" + redirectRouteUri + "\n\n");
                     return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
                 }
 

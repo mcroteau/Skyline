@@ -62,22 +62,16 @@ namespace Skyline.Security{
             return networkRequest.getUserCredential();
         }
 
-        public Boolean signin(String username, String hashedPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
-            String password = securityAccess.getPassword(username);
-
-            Console.WriteLine("cz:" + password + ":" + hashedPassword);
+        public Boolean signin(String username, String sentPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
+            String password = securityAccess.getPassword(username).Trim();
+            Console.WriteLine("\n\nfucking password:" + password.Equals(sentPassword) + ":" + sentPassword + "':'" + password + "'" + ":" + !isAuthenticated(networkRequest));
             try{
                 if (!isAuthenticated(networkRequest) &&
-                        password.Equals(hashedPassword)) {
-                    Console.WriteLine("00");
+                        password == sentPassword) {
                     String securityAttributePrincipal = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
-                    Console.WriteLine("00");
                     networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
-                    Console.WriteLine("00");
                     String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal + "; path=/;";
-                    Console.WriteLine("00");
                     SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-                    Console.WriteLine("00");
                     networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
                     return true;
                 }
@@ -102,33 +96,6 @@ namespace Skyline.Security{
                 return true;
             }
             return false;
-        }
-
-        public String hash(String password){
-            StringBuilder Sb = new StringBuilder();
-            var hash = SHA256.Create();
-
-            Encoding enc = Encoding.UTF8;
-            byte[] result = hash.ComputeHash(enc.GetBytes(password));
-
-            foreach (byte b in result){
-                Sb.Append(b.ToString("x2"));
-            }
-            return Sb.ToString();
-        }
-
-        public static String dirty(String passwd){
-            StringBuilder Sb = new StringBuilder();
-            var hash = SHA256.Create();
-
-            Encoding enc = Encoding.UTF8;
-            byte[] result = hash.ComputeHash(enc.GetBytes(passwd));
-
-            foreach (byte b in result){
-                Sb.Append(b.ToString("x2"));
-            }
-
-            return Sb.ToString();
         }
     }
 }

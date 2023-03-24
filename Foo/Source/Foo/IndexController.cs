@@ -45,8 +45,10 @@ namespace Foo{
         }
 
         [Text]
+        [Layout(file="/Pages/Default.asp")]
         [Get(route="/secured")]
         public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
+            Console.WriteLine("\n\n***************************\n\n");
             if(!manager.isAuthenticated(req)){
                 return "redirect:/";
             }

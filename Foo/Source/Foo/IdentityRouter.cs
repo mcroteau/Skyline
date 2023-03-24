@@ -31,14 +31,13 @@ namespace Foo{
             }
             
             String email = req.getValue("email");
-            String password = req.getValue("password").Trim();
+            String password = req.getValue("password");
             Console.WriteLine("password:'" + password + "'");
-            String hashed = manager.hash(password);
             
-            cache.set("message", "");
+            cache.set("message", "");//java, c#// new instances// c# is kind of awesome!
 
-            if(manager.signin(email, hashed, req, resp)){
-                Console.WriteLine("email:" + email + " password:" + password + " hashed:" + hashed + " resp:" + resp);
+            if(manager.signin(email, password, req, resp)){
+                Console.WriteLine("email:" + email + " password:" + password + " resp:" + resp);
                 return "redirect:/secured";
             }
             cache.set("message","fail.");

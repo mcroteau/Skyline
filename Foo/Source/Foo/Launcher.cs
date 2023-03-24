@@ -38,7 +38,7 @@ namespace Foo{
 
             User user = new User();
             user.setEmail("abc@plsar.net");
-            user.setPassword(manager.hash("effort."));
+            user.setPassword("effort.");
             long id = personRepo.save(user);
             Console.WriteLine("id:" + id);
 

@@ -46,6 +46,9 @@ namespace Skyline{
         ComponentsHolder componentsHolder;
         RouteEndpointHolder routeEndpointHolder;
 
+        NetworkRequest networkRequest;
+        NetworkResponse networkResponse;
+
         Type securityAccessType;
 
         Socket listener;
@@ -83,6 +86,9 @@ namespace Skyline{
                     propertiesConfig = new PropertiesConfig();
                     propertiesConfig.setPropertiesFile(PROPERTIES);
                 }
+
+                networkRequest = new NetworkRequest();
+                networkResponse = new NetworkResponse();
 
                 RouteAttributesResolver routeAttributesResolver = new RouteAttributesResolver();
                 routeAttributesResolver.setPropertiesConfig(propertiesConfig);
@@ -151,8 +157,6 @@ namespace Skyline{
                 if(bytesRec < bytes.Length)break;
             }
 
-            Console.WriteLine(completeRequestContent);
-
             byte[] requestByteArray = utf8.GetBytes(completeRequestContent);
         
             ResourceUtility resourceUtility = new ResourceUtility();
@@ -177,13 +181,10 @@ namespace Skyline{
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
-            NetworkRequest networkRequest = new NetworkRequest();
             networkRequest.setRequestAction(networkRequestAction);
             networkRequest.setRequestPath(networkRequestPath);
             networkRequest.setSecurityAttributes(securityAttributes);
             networkRequest.resolveRequestAttributes();
-
-            NetworkResponse networkResponse = new NetworkResponse();
 
             RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
             requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
@@ -228,6 +229,7 @@ namespace Skyline{
             networkRequestHandler.Send(utf8.GetBytes(routeResult.getResponseCode()));
             networkRequestHandler.Send(utf8.GetBytes(BREAK));
 
+            Console.WriteLine("\nbefore:" + networkRequest.isRedirect() + ":" + networkRequest.getRedirectLocation());
             if(networkRequest.isRedirect()) {
                 networkRequestHandler.Send(utf8.GetBytes("Content-Type:text/plain"));
                 networkRequestHandler.Send(utf8.GetBytes(BREAK));
@@ -260,6 +262,9 @@ namespace Skyline{
             // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             // networkRequestHandler.Send(resp);
             networkRequestHandler.Close();
+
+            networkRequest = new NetworkRequest();
+            networkResponse = new NetworkResponse();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
         }    

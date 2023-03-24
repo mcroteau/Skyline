@@ -52,17 +52,19 @@ namespace Skyline{
                             foreach(String entry in requestQueryParts) {
                                 RequestComponent requestComponent = new RequestComponent();
                                 String[] keyValue = entry.Split("=", 2);
-                                String key = keyValue[0];
+                                String key = keyValue[0].Trim();
+                                string keyNoClue = new string(key.Where(c => !char.IsControl(c)).ToArray());
                                 if (keyValue.Length > 1) {
-                                    String value = keyValue[1];
-                                    requestComponent.setName(key);
-                                    requestComponent.setValue(value);
+                                    String value = keyValue[1].Trim();
+                                    string valueNoIdea = new string(value.Where(c => !char.IsControl(c)).ToArray());
+                                    requestComponent.setName(keyNoClue);
+                                    requestComponent.setValue(valueNoIdea);
                                 } else {
-                                    requestComponent.setName(key);
+                                    requestComponent.setName(keyNoClue);
                                     requestComponent.setValue("");
                                 }
                                 Console.WriteLine("zn:" + requestComponent.getName() + ":" + requestComponent.getValue());
-                                networkRequest.getRequestComponents()[key] = requestComponent;
+                                networkRequest.getRequestComponents()[keyNoClue] = requestComponent;
                             }
                         }
 
