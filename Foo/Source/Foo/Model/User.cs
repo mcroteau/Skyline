@@ -2,15 +2,15 @@ using System;
 
 namespace Foo.Model{
     public class User{
-        long id;
+        int id;
         String email;
         String password;
 
-        public long getId() {
+        public int getId() {
             return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(int id) {
             this.id = id;
         }
 

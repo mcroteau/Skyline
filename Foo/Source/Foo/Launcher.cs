@@ -5,6 +5,8 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using System.Threading;
+using System.Data.SQLite;
+
 using Skyline;
 using Skyline.Model;
 using Skyline.Schemes;
@@ -19,33 +21,38 @@ namespace Foo{
         public static int Main(String[] args){
             
             DatabaseSetup databaseSetup = new DatabaseSetup();
+            SQLiteConnection connection = databaseSetup.getConnection();
             databaseSetup.clean();
             databaseSetup.setup();
 
-            PersonRepo personRepo = new PersonRepo(new DataTransferObject(new PersistenceConfig()));
+            Console.WriteLine("connection" + connection);
+            ApplicationAttributes applicationAttributes = new ApplicationAttributes();
+            applicationAttributes.getAttributes().Add("connection", connection);
+
+            DataTransferObject dto = new DataTransferObject(new PersistenceConfig());
+            dto.setApplicationAttributes(applicationAttributes);
+            
+            PersonRepo personRepo = new PersonRepo(dto);
+            PersistenceConfig persistenceConfig = new PersistenceConfig();
+            SecurityManager manager = new SecurityManager(new AuthAccess(new DataTransferObject(persistenceConfig)));
+
             User user = new User();
             user.setEmail("abc@plsar.net");
-            user.setPassword("3b1a5b7b9b996e21e81ae1b12abacab5c463707ccb0206535889c815cde5f650");
-            personRepo.save(user);
+            user.setPassword(manager.hash("effort."));
+            long id = personRepo.save(user);
+            Console.WriteLine("id:" + id);
 
-            ApplicationAttributes applicationAttributes = new ApplicationAttributes();
-            applicationAttributes.getAttributes().Add("abc", "123");
-            applicationAttributes.getAttributes().Add("db", "Ocean.db");
 
             SkylineRunnable skyline = new SkylineRunnable(4000);
             skyline.setNumberOfPartitions(30);
             skyline.setNumberOfRequestExecutors(70);
 
-            PersistenceConfig persistenceConfig = new PersistenceConfig();
 
             ViewConfig viewConfig = new ViewConfig();
             viewConfig.setResourcesPath("Assets");
             viewConfig.setRenderingScheme(RenderingScheme.RELOAD_EACH_REQUEST);
 
             skyline.setSecurityAccessType(new AuthAccess().GetType());
-
-            SecurityManager manager = new SecurityManager(new AuthAccess(new DataTransferObject(persistenceConfig)));
-            manager.signin("abc@plsar.net", "effort.", new NetworkRequest(), new NetworkResponse());
 
             skyline.setApplicationAttributes(applicationAttributes);
             skyline.setPersistenceConfig(persistenceConfig);

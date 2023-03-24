@@ -114,7 +114,7 @@ namespace Skyline.Model {
 
         public ArrayList getRequestComponentsList(){
             ArrayList components = new ArrayList();
-            foreach(var requestComponentEntry in requestComponents){
+            foreach(var requestComponentEntry in this.requestComponents){
                 components.Add(requestComponentEntry.Value);
             }
             return components;

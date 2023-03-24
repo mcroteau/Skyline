@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Web;
 using System.Text.RegularExpressions;
 using System.Collections;
 
@@ -17,45 +18,57 @@ namespace Skyline{
             var utf8 = new UTF8Encoding();
 
             Dictionary<String, String> headers = networkRequest.getHeaders();
-            String contentType = headers["content-type"];
-            String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
-            if (boundaryParts.Length > 1) {
-                String formDelimiter = boundaryParts[1];
-                String requestPayload = getRequestContent(requestBytes);
-                ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
-                
-                foreach(RequestComponent requestComponent in requestComponents){
-                    String requestComponentKey = requestComponent.getName();
-                    networkRequest.setRequestComponent(requestComponentKey, requestComponent);
-                }
-            }else if(requestBytes.Length > 0){
+            if(headers.ContainsKey("content-type")){
+                Console.WriteLine("\n\ncontent type found.");
+                String contentType = headers["content-type"];
+                String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
-                try {
-
-                    String requestQueryComplete = utf8.GetString(requestBytes);
-                    String[] requestQueryParts = requestQueryComplete.Split("\r\n\r\n", 2);
-                    if(requestQueryParts.Length == 2 &&
-                            !requestQueryParts[1].Equals("")) {
-                        String requestQuery =  requestQueryParts[1];
-                        foreach(String entry in requestQuery.Split("&")) {
-                            RequestComponent requestComponent = new RequestComponent();
-                            String[] keyValue = entry.Split("=", 2);
-                            String key = keyValue[0];
-                            if (keyValue.Length > 1) {
-                                String value = keyValue[1];
-                                requestComponent.setName(key);
-                                requestComponent.setValue(value);
-                            } else {
-                                requestComponent.setName(key);
-                                requestComponent.setValue("");
-                            }
-                            networkRequest.getRequestComponents()[key] = requestComponent;
-                        }
+                Console.WriteLine("boundaryParts:" + boundaryParts.Length);
+                if (boundaryParts.Length > 1) {
+                    String formDelimiter = boundaryParts[1];
+                    Console.WriteLine(formDelimiter);
+                    String requestPayload = getRequestContent(requestBytes);
+                    Console.WriteLine(requestPayload);
+                    ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
+                    
+                    foreach(RequestComponent requestComponent in requestComponents){
+                        String requestComponentKey = requestComponent.getName();
+                        networkRequest.setRequestComponent(requestComponentKey, requestComponent);
                     }
+                }else if(requestBytes.Length > 0){
 
-                } catch (Exception ex){
-                    Console.WriteLine(ex.ToString());
+                    try {
+
+                        String requestQueryComplete = utf8.GetString(requestBytes);
+                        String requestQueryFinal = HttpUtility.UrlDecode(requestQueryComplete);
+                        String[] requestBodyQuery = requestQueryFinal.Split("\r\n\r\n", 2);
+
+                        Console.WriteLine("reqp:" + requestBodyQuery[1]);
+                        if(requestBodyQuery.Length == 2 &&
+                                !requestBodyQuery[1].Equals("")) {
+                            String requestQuery =  requestBodyQuery[1];
+                            String[] requestQueryParts = requestQuery.Split("&");
+                            foreach(String entry in requestQueryParts) {
+                                RequestComponent requestComponent = new RequestComponent();
+                                String[] keyValue = entry.Split("=", 2);
+                                String key = keyValue[0];
+                                if (keyValue.Length > 1) {
+                                    String value = keyValue[1];
+                                    requestComponent.setName(key);
+                                    requestComponent.setValue(value);
+                                } else {
+                                    requestComponent.setName(key);
+                                    requestComponent.setValue("");
+                                }
+                                Console.WriteLine("zn:" + requestComponent.getName() + ":" + requestComponent.getValue());
+                                networkRequest.getRequestComponents()[key] = requestComponent;
+                            }
+                        }
+
+                    } catch (Exception ex){
+                        Console.WriteLine(ex.ToString());
+                    }
                 }
             }
         }

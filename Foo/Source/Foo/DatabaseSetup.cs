@@ -4,8 +4,13 @@ using System.Data.SQLite;
 
 namespace Foo{
     public class DatabaseSetup{
+        SQLiteConnection connection;
+
+        public DatabaseSetup(){
+            this.connection = new SQLiteConnection("Data Source=app.db;Version=3;New=True");
+        }
+
         public void setup(){
-            var connection = new SQLiteConnection("Data Source=app.db");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -32,9 +37,13 @@ namespace Foo{
                 );
             ";
             command.ExecuteNonQuery();
+            connection.Close();
         }    
         public void clean(){
             File.Delete("app.db");
+        }
+        public SQLiteConnection getConnection(){
+            return this.connection;
         }
     }
 }

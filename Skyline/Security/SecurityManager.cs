@@ -65,7 +65,7 @@ namespace Skyline.Security{
         public Boolean signin(String username, String hashedPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
             String password = securityAccess.getPassword(username);
 
-            Console.WriteLine(password);
+            Console.WriteLine("cz:" + password + ":" + hashedPassword);
             try{
                 if (!isAuthenticated(networkRequest) &&
                         password.Equals(hashedPassword)) {
@@ -104,17 +104,16 @@ namespace Skyline.Security{
             return false;
         }
 
-        public String hash(String passwd){
+        public String hash(String password){
             StringBuilder Sb = new StringBuilder();
             var hash = SHA256.Create();
 
             Encoding enc = Encoding.UTF8;
-            byte[] result = hash.ComputeHash(enc.GetBytes(passwd));
+            byte[] result = hash.ComputeHash(enc.GetBytes(password));
 
             foreach (byte b in result){
                 Sb.Append(b.ToString("x2"));
             }
-
             return Sb.ToString();
         }
 

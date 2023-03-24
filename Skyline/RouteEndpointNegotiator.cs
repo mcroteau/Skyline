@@ -96,6 +96,8 @@ namespace Skyline{
                 
                 if(persistenceConfig != null) {
                     DataTransferObject dto = new DataTransferObject(persistenceConfig);
+                    dto.setApplicationAttributes(applicationAttributes);
+
                     FieldInfo[] routeFields = routeEndpointInstance.GetType().GetFields();
                     foreach(FieldInfo routeFieldInfo in routeFields) {
                         Object[] binds = routeFieldInfo.GetCustomAttributes(typeof (Bind), true);

@@ -25,8 +25,14 @@ namespace Foo{
 
         [Post(route="/signin")]
         public String signin(NetworkRequest req, NetworkResponse resp, SecurityManager manager, ViewCache cache){
+            Console.WriteLine("reqz:" + req.getRequestComponentsList().Count);
+            foreach(RequestComponent requestComponent in req.getRequestComponentsList()){
+                Console.WriteLine("req:" + requestComponent.getName() + ":" + requestComponent.getValue());
+            }
+            
             String email = req.getValue("email");
-            String password = req.getValue("password");
+            String password = req.getValue("password").Trim();
+            Console.WriteLine("password:'" + password + "'");
             String hashed = manager.hash(password);
             
             cache.set("message", "");

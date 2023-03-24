@@ -21,11 +21,11 @@ namespace Foo.Repo{
         public PersonRepo(DataTransferObject dto){}
 
         public long save(User user){
-            var connection = new SQLiteConnection("Data Source=app.db");
+            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
+            var transaction = connection.BeginTransaction();
             
             var command = connection.CreateCommand();
-
 
             command.CommandText =
             @"
@@ -41,45 +41,64 @@ namespace Foo.Repo{
                 SELECT last_insert_rowid()
             ";
             long id = (long)command.ExecuteScalar();
+            
+            transaction.Commit();
+            connection.Close();
+            
             return id;
         }        
 
 
         public User getEmail(String email){
-            var connection = new SQLiteConnection("Data Source=app.db");
+            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
+            var command = connection.CreateCommand();
             Console.WriteLine("za:" + email);
 
-            var command = connection.CreateCommand();
+
+
+// command.CommandText = "SELECT * FROM users";
+
+//          var sqlite_datareader = command.ExecuteReader();
+//          while (sqlite_datareader.Read())
+//          {
+//             var myreader = sqlite_datareader.GetString(1);
+//             Console.WriteLine("z" + myreader);
+//          }
+
+
             command.CommandText =
             @"
                 SELECT id, email, password
-                FROM users
-                WHERE email = '$email'
+                FROM users WHERE email = $email
             ";
-            command.Parameters.AddWithValue("$email", email);
+            command.Parameters.Add(new SQLiteParameter("$email", email));
 
             ArrayList users = new ArrayList();
             var reader = command.ExecuteReader();
             while (reader.Read()){
                 User user = new User();
-                Console.WriteLine(reader.GetString(0));
-                user.setId(long.Parse(reader.GetString(0)));
+                Console.WriteLine("read:");
+                user.setId(reader.GetInt32(0));
                 user.setEmail(reader.GetString(1));
                 user.setPassword(reader.GetString(2));
                 users.Add(user);
             }
             Console.WriteLine("zq:" + users.Count);
+            
+            connection.Close();
+            
             if(users.Count > 0){
                 return users[0] as User;
             }
+            
             return null;
         }
 
 
         public HashSet<String> getRoles(long userId){
-            var connection = new SQLiteConnection("Data Source=app.db");
+            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -96,11 +115,13 @@ namespace Foo.Repo{
             while (reader.Read()){
                 userRoles.Add(reader.GetString(0));
             }
+            connection.Close();
+            
             return userRoles;
         }
         
         public HashSet<String> getPermissions(long userId){
-            var connection = new SQLiteConnection("Data Source=app.db");
+            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -117,6 +138,9 @@ namespace Foo.Repo{
             while (reader.Read()){
                 permissions.Add(reader.GetString(0));
             }
+
+            connection.Close();
+            
             return permissions;
         }
     }

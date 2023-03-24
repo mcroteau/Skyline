@@ -89,10 +89,6 @@ namespace Skyline{
                 routeAttributes = routeAttributesResolver.resolve();
                 routeAttributes.setPersistenceConfig(persistenceConfig);
 
-                foreach(var propertyEntry in routeAttributes.getAttributes()){
-                    Console.WriteLine(propertyEntry.Key + ":" + propertyEntry.Value);
-                }
-
                 String resourcesDirectory = viewConfig.getResourcesPath();
                 viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
 
@@ -155,6 +151,8 @@ namespace Skyline{
                 if(bytesRec < bytes.Length)break;
             }
 
+            Console.WriteLine(completeRequestContent);
+
             byte[] requestByteArray = utf8.GetBytes(completeRequestContent);
         
             ResourceUtility resourceUtility = new ResourceUtility();
@@ -192,6 +190,11 @@ namespace Skyline{
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
 
+            RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
+            requestComponentResolver.setRequestBytes(requestByteArray);
+            requestComponentResolver.setNetworkRequest(networkRequest);
+            requestComponentResolver.resolve();
+
             RouteEndpointNegotiator routeEndpointNegotiator = new RouteEndpointNegotiator();
             routeEndpointNegotiator.setApplicationAttributes(applicationAttributes);
             routeEndpointNegotiator.setSecurityAttributes(securityAttributes);
@@ -200,7 +203,9 @@ namespace Skyline{
 
             RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
             networkRequest.setRouteAttributes(routeAttributesFinal);
-            SecurityAccess securityAccessInstance = (SecurityAccess) Activator.CreateInstance(securityAccessType);
+            DataTransferObject dto = new DataTransferObject(persistenceConfig);
+            dto.setApplicationAttributes(applicationAttributesCopy);
+            SecurityAccess securityAccessInstance = (SecurityAccess) Activator.CreateInstance(securityAccessType, new Object[]{dto});
             SecurityManager securityManager = new SecurityManager(securityAccessInstance, securityAttributes);
             if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             
@@ -209,11 +214,6 @@ namespace Skyline{
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
-
-            RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
-            requestComponentResolver.setRequestBytes(requestByteArray);
-            requestComponentResolver.setNetworkRequest(networkRequest);
-            requestComponentResolver.resolve();
 
             StringBuilder sessionValues = new StringBuilder();
             foreach(var securityAttributeEntry in networkResponse.getSecurityAttributes()){

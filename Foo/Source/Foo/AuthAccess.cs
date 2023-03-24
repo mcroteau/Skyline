@@ -17,9 +17,7 @@ namespace Foo{
         PersonRepo personRepo;
         DataTransferObject dto;
 
-        public AuthAccess(){
-            this.personRepo = new PersonRepo(new DataTransferObject(new PersistenceConfig()));
-        }
+        public AuthAccess(){}
 
         public AuthAccess(DataTransferObject dto){
             this.personRepo = new PersonRepo(dto);
