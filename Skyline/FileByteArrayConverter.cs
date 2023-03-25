@@ -4,11 +4,12 @@ using System.IO;
 namespace Skyline{
     public class FileByteArrayConverter{
         String file;
-        ViewConfig viewConfig;
+        String fileDirectory;
 
         public byte[] convert(){
-            String filePath = "Webapp" + Path.DirectorySeparatorChar.ToString()
-                + Path.DirectorySeparatorChar.ToString() + file;
+            String filePath = Path.DirectorySeparatorChar.ToString() + "Origin" + 
+                Path.DirectorySeparatorChar.ToString() + fileDirectory +
+                Path.DirectorySeparatorChar.ToString() + file;
 
             Console.WriteLine("filePath~" + filePath);
             
@@ -32,12 +33,12 @@ namespace Skyline{
             this.file = file;
         }
 
-        public ViewConfig getViewConfig() {
-            return this.viewConfig;
+        public String getFileDirectory(){
+            return this.fileDirectory;
         }
 
-        public void setViewConfig(ViewConfig viewConfig) {
-            this.viewConfig = viewConfig;
+        public void setFileDirectory(String fileDirectory){
+            this.fileDirectory = fileDirectory;
         }
     }
 }

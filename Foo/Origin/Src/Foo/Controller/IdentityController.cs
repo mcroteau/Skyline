@@ -4,23 +4,24 @@ using Skyline.Model;
 using Skyline.Security;
 using Skyline.Annotation;
 
-namespace Foo{
+namespace Foo.Controller{
 
 
     [NetworkController]
-    public class IdentityRouter{
+    public class IdentityController{
 
-        public IdentityRouter(){}
+        public IdentityController(){}
 
         ApplicationAttributes applicationAttributes;
-        public IdentityRouter(ApplicationAttributes applicationAttributes){
+        
+        public IdentityController(ApplicationAttributes applicationAttributes){
             this.applicationAttributes = applicationAttributes;
         }
 
-        [Layout(file="/Pages/Default.asp")]        
+        [Layout(file="Views/Default.asp")]        
         [Get(route="/signin")]
         public String signin(){
-            return "/Pages/Signin.asp";
+            return "Views/Signin.asp";
         }
 
         [Post(route="/signin")]

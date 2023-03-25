@@ -4,8 +4,8 @@ using Skyline.Schemes;
 namespace Skyline{
     public class ViewConfig{
         public ViewConfig(){
-            this.viewsPath = "Webapp";
-            this.resourcesPath = "assets";
+            this.viewsPath = "Views";
+            this.resourcesPath = "Assets";
             this.viewExtension = ".asp";
             this.renderingScheme = RenderingScheme.RELOAD_EACH_REQUEST;
         }

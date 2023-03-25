@@ -8,7 +8,7 @@ using Skyline.Security;
 
 using Foo.Repo;
 
-namespace Foo{
+namespace Foo.Controller{
     
     [NetworkController]
     public class IndexController{
@@ -24,7 +24,7 @@ namespace Foo{
             this.applicationAttributes = applicationAttributes;
         }
         
-        [Layout(file="/Pages/Default.asp")]
+        [Layout(file="Views/Default.asp")]
         [Get(route="/")]
         public String index(NetworkRequest req, NetworkResponse resp, SecurityManager manager, FlashMessage flashMessage, ViewCache cache){
             cache.set("message", "");
@@ -41,17 +41,17 @@ namespace Foo{
                 Console.WriteLine(ex.ToString());
             }
 
-            return "/Pages/Index.asp";
+            return "Views/Index.asp";
         }
 
-        [Layout(file="/Pages/Default.asp")]
+        [Layout(file="Views/Default.asp")]
         [Get(route="/secured")]
         public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
             Console.WriteLine("\n\n***************************\n\n");
             if(!manager.isAuthenticated(req)){
                 return "redirect:/";
             }
-            return "/Pages/Secured.asp";
+            return "Views/Secured.asp";
         }
 
     }

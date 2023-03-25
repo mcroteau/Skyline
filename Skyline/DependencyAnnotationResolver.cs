@@ -16,7 +16,10 @@ namespace Skyline {
 
         public ComponentsHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
-                Path.DirectorySeparatorChar.ToString() + "Source" + Path.DirectorySeparatorChar.ToString();
+                Path.DirectorySeparatorChar.ToString() + "Origin" + 
+                Path.DirectorySeparatorChar.ToString() + "Src" + 
+                Path.DirectorySeparatorChar.ToString();
+                
             InspectFilePath(sourcesDirectory, sourcesDirectory);
             return componentsHolder;
         }
