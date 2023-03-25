@@ -53,7 +53,7 @@ namespace Skyline{
                         return routeResult;
                     }
                     if(renderer.Equals("reload-requests")){
-                        FileByteArrayConverter resourcesFileConverter = new FileByteArrayConverter();
+                        ResourceFileConverter resourcesFileConverter = new ResourceFileConverter();
                         resourcesFileConverter.setFile(routeEndpointPath);
                         resourcesFileConverter.setFileDirectory(viewConfig.getResourcesPath());
                         responseOutput = resourcesFileConverter.convert();
@@ -207,7 +207,7 @@ namespace Skyline{
 
 
                 if(renderer.Equals("reload-requests")){
-                    FileByteArrayConverter viewConverter = new FileByteArrayConverter();
+                    ViewFileConverter viewConverter = new ViewFileConverter();
                     viewConverter.setFile(methodResponse);
                     viewConverter.setFileDirectory(viewConfig.getViewsPath());
                     byte[] viewBytes = viewConverter.convert();
@@ -225,7 +225,7 @@ namespace Skyline{
                     }
 
                     if(renderer.Equals("reload-requests")){
-                        FileByteArrayConverter layoutConverter = new FileByteArrayConverter();
+                        ViewFileConverter layoutConverter = new ViewFileConverter();
                         layoutConverter.setFile(designUri);
                         layoutConverter.setFileDirectory(viewConfig.getViewsPath());
                         designBytes = layoutConverter.convert(); 

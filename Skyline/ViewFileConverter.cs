@@ -2,13 +2,12 @@ using System;
 using System.IO;
 
 namespace Skyline{
-    public class FileByteArrayConverter{
+    public class ViewFileConverter{
         String file;
         String fileDirectory;
 
         public byte[] convert(){
-            String filePath = Path.DirectorySeparatorChar.ToString() + "Origin" + 
-                Path.DirectorySeparatorChar.ToString() + fileDirectory +
+            String filePath = "Origin" + Path.DirectorySeparatorChar.ToString() + fileDirectory +
                 Path.DirectorySeparatorChar.ToString() + file;
 
             Console.WriteLine("filePath~" + filePath);

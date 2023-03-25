@@ -58,7 +58,7 @@ namespace Skyline{
 
         public SkylineRunnable(){
             this.port = 1301;
-            this.sourcesPath = "Source";
+            this.sourcesPath = "Src";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
@@ -67,7 +67,7 @@ namespace Skyline{
 
         public SkylineRunnable(int port){
             this.port = port;
-            this.sourcesPath = "Source";
+            this.sourcesPath = "Src";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
@@ -181,19 +181,19 @@ namespace Skyline{
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
-            if(!networkRequest.isRedirect()){
-                networkRequest.setRequestAction(networkRequestAction);
-                networkRequest.setRequestPath(networkRequestPath);
-                networkRequest.resolveRequestAttributes();
-            }
-            
+            NetworkRequest networkRequest = new NetworkRequest();
+            NetworkResponse networkResponse = new NetworkResponse();
+            networkRequest.setRequestAction(networkRequestAction);
+            networkRequest.setRequestPath(networkRequestPath);
+            networkRequest.resolveRequestAttributes();
             networkRequest.setSecurityAttributes(securityAttributes);
 
+            Console.WriteLine("...redirect:" + networkRequest.isRedirect());
             RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
             requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
-
+            
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
             requestComponentResolver.setRequestBytes(requestByteArray);
             requestComponentResolver.setNetworkRequest(networkRequest);
@@ -213,8 +213,6 @@ namespace Skyline{
             SecurityManager securityManager = new SecurityManager(securityAccessInstance, securityAttributes);
             if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             
-            RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
-
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
@@ -225,6 +223,8 @@ namespace Skyline{
                 SecurityAttribute securityAttribute = securityAttributeEntry.Value;
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
+
+            RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
             Console.WriteLine("se:" + sessionValues.ToString());
 
@@ -248,9 +248,6 @@ namespace Skyline{
             
                 viewCache = new ViewCache();
                 flashMessage = new FlashMessage();
-
-                networkRequest = new NetworkRequest();
-                networkResponse = new NetworkResponse();
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
                 return;

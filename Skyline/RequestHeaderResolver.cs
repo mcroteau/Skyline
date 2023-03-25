@@ -12,11 +12,11 @@ namespace Skyline{
             String[] networkRequestHeaderElements = networkRequestHeaderElement.Split(BREAK);
             foreach(String headerLineElement in networkRequestHeaderElements){
                 String[] headerLineComponents = headerLineElement.Split(":", 2);
-                Console.WriteLine("req=>" + networkRequest.getRequestPath() + "     /===> " + headerLineElement);
+                
                 if(headerLineComponents.Length == 2) {
                     String fieldKey = headerLineComponents[0].Trim();
                     String content = headerLineComponents[1].Trim();
-                    networkRequest.getHeaders().Add(fieldKey.ToLower(), content);
+                    networkRequest.getHeaders()[fieldKey.ToLower()] = content;
                 }
             }
         }
