@@ -25,20 +25,12 @@ namespace Foo.Controller{
         }
 
         [Post(route="/signin")]
-        public String signin(NetworkRequest req, NetworkResponse resp, SecurityManager manager, ViewCache cache){
-            Console.WriteLine("reqz:" + req.getRequestComponentsList().Count);
-            foreach(RequestComponent requestComponent in req.getRequestComponentsList()){
-                Console.WriteLine("req:" + requestComponent.getName() + ":" + requestComponent.getValue());
-            }
-            
+        public String signin(NetworkRequest req, NetworkResponse resp, SecurityManager manager, ViewCache cache){            
             String email = req.getValue("email");
             String password = req.getValue("password");
-            Console.WriteLine("password:'" + password + "'");
-            
-            cache.set("message", "");//java, c#// new instances// c# is kind of awesome!
-
+        
+            cache.set("message", "");
             if(manager.signin(email, password, req, resp)){
-                Console.WriteLine("email:" + email + " password:" + password + " resp:" + resp);
                 return "redirect:/secured";
             }
             cache.set("message","fail.");

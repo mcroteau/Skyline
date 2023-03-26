@@ -24,7 +24,6 @@ namespace Foo{
         }
         
         public String getPassword(String email){
-            Console.WriteLine("get password:" + email);
             User user = personRepo.getEmail(email);
             if(user != null){
                 return user.getPassword();

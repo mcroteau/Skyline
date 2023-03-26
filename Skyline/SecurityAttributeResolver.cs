@@ -22,7 +22,6 @@ namespace Skyline{
                     String securityAttributeKey = securityAttributeParts[0].Trim();
                     String securityAttributeKeyClean = new string(securityAttributeKey.Where(c => !char.IsControl(c)).ToArray());
 
-                    Console.WriteLine("securityAttributes.getSecurityElement(): " + securityAttributes.getSecurityElement() + ":" + securityAttributeKeyClean);
                     String securityAttributeValue = securityAttributeParts[1].Trim();
 
                     if (securityAttributes.getSecurityElement().Equals(securityAttributeKeyClean)) {
@@ -31,7 +30,6 @@ namespace Skyline{
                         String securedElement = securityAttributeValueElements[0];
                         String securedElementClean = new string(securedElement.Where(c => !char.IsControl(c)).ToArray());
 
-                        Console.WriteLine(securedElementClean);
                         if(!securedElementClean.Equals(securityAttributes.getSecuredAttribute()))continue;
 
                         String securityElementPrincipalPre = securityAttributeValueElements[1];
@@ -40,8 +38,6 @@ namespace Skyline{
                         SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributeKey, securityElementValue);
 
                         networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
-
-                        Console.WriteLine("default.security:" + securityElementPrincipalPre);
 
                         byte[] securityElementPrincipalBytes = Convert.FromBase64String(securityElementPrincipalPre);
                         String securityElementPrincipal = Encoding.UTF8.GetString(securityElementPrincipalBytes);

@@ -64,7 +64,6 @@ namespace Skyline.Security{
 
         public Boolean signin(String username, String sentPassword, NetworkRequest networkRequest, NetworkResponse networkResponse) {
             String password = securityAccess.getPassword(username).Trim();
-            Console.WriteLine("\n\nfucking password:" + password.Equals(sentPassword) + ":" + sentPassword + "':'" + password + "'" + ":" + !isAuthenticated(networkRequest));
             try{
                 if (!isAuthenticated(networkRequest) &&
                         password == sentPassword) {

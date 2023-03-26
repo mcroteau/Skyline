@@ -182,7 +182,6 @@ namespace Skyline{
                     String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
                     networkRequest.setRedirect(true);
                     networkRequest.setRedirectLocation(redirectRouteUri);
-                    Console.WriteLine("\n\nredirect:" + redirectRouteUri + "\n\n");
                     return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
                 }
 
@@ -269,7 +268,6 @@ namespace Skyline{
                 }
 
             }catch(Exception ex){
-                Console.WriteLine(ex.ToString());
                 return new RouteResult(utf8.GetBytes("issue. " + ex.Message), "500", "text/plain");
             }
 
@@ -279,7 +277,6 @@ namespace Skyline{
         MethodComponents getMethodAttributesComponents(String routeEndpointPath, ViewCache viewCache, FlashMessage flashMessage, NetworkRequest networkRequest, NetworkResponse networkResponse, SecurityManager securityManager, RouteEndpoint routeEndpoint) {
             MethodComponents methodComponents = new MethodComponents();
             ParameterInfo[] endpointMethodAttributes = routeEndpoint.getRouteMethod().GetParameters();
-            Console.WriteLine("p:" + endpointMethodAttributes);
             int index = 0;
             int pathVariableIndex = 0;
             int firstIndex = routeEndpointPath.IndexOf("/");
@@ -293,10 +290,6 @@ namespace Skyline{
                 RouteAttribute routeAttribute = routeEndpoint.getRouteAttributes()[methodAttributeKey];
                 MethodAttribute methodAttribute = new MethodAttribute();
                 methodAttribute.setDescription(description);
-
-                Console.WriteLine("3.1 {0}" + endpointMethodAttribute.ParameterType.ToString());
-                
-                Console.WriteLine("3.10 {0}", pathVariableIndex);
 
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Security.SecurityManager")){
                     methodAttribute.setDescription("securitymanager");
@@ -345,7 +338,6 @@ namespace Skyline{
                     pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int128")){
-                    Console.WriteLine("3.20" + routePathUriAttributes[pathVariableIndex]);
                     Int128 attributeValue = Int128.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
@@ -353,7 +345,7 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                     pathVariableIndex++;
                 }
-                Console.WriteLine("3.2:" + endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean"));
+                
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean")){
                     Boolean attributeValue = Boolean.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
@@ -363,7 +355,6 @@ namespace Skyline{
                     pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.String")){
-                    Console.WriteLine("3.21");
                     String attributeValue = new String(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
@@ -373,11 +364,6 @@ namespace Skyline{
                 }
             }
 
-            Console.WriteLine("here.");
-            foreach(Object obj in methodComponents.getRouteMethodAttributesList()){
-                Console.WriteLine("3.10" + obj);
-            }
-            
             return methodComponents;
         }
 

@@ -25,7 +25,6 @@ namespace Foo{
             databaseSetup.clean();
             databaseSetup.setup();
 
-            Console.WriteLine("connection" + connection);
             ApplicationAttributes applicationAttributes = new ApplicationAttributes();
             applicationAttributes.getAttributes().Add("connection", connection);
 
@@ -40,8 +39,6 @@ namespace Foo{
             user.setEmail("abc@plsar.net");
             user.setPassword("effort.");
             long id = personRepo.save(user);
-            Console.WriteLine("id:" + id);
-
 
             SkylineRunnable skyline = new SkylineRunnable(4000);
             skyline.setNumberOfPartitions(30);

@@ -50,12 +50,11 @@ namespace Skyline{
                             String routeKey = new String("");
                             String routePath = new String("");
                             foreach(MethodInfo routeMethod in routeMethods){
-                                Console.WriteLine(routeMethod);
+                                
                                 Object[] gets = routeMethod.GetCustomAttributes(typeof (Get), true);
                                 if(gets.Length > 0){
                                     Get get = (Get) gets[0];
                                     routePath = get.getRoute();
-                                    Console.WriteLine("add " + routePath + ":" + get.getRoute());
                                     RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassPath);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
@@ -111,7 +110,6 @@ namespace Skyline{
 
             String routeRegex = new String("");
             String[] routeParts = routePath.Split("/");
-            Console.WriteLine("1.0" + routeParts.Length + ":" + routePath);
             foreach(String routePart in routeParts){
                 routeRegex += "/";
                 if(routePart.Contains("{") && routePart.Contains("}")){
@@ -123,7 +121,6 @@ namespace Skyline{
 
             if(routeRegex.Equals(""))routeRegex += "/";
 
-            Console.WriteLine(routeRegex);
             routeEndpoint.setRegexRoutePath(routeRegex);
 
             if(routeEndpoint.getRegexRoutePath().Contains("["))routeEndpoint.setRegex(true);

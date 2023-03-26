@@ -143,24 +143,31 @@ namespace Skyline{
         public void ExecuteNetworkRequest(Object stateInfo){
             Socket networkRequestHandler = listener.Accept();
 
-            String data = null;
-            byte[] bytes = null;
-
-
             var utf8 = new UTF8Encoding();
-            String completeRequestContent = new String("");
-            while (true){
-                bytes = new byte[1024 * 3];
+            bool readRequestInput = true;
+            ArrayList requestByteArray = new ArrayList();
+            StringBuilder requestPayloadBuilder = new StringBuilder();
+            while (readRequestInput){
+                byte[] bytes = new byte[1024 * 24 * 3];
                 int bytesRec = networkRequestHandler.Receive(bytes);
-                Thread.Sleep(19);
-                completeRequestContent = GetBytesToStringConverted(bytes);
-                if(bytesRec < bytes.Length)break;
+                for(int xyz = 0; xyz < bytes.Length; xyz++){
+                    byte activeByte = bytes[xyz];
+                    requestByteArray.Add(activeByte);
+                }
+                if(bytesRec < bytes.Length)readRequestInput = false;
             }
 
-            byte[] requestByteArray = utf8.GetBytes(completeRequestContent);
+            byte[] requestBytes = new byte[requestByteArray.Count];
+            for(int xyz = 0; xyz < requestByteArray.Count; xyz++){
+                byte activeByte = (byte)requestByteArray[xyz];
+                requestBytes[xyz] = activeByte;
+            }
+
+            String completeRequestPayload = utf8.GetString(requestBytes);
+            Console.WriteLine("p:" + completeRequestPayload);
         
             ResourceUtility resourceUtility = new ResourceUtility();
-            String[] requestBlocks = completeRequestContent.Split(DOUBLEBREAK, 2);
+            String[] requestBlocks = completeRequestPayload.Split(DOUBLEBREAK, 2);
 
             String requestHeaderElement = requestBlocks[0];
             String[] methodPathComponentsLookup = requestHeaderElement.Split(BREAK);
@@ -188,14 +195,13 @@ namespace Skyline{
             networkRequest.resolveRequestAttributes();
             networkRequest.setSecurityAttributes(securityAttributes);
 
-            Console.WriteLine("...redirect:" + networkRequest.isRedirect());
             RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
             requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
             
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
-            requestComponentResolver.setRequestBytes(requestByteArray);
+            requestComponentResolver.setRequestBytes(requestBytes);
             requestComponentResolver.setNetworkRequest(networkRequest);
             requestComponentResolver.resolve();
 
@@ -219,20 +225,16 @@ namespace Skyline{
 
             StringBuilder sessionValues = new StringBuilder();
             foreach(var securityAttributeEntry in networkResponse.getSecurityAttributes()){
-                Console.WriteLine("zc:" + securityAttributeEntry.Value);
                 SecurityAttribute securityAttribute = securityAttributeEntry.Value;
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
             RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
-            Console.WriteLine("se:" + sessionValues.ToString());
-
             networkRequestHandler.Send(utf8.GetBytes((networkRequestVersion + " ")));
             networkRequestHandler.Send(utf8.GetBytes(routeResult.getResponseCode()));
             networkRequestHandler.Send(utf8.GetBytes(BREAK));
 
-            Console.WriteLine("\nbefore:" + networkRequest.isRedirect() + ":" + networkRequest.getRedirectLocation());
             if(networkRequest.isRedirect()) {
                 networkRequestHandler.Send(utf8.GetBytes("Content-Type:text/plain"));
                 networkRequestHandler.Send(utf8.GetBytes(BREAK));

@@ -18,7 +18,6 @@ namespace Skyline{
             Path.DirectorySeparatorChar.ToString() + "Src" + 
             Path.DirectorySeparatorChar.ToString();
 
-            Console.WriteLine(sourcesDirectory);
             InspectFilePath(sourcesDirectory, sourcesDirectory);
             return componentsHolder;
         }

@@ -20,7 +20,7 @@ namespace Skyline{
             Dictionary<String, String> headers = networkRequest.getHeaders();
 
             if(headers.ContainsKey("content-type")){
-                Console.WriteLine("\n\ncontent type found.");
+                
                 String contentType = headers["content-type"];
                 String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
@@ -29,7 +29,6 @@ namespace Skyline{
                     String formDelimiter = boundaryParts[1];
                     Console.WriteLine(formDelimiter);
                     String requestPayload = getRequestContent(requestBytes);
-                    Console.WriteLine(requestPayload);
                     ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
                     
                     foreach(RequestComponent requestComponent in requestComponents){
@@ -44,7 +43,6 @@ namespace Skyline{
                         String requestQueryFinal = HttpUtility.UrlDecode(requestQueryComplete);
                         String[] requestBodyQuery = requestQueryFinal.Split("\r\n\r\n", 2);
 
-                        Console.WriteLine("reqp:" + requestBodyQuery[1]);
                         if(requestBodyQuery.Length == 2 &&
                                 !requestBodyQuery[1].Equals("")) {
                             String requestQuery =  requestBodyQuery[1];
@@ -63,7 +61,6 @@ namespace Skyline{
                                     requestComponent.setName(keyNoClue);
                                     requestComponent.setValue("");
                                 }
-                                Console.WriteLine("zn:" + requestComponent.getName() + ":" + requestComponent.getValue());
                                 networkRequest.getRequestComponents()[keyNoClue] = requestComponent;
                             }
                         }
@@ -78,25 +75,37 @@ namespace Skyline{
         ArrayList getRequestComponents(String delimeter, String requestPayload){
             String elementRegex = "(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\._\\d]+\"\\s)|(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\.\\d]+\"; filename=\"[a-zA-Z\\.\\-_\\s\\d\\']+\")";
 
+            Dictionary<String, Boolean> matches = new Dictionary<String, Boolean>();
             ArrayList components = new ArrayList();
 
             int lastIndex = 0;
             Regex regexLocator = new Regex(elementRegex, RegexOptions.IgnoreCase);
             Match matcher = regexLocator.Match(requestPayload);
+            Console.WriteLine(delimeter + ":" + requestPayload);
             while (matcher.Success){
+
                 String fileGroup = matcher.Value;
-                Console.WriteLine("zz:" + fileGroup);
-                int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
-                int beginIndexWith = beginIndex + 1;
-                int delimiterIndex = requestPayload.IndexOf(delimeter, beginIndexWith);
-                int delimeterTotal = delimiterIndex + delimeter.Length;
-                Console.WriteLine("za:" + delimiterIndex);
-                String componentContent = requestPayload.Substring(beginIndex, delimiterIndex);
-                Component component = new Component(componentContent);
-                component.setActiveBeginIndex(beginIndex);
-                component.setActiveCloseIndex(delimeterTotal);
-                components.Add(component);
-                lastIndex = delimiterIndex;
+                if(!matches.ContainsKey(fileGroup)){
+
+                    Console.WriteLine("zz:" + fileGroup);
+                    int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
+                    int beginIndexWith = beginIndex + 1;
+                    int delimiterIndex = requestPayload.IndexOf(delimeter, beginIndexWith);
+                    int delimeterTotal = delimiterIndex + delimeter.Length;
+                    Console.WriteLine("za:" + delimiterIndex);
+                    String componentContent = requestPayload.Substring(beginIndex, delimiterIndex);
+                    
+                    Console.WriteLine("component content " + componentContent);
+
+                    Component component = new Component(componentContent);
+                    component.setActiveBeginIndex(beginIndex);
+                    component.setActiveCloseIndex(delimeterTotal);
+                    components.Add(component);
+                    lastIndex = delimiterIndex;
+
+                    matches[fileGroup] = true;
+                }
+
             }
 
             String NAME = "name=\"";
