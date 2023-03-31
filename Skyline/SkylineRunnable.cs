@@ -120,17 +120,9 @@ namespace Skyline{
                 
                 Console.WriteLine("Registering network request negotiators, please wait...");
                 
-                Thread thread = null;
-                for(int partitions = 0; partitions < numberOfPartitions; partitions++){
-                    thread = new Thread(() => {
-                        Console.Write("Registered {0} network request negotiators \r", partitions * numberOfRequestExecutors);
-                        ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
-                    });
-                    thread.Start();
-                }               
-                thread.Join();
-
+                ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
+                    
                 Console.WriteLine("\n\nReady!");
 
             }catch(Exception ex){
@@ -142,28 +134,47 @@ namespace Skyline{
 
         public void ExecuteNetworkRequest(Object stateInfo){
             Socket networkRequestHandler = listener.Accept();
+            Console.WriteLine("pre.");
+            NetworkStream myNetworkStream = new NetworkStream(networkRequestHandler);
 
-            var utf8 = new UTF8Encoding();
-            bool readRequestInput = true;
-            ArrayList requestByteArray = new ArrayList();
-            StringBuilder requestPayloadBuilder = new StringBuilder();
-            while (readRequestInput){
-                byte[] bytes = new byte[1024 * 24 * 3];
-                int bytesRec = networkRequestHandler.Receive(bytes);
-                for(int xyz = 0; xyz < bytes.Length; xyz++){
-                    byte activeByte = bytes[xyz];
-                    requestByteArray.Add(activeByte);
+            StringBuilder completeRequestPayloadBuilder = new StringBuilder();
+            UTF8Encoding utf8 = new UTF8Encoding();
+            byte[] receiveBuffer = new byte[1024 * 12];
+            int bytesReceived;
+            bool newlinesRead = false;
+            while(true){
+                bytesReceived = networkRequestHandler.Receive(receiveBuffer, receiveBuffer.Length, SocketFlags.None);
+                completeRequestPayloadBuilder.Append(utf8.GetString(receiveBuffer));
+                if(completeRequestPayloadBuilder.ToString().Contains(DOUBLEBREAK + DOUBLEBREAK) && !newlinesRead){
+                    bytesReceived = networkRequestHandler.Receive(receiveBuffer, receiveBuffer.Length, SocketFlags.None);
+                    completeRequestPayloadBuilder.Append(utf8.GetString(receiveBuffer));
+                    newlinesRead = true;
+                    continue;
                 }
-                if(bytesRec < bytes.Length)readRequestInput = false;
+                if (bytesReceived != receiveBuffer.Length){
+                    break;
+                }
+                // Don't loop too quickly.
+                System.Threading.Thread.Sleep(10);
             }
 
-            byte[] requestBytes = new byte[requestByteArray.Count];
-            for(int xyz = 0; xyz < requestByteArray.Count; xyz++){
-                byte activeByte = (byte)requestByteArray[xyz];
-                requestBytes[xyz] = activeByte;
-            }
+            // StringBuilder completeRequestPayloadBuilder = new StringBuilder();
+            // StreamReader sr = new StreamReader(myNetworkStream);
+            // int newlineCount = 0;
+            // while (!sr.EndOfStream){
+            //     String requestLine = sr.ReadLine();
+            //     completeRequestPayloadBuilder.Append(requestLine);
+            // }
+            // Console.WriteLine("." + completeRequestPayloadBuilder.ToString());
+            // String completeRequestPayload = completeRequestPayloadBuilder.ToString();
 
-            String completeRequestPayload = utf8.GetString(requestBytes);
+            
+            String completeRequestPayload = completeRequestPayloadBuilder.ToString();
+
+            byte[] requestBytes = new byte[0];
+    
+
+            // String completeRequestPayload = myCompleteMessage.ToString();
             Console.WriteLine("p:" + completeRequestPayload);
         
             ResourceUtility resourceUtility = new ResourceUtility();
@@ -246,12 +257,16 @@ namespace Skyline{
                 networkRequestHandler.Send(utf8.GetBytes("Content-Length: -1"));
                 networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
 
+                myNetworkStream.Flush();
+                myNetworkStream.Close();
+
                 networkRequestHandler.Close();
             
                 viewCache = new ViewCache();
                 flashMessage = new FlashMessage();
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
+
                 return;
             }
 
@@ -265,8 +280,11 @@ namespace Skyline{
             networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
             networkRequestHandler.Send(routeResult.getResponseOutput());
 
+            // Console.WriteLine("here..");
             // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             // networkRequestHandler.Send(resp);
+            myNetworkStream.Flush();
+            myNetworkStream.Close();
             networkRequestHandler.Close();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));

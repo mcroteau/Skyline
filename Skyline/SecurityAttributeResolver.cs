@@ -11,39 +11,42 @@ namespace Skyline{
         SecurityAttributes securityAttributes;
 
         public Boolean resolve(NetworkRequest networkRequest, NetworkResponse networkResponse) {
-            String securityAttributesElement = networkRequest.getHeaders()[SECURITY_KEY];
-            Console.WriteLine("cookie:" + securityAttributesElement);
             try {
-                String[] securityAttributePartials = securityAttributesElement.Split(";");
-                foreach(String securityAttributePartial in securityAttributePartials) {
-                    
-                    String[] securityAttributeParts = securityAttributePartial.Split("=", 2);
+                if(networkRequest.getHeaders().ContainsKey(SECURITY_KEY)){
 
-                    String securityAttributeKey = securityAttributeParts[0].Trim();
-                    String securityAttributeKeyClean = new string(securityAttributeKey.Where(c => !char.IsControl(c)).ToArray());
+                    String securityAttributesElement = networkRequest.getHeaders()[SECURITY_KEY];
+                    Console.WriteLine("cookie:" + securityAttributesElement);
+                    String[] securityAttributePartials = securityAttributesElement.Split(";");
+                    foreach(String securityAttributePartial in securityAttributePartials) {
+                        
+                        String[] securityAttributeParts = securityAttributePartial.Split("=", 2);
 
-                    String securityAttributeValue = securityAttributeParts[1].Trim();
+                        String securityAttributeKey = securityAttributeParts[0].Trim();
+                        String securityAttributeKeyClean = new string(securityAttributeKey.Where(c => !char.IsControl(c)).ToArray());
 
-                    if (securityAttributes.getSecurityElement().Equals(securityAttributeKeyClean)) {
+                        String securityAttributeValue = securityAttributeParts[1].Trim();
 
-                        String[] securityAttributeValueElements = securityAttributeValue.Split(".");
-                        String securedElement = securityAttributeValueElements[0];
-                        String securedElementClean = new string(securedElement.Where(c => !char.IsControl(c)).ToArray());
+                        if (securityAttributes.getSecurityElement().Equals(securityAttributeKeyClean)) {
 
-                        if(!securedElementClean.Equals(securityAttributes.getSecuredAttribute()))continue;
+                            String[] securityAttributeValueElements = securityAttributeValue.Split(".");
+                            String securedElement = securityAttributeValueElements[0];
+                            String securedElementClean = new string(securedElement.Where(c => !char.IsControl(c)).ToArray());
 
-                        String securityElementPrincipalPre = securityAttributeValueElements[1];
+                            if(!securedElementClean.Equals(securityAttributes.getSecuredAttribute()))continue;
 
-                        String securityElementValue = securedElement + "." + securityElementPrincipalPre + "; path=/";
-                        SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributeKey, securityElementValue);
+                            String securityElementPrincipalPre = securityAttributeValueElements[1];
 
-                        networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
+                            String securityElementValue = securedElement + "." + securityElementPrincipalPre + "; path=/";
+                            SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributeKey, securityElementValue);
 
-                        byte[] securityElementPrincipalBytes = Convert.FromBase64String(securityElementPrincipalPre);
-                        String securityElementPrincipal = Encoding.UTF8.GetString(securityElementPrincipalBytes);
-  
-                        networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
-                        networkRequest.setUserCredential(securityElementPrincipal);
+                            networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
+
+                            byte[] securityElementPrincipalBytes = Convert.FromBase64String(securityElementPrincipalPre);
+                            String securityElementPrincipal = Encoding.UTF8.GetString(securityElementPrincipalBytes);
+    
+                            networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
+                            networkRequest.setUserCredential(securityElementPrincipal);
+                        }
                     }
                 }
             }catch(Exception ex){

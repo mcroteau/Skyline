@@ -27,7 +27,6 @@ namespace Skyline{
                 Console.WriteLine("boundaryParts:" + boundaryParts.Length);
                 if (boundaryParts.Length > 1) {
                     String formDelimiter = boundaryParts[1];
-                    Console.WriteLine(formDelimiter);
                     String requestPayload = getRequestContent(requestBytes);
                     ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
                     
@@ -81,25 +80,26 @@ namespace Skyline{
             int lastIndex = 0;
             Regex regexLocator = new Regex(elementRegex, RegexOptions.IgnoreCase);
             Match matcher = regexLocator.Match(requestPayload);
-            Console.WriteLine(delimeter + ":" + requestPayload);
+            
             while (matcher.Success){
 
                 String fileGroup = matcher.Value;
                 if(!matches.ContainsKey(fileGroup)){
 
                     Console.WriteLine("zz:" + fileGroup);
+
                     int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
-                    int beginIndexWith = beginIndex + 1;
-                    int delimiterIndex = requestPayload.IndexOf(delimeter, beginIndexWith);
-                    int delimeterTotal = delimiterIndex + delimeter.Length;
+                    int delimeterIndexLength = beginIndex + delimeter.Length;
+                    int delimiterIndex = requestPayload.IndexOf(delimeter, beginIndex);
+                    int delimeterLength = delimeter.Length;
                     Console.WriteLine("za:" + delimiterIndex);
-                    String componentContent = requestPayload.Substring(beginIndex, delimiterIndex);
+                    String componentContent = requestPayload.Substring(delimiterIndex, delimiterIndex);
                     
                     Console.WriteLine("component content " + componentContent);
 
                     Component component = new Component(componentContent);
                     component.setActiveBeginIndex(beginIndex);
-                    component.setActiveCloseIndex(delimeterTotal);
+                    component.setActiveCloseIndex(delimiterIndex);
                     components.Add(component);
                     lastIndex = delimiterIndex;
 
