@@ -15,28 +15,27 @@ namespace Skyline{
 
         public void resolve(){
 
-            var utf8 = new UTF8Encoding();
+            try {
+                var utf8 = new UTF8Encoding();
 
-            Dictionary<String, String> headers = networkRequest.getHeaders();
+                Dictionary<String, String> headers = networkRequest.getHeaders();
 
-            if(headers.ContainsKey("content-type")){
-                
-                String contentType = headers["content-type"];
-                String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
-
-                Console.WriteLine("boundaryParts:" + boundaryParts.Length);
-                if (boundaryParts.Length > 1) {
-                    String formDelimiter = boundaryParts[1];
-                    String requestPayload = getRequestContent(requestBytes);
-                    ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
+                if(headers.ContainsKey("content-type")){
                     
-                    foreach(RequestComponent requestComponent in requestComponents){
-                        String requestComponentKey = requestComponent.getName();
-                        networkRequest.setRequestComponent(requestComponentKey, requestComponent);
-                    }
-                }else if(requestBytes.Length > 0){
+                    String contentType = headers["content-type"];
+                    String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
-                    try {
+                    Console.WriteLine("boundaryParts:" + boundaryParts.Length);
+                    if (boundaryParts.Length > 1) {
+                        String formDelimiter = boundaryParts[1];
+                        String requestPayload = getRequestContent(requestBytes);
+                        ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
+                        
+                        foreach(RequestComponent requestComponent in requestComponents){
+                            String requestComponentKey = requestComponent.getName();
+                            networkRequest.setRequestComponent(requestComponentKey, requestComponent);
+                        }
+                    }else if(requestBytes.Length > 0){
 
                         String requestQueryComplete = utf8.GetString(requestBytes);
                         String requestQueryFinal = HttpUtility.UrlDecode(requestQueryComplete);
@@ -63,11 +62,12 @@ namespace Skyline{
                                 networkRequest.getRequestComponents()[keyNoClue] = requestComponent;
                             }
                         }
-
-                    } catch (Exception ex){
-                        Console.WriteLine(ex.ToString());
                     }
+
                 }
+
+            } catch (Exception ex){
+                Console.WriteLine(ex.ToString());
             }
         }
 
