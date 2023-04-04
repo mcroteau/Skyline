@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.IO.Pipes;
 using System.Text;
 using System.IO;
 using System.Collections;
@@ -132,8 +133,8 @@ namespace Skyline{
             Console.ReadKey();
         }
 
-        public void ExecuteNetworkRequest(Object stateInfo){
-            Socket networkRequestHandler = listener.Accept();
+        public async void ExecuteNetworkRequest(Object stateInfo){
+            Socket networkRequestHandler = await listener.AcceptAsync();
             MemoryStream memoryStream = new MemoryStream();
 
             int bytesReceived;
@@ -141,22 +142,29 @@ namespace Skyline{
             
             StringBuilder completeRequestPayloadBuilder = new StringBuilder();
             UTF8Encoding utf8 = new UTF8Encoding();
-            byte[] receiveBuffer = new byte[240];
+            byte[] receiveBuffer = new byte[1024];
             
+
+            int count = 0;
+            int totalBytesRead = 0; 
             while(true){
-                bytesReceived = networkRequestHandler.Receive(receiveBuffer, receiveBuffer.Length, SocketFlags.None);
+                System.Threading.Thread.Sleep(10);
+                bytesReceived = networkRequestHandler.Receive(receiveBuffer, SocketFlags.ControlDataTruncated);
+                totalBytesRead += bytesReceived;
                 completeRequestPayloadBuilder.Append(utf8.GetString(receiveBuffer));
                 memoryStream.Write(receiveBuffer, 0, bytesReceived);
-                if (bytesReceived != receiveBuffer.Length){
-                    break;
+                Console.WriteLine(bytesReceived);
+                if(completeRequestPayloadBuilder.ToString().ToLower().Contains("webkit")){
+                    count++;
                 }
-                System.Threading.Thread.Sleep(10);
+                if(bytesReceived == -1)break;
+                if(networkRequestHandler.Available == 0)break;
             }
 
             byte[] requestBytes = memoryStream.ToArray();    
             String completeRequestPayload = completeRequestPayloadBuilder.ToString();
         
-            Console.WriteLine(completeRequestPayload);
+            Console.WriteLine("completeRequestPayload:" + completeRequestPayload);
             
             ResourceUtility resourceUtility = new ResourceUtility();
             String[] requestBlocks = completeRequestPayload.Split(DOUBLEBREAK, 2);
@@ -238,6 +246,7 @@ namespace Skyline{
                 networkRequestHandler.Send(utf8.GetBytes("Content-Length: -1"));
                 networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
 
+                networkRequestHandler.Dispose();
                 networkRequestHandler.Close();
             
                 viewCache = new ViewCache();
@@ -261,6 +270,7 @@ namespace Skyline{
             // Console.WriteLine("here..");
             // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             // networkRequestHandler.Send(resp);
+            networkRequestHandler.Dispose();
             networkRequestHandler.Close();
 
             ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
