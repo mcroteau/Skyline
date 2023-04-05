@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Web;
+using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Collections;
 
@@ -10,7 +11,8 @@ namespace Skyline{
     
     public class RequestComponentResolver {
 
-        byte[] requestBytes;
+        String requestPayload;
+        Encoding encoding;
         NetworkRequest networkRequest;
 
         public void resolve(){
@@ -27,17 +29,16 @@ namespace Skyline{
 
                     Console.WriteLine("boundaryParts:" + boundaryParts.Length);
                     if (boundaryParts.Length > 1) {
-                        String formDelimiter = boundaryParts[1];
-                        String requestPayload = getRequestContent(requestBytes);
-                        ArrayList requestComponents = getRequestComponents(formDelimiter, requestPayload);
+                        String formDelimiter = boundaryParts[1].Replace(";", "");
+                        ArrayList requestComponents = getRequestComponents(formDelimiter);
                         
                         foreach(RequestComponent requestComponent in requestComponents){
                             String requestComponentKey = requestComponent.getName();
                             networkRequest.setRequestComponent(requestComponentKey, requestComponent);
                         }
-                    }else if(requestBytes.Length > 0){
+                    }else if(requestPayload.Length == 0){
 
-                        String requestQueryComplete = utf8.GetString(requestBytes);
+                        String requestQueryComplete = "";
                         String requestQueryFinal = HttpUtility.UrlDecode(requestQueryComplete);
                         String[] requestBodyQuery = requestQueryFinal.Split("\r\n\r\n", 2);
 
@@ -71,40 +72,39 @@ namespace Skyline{
             }
         }
 
-        ArrayList getRequestComponents(String delimeter, String requestPayload){
-            String elementRegex = "(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\._\\d]+\"\\s)|(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\.\\d]+\"; filename=\"[a-zA-Z\\.\\-_\\s\\d\\']+\")";
+        ArrayList getRequestComponents(String delimeter){
+            String elementRegex = "(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\._\\d]+\"$)|(Content-Disposition: form-data; name=\"[a-zA-Z\\-\\.\\d]+\"; filename=\"[a-zA-Z\\.\\-_\\s\\d\\']+\")";
 
             Dictionary<String, Boolean> matches = new Dictionary<String, Boolean>();
             ArrayList components = new ArrayList();
 
-            int lastIndex = 0;
-            Regex regexLocator = new Regex(elementRegex, RegexOptions.IgnoreCase);
-            Match matcher = regexLocator.Match(requestPayload);
+            int lastIndex = 3;
             
-            while (matcher.Success){
+            foreach (Match match in Regex.Matches(requestPayload, elementRegex,
+                                               RegexOptions.None,
+                                               TimeSpan.FromSeconds(1))){
+                              
+                String fileGroup = match.Value;
 
-                String fileGroup = matcher.Value;
-                if(!matches.ContainsKey(fileGroup)){
+                Console.WriteLine("x:" + requestPayload);
 
-                    Console.WriteLine("zz:" + fileGroup);
+                int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
+                Console.WriteLine(beginIndex + ":" + delimeter);
+                int beginIndexWith = beginIndex + fileGroup.Length;
+                int delimiterIndex = requestPayload.IndexOf(delimeter, lastIndex);
+                int delimiterIndexWith = delimiterIndex + delimeter.Length;
+                int componentLength = delimiterIndexWith - beginIndex;
 
-                    int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
-                    int delimeterIndexLength = beginIndex + delimeter.Length;
-                    int delimiterIndex = requestPayload.IndexOf(delimeter, beginIndex);
-                    int delimeterLength = delimeter.Length;
-                    Console.WriteLine("za:" + delimiterIndex);
-                    String componentContent = requestPayload.Substring(delimiterIndex, delimiterIndex);
-                    
-                    Console.WriteLine("component content " + componentContent);
+                Console.WriteLine("beginIndex:" + beginIndex + ":" + delimiterIndex + ":" + componentLength + ":" + fileGroup);
+                String componentContent = requestPayload.Substring(beginIndex, componentLength);
 
-                    Component component = new Component(componentContent);
-                    component.setActiveBeginIndex(beginIndex);
-                    component.setActiveCloseIndex(delimiterIndex);
-                    components.Add(component);
-                    lastIndex = delimiterIndex;
+                Console.WriteLine(componentContent);
 
-                    matches[fileGroup] = true;
-                }
+                Component component = new Component(componentContent);
+                component.setActiveBeginIndex(beginIndex);
+                component.setActiveCloseIndex(delimiterIndex);
+                components.Add(component);
+                lastIndex = delimiterIndex;
 
             }
 
@@ -114,17 +114,27 @@ namespace Skyline{
             Dictionary<String, RequestComponent> requestComponentMap = new Dictionary<String, RequestComponent>();
             foreach(Component component in components){
                 String componentContent = component.getComponent();
-                Console.WriteLine("component:" + component);
+                Console.WriteLine("component:" + componentContent);
                 int beginNameIdx = componentContent.IndexOf(NAME);
-                int endNameIdx = componentContent.IndexOf("\"", beginNameIdx + NAME.Length);
-                String nameElement = componentContent.Substring(beginNameIdx + NAME.Length, endNameIdx);
+                int beginNameIdxWith = beginNameIdx + NAME.Length;
+                int endNameIdx = componentContent.IndexOf("\"", beginNameIdxWith);
+                int nameDiff = endNameIdx - beginNameIdx;
+                String nameElement = componentContent.Substring(beginNameIdxWith, nameDiff);
 
                 int beginFilenameIdx = componentContent.IndexOf(FILE);
                 if(beginFilenameIdx == -1){
                     int beginValueIdx = componentContent.IndexOf("\r\n\r\n", endNameIdx);
-                    int endValueIdx = componentContent.IndexOf("--", beginValueIdx + NEWLINE.Length);
-                    String valueDirty = componentContent.Substring(beginValueIdx + NEWLINE.Length, endValueIdx);
+                    int beginValueIdxWith = beginValueIdx + "\r\n\r\n".Length;
+
+                    String endDelimeter = delimeter + "--";
+
+                    int endValueIdx = componentContent.IndexOf(endDelimeter, beginValueIdxWith);
+                    int endValueIdxWith = endValueIdx + endDelimeter.Length;
+                    int valueDiff = endValueIdxWith - beginValueIdxWith;
+                    String valueDirty = componentContent.Substring(beginValueIdxWith, valueDiff);
                     String value = valueDirty.Replace("\r\n", "");
+
+                    Console.WriteLine("\n\nn:" + value);
 
                     if(requestComponentMap.ContainsKey(nameElement)){
                         RequestComponent requestComponent = requestComponentMap[nameElement];
@@ -141,18 +151,21 @@ namespace Skyline{
                     }
 
                 }else{
+                    Console.WriteLine("file checked..." + nameElement + ":" + requestComponentMap.ContainsKey(nameElement));
                     if(requestComponentMap.ContainsKey(nameElement)){
                         RequestComponent requestComponent = requestComponentMap[nameElement];
                         requestComponent.setName(nameElement);
-                        FileComponent fileComponent = getFileComponent(component, componentContent);
+                        FileComponent fileComponent = getFileComponent(delimeter, component, componentContent);
                         if(fileComponent != null) {
                             requestComponent.getFileComponents().Add(fileComponent);
                             requestComponentMap[nameElement] = requestComponent;
                         }
                     }else{
+                        Console.WriteLine("file checked dos..." + nameElement + ":" + requestComponentMap.ContainsKey(nameElement));
+                    
                         RequestComponent requestComponent = new RequestComponent();
                         requestComponent.setName(nameElement);
-                        FileComponent fileComponent = getFileComponent(component, componentContent);
+                        FileComponent fileComponent = getFileComponent(delimeter, component, componentContent);
                         if(fileComponent != null) {
                             requestComponent.getFileComponents().Add(fileComponent);
                             requestComponentMap[nameElement] = requestComponent;
@@ -169,56 +182,101 @@ namespace Skyline{
             return requestComponents;
         }
 
-        FileComponent getFileComponent(Component component, String componentContent) {
+        FileComponent getFileComponent(String delimeter, Component component, String componentContent) {
             FileComponent fileComponent = new FileComponent();
 
             int fileIdx = componentContent.IndexOf("filename=");
-            int startFile = componentContent.IndexOf("\"", fileIdx + 1);
-            int endFile = componentContent.IndexOf("\"", startFile + 1);
-            String fileName = componentContent.Substring(startFile + 1, endFile);
+            int fileIdxWith = fileIdx + 1;
+            
+            int startFile = componentContent.IndexOf("\"", fileIdxWith);
+            int startFileWith = startFile + 1;
+
+            int endFile = componentContent.IndexOf("\"", startFileWith);
+            int fileDiff = endFile - startFileWith;
+
+            String fileName = componentContent.Substring(startFileWith, fileDiff);
             fileComponent.setFileName(fileName);
 
-            int startContent = componentContent.IndexOf("Content-Type", endFile + 1);
-            int startType = componentContent.IndexOf(":", startContent + 1);
-            int endType = componentContent.IndexOf("\r\n", startType + 1);
-            String type = componentContent.Substring(startType + 1, endType).Trim();
-            fileComponent.setContentType(type);
+            Console.WriteLine("fileName:" + fileName);
 
-            int activeBeginIndex = component.getActiveBeginIndex() + componentContent.IndexOf("\r\n", endType) + "\r\n\r\n".Length;
-            int activeCloseIndex = component.getActiveCloseIndex() + componentContent.IndexOf("--", activeBeginIndex);
+            int endFileWith = endFile + 1;
 
-            if(activeCloseIndex >= requestBytes.Length)activeCloseIndex = requestBytes.Length;
+            int startContent = componentContent.IndexOf("Content-Type", endFileWith);
+            int startContentWith = startContent + 1;
 
-            if (activeCloseIndex - activeBeginIndex > "\r\n\r\n".Length) {
+            int startType = componentContent.IndexOf(":", startContentWith);
+            int startTypeWith = startType + 1;
 
-                ArrayList byteArrayOutputStream = new ArrayList();
-                for (int activeIndex = activeBeginIndex; activeIndex < activeCloseIndex; activeIndex++) {
-                    byte activeByte = requestBytes[activeIndex];
-                    byteArrayOutputStream.Add(activeByte);
-                }
+            int endType = componentContent.IndexOf("\r\n", startTypeWith);
+            int endTypeWith = endType + "\r\n".Length;
+            int typeDiff = endType - startTypeWith;
 
-                int index = 0;
-                byte[] bytes = new byte[byteArrayOutputStream.Count];
-                foreach(object objectInstance in byteArrayOutputStream){
-                    byte b = (byte)objectInstance;
-                    bytes[index] = b;
-                }
+            String contentType = componentContent.Substring(startTypeWith, typeDiff).Trim();
+            Console.WriteLine("contentType:" + contentType);
+            fileComponent.setContentType(contentType);
 
-                fileComponent.setFileBytes(bytes);
-                fileComponent.setActiveIndex(activeCloseIndex);
+            int activeCloseIndex = componentContent.IndexOf(delimeter);
+            int fileValueDiff = activeCloseIndex - endTypeWith + "\r\n".Length;
 
-                return fileComponent;
+            String fileValue = componentContent.Substring(endTypeWith, fileValueDiff);
+            // String fileValueClean = new String(fileValue.Where(c => !char.IsControl(c)).ToArray());
+            int dashIndex = fileValue.LastIndexOf("----");  
+            String peace  = fileValue;
+            if(dashIndex != -1){          
+                peace = fileValue.Remove(dashIndex, "----".Length);
+            }
+            int newlineIndex = peace.LastIndexOf("\r\n");  
+            String love  = peace;
+            if(newlineIndex != -1){          
+                love = peace.Remove(newlineIndex, "\r\n".Length);
+            }
+            int firstNewlineIndex = love.IndexOf("\r\n");  
+            String harmony  = love;
+            if(firstNewlineIndex != -1){          
+                harmony = love.Remove(firstNewlineIndex, "\r\n".Length);
             }
 
-            return null;
+            ArrayList fileBytesArray = new ArrayList();
+            char[] fileChars = harmony.ToCharArray();
+            for(int xyz = 0; xyz < fileChars.Length; xyz++){
+                fileBytesArray.Add((byte)fileChars[xyz]);
+            }
+
+            byte[] fileBytes = new byte[fileBytesArray.Count];
+            for(int xyz = 0; xyz < fileBytesArray.Count; xyz++){
+                fileBytes[xyz] = (byte)fileBytesArray[xyz];
+            }
+
+            Console.WriteLine("fileBytesArray: " + fileBytes.Length);
+            // Console.WriteLine("pre:'" + harmony + "'");
+            
+            UTF8Encoding utf8 = new UTF8Encoding();
+
+            byte[] data = System.IO.File.ReadAllBytes(@"m.png");
+            Console.WriteLine("data: " + data.Length);
+            Console.WriteLine("'" + encoding.GetString(data) + "'");
+            for(int xyz = 0; xyz < fileBytesArray.Count; xyz++){
+                fileBytes[xyz] = (byte)fileBytesArray[xyz];
+            }
+
+            using var writer = new BinaryWriter(File.OpenWrite("effort.png"));
+            writer.Write(fileBytes);
+
+            
+
+            fileComponent.setFileBytes(fileBytes);
+            fileComponent.setActiveIndex(activeCloseIndex);
+
+            return fileComponent;
+        
         }
 
-        public byte[] getRequestBytes() {
-            return requestBytes;
+        public void setEncoding(Encoding encoding){
+            this.encoding = encoding;
         }
 
-        public void setRequestBytes(byte[] requestBytes) {
-            this.requestBytes = requestBytes;
+        public void setRequestPayload(String requestPayload){
+            this.requestPayload = requestPayload;
         }
 
         public NetworkRequest getNetworkRequest() {
@@ -228,14 +286,5 @@ namespace Skyline{
         public void setNetworkRequest(NetworkRequest networkRequest) {
             this.networkRequest = networkRequest;
         }
-
-        String getRequestContent(byte[] requestBytes){
-            StringBuilder sb = new StringBuilder();
-            foreach(byte b in requestBytes) {
-                sb.Append((char) b);
-            }
-            return  sb.ToString();
-        }
-
     }
 }

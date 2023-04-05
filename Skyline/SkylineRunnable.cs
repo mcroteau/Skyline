@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 using System.Reflection;
+using System.Diagnostics;
 
 using Skyline;
 using Skyline.Model;
@@ -52,7 +53,7 @@ namespace Skyline{
 
         Type securityAccessType;
 
-        Socket listener;
+        HttpListener listener;
 
         String securedAttribute = "attribute";
         String securityElement = "default.security";
@@ -111,20 +112,20 @@ namespace Skyline{
                 componentAnnotationResolver.setApplicationAttributes(applicationAttributes);
                 componentsHolder = componentAnnotationResolver.resolve();
 
-                IPHostEntry host = Dns.GetHostEntry("localhost");
-                IPAddress ipAddress = host.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
-                listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                listener.Bind(localEndPoint);
-                listener.Listen(1);
+			    listener = new HttpListener();
+			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
+
+			    listener.Start();
+                Console.WriteLine("Registering request handlers, please wait...");
                 
-                Console.WriteLine("Registering network request negotiators, please wait...");
-                
-                ThreadPool.SetMinThreads(numberOfRequestExecutors, numberOfRequestExecutors);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
-                    
-                Console.WriteLine("\n\nReady!");
+                int requestCount = 0;
+                while(requestCount < numberOfRequestExecutors){ 
+                    PrepareNetworkRequest(); 
+                    requestCount++;
+                }
+
+                Console.WriteLine("Ready!");
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
@@ -132,77 +133,100 @@ namespace Skyline{
 
             Console.ReadKey();
         }
+        
+        void PrepareNetworkRequest(){
+			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
+			var startNew = Stopwatch.StartNew();
+			result.AsyncWaitHandle.WaitOne();
+			startNew.Stop();
+			Console.WriteLine("ElapsedMilliseconds "+ startNew.ElapsedMilliseconds);
+		}
 
-        public async void ExecuteNetworkRequest(Object stateInfo){
-            Socket networkRequestHandler = await listener.AcceptAsync();
+        void ExecuteNetworkRequest(IAsyncResult result){
+			
+            Thread.Sleep(1000);
+
+			var context = listener.EndGetContext(result);
+
+            var request = context.Request;
+            Encoding encoding = request.ContentEncoding;
+    
+            ArrayList requestBytesArray = new ArrayList();
             MemoryStream memoryStream = new MemoryStream();
-
-            int bytesReceived;
-            bool newlinesRead = false;
-            
-            StringBuilder completeRequestPayloadBuilder = new StringBuilder();
-            UTF8Encoding utf8 = new UTF8Encoding();
-            byte[] receiveBuffer = new byte[1024];
-            
-
-            int count = 0;
-            int totalBytesRead = 0; 
-            while(true){
-                System.Threading.Thread.Sleep(10);
-                bytesReceived = networkRequestHandler.Receive(receiveBuffer, SocketFlags.ControlDataTruncated);
-                totalBytesRead += bytesReceived;
-                completeRequestPayloadBuilder.Append(utf8.GetString(receiveBuffer));
-                memoryStream.Write(receiveBuffer, 0, bytesReceived);
-                Console.WriteLine(bytesReceived);
-                if(completeRequestPayloadBuilder.ToString().ToLower().Contains("webkit")){
-                    count++;
-                }
-                if(bytesReceived == -1)break;
-                if(networkRequestHandler.Available == 0)break;
+            int totalBytesRecieved = 0;
+            String completeRequestPayload = "";
+            if(request.HttpMethod.ToUpper().Equals("POST")){          
+                Stream requestStream = request.InputStream;  
+                // Console.WriteLine("l:" + requestStream.Length);
+                // byte[] bytesBuffer = new byte[1024 * 12];
+                // int bytesRecieved;
+                // while(true){
+                //     bytesRecieved = requestStream.Read(bytesBuffer, 0, bytesBuffer.Length);
+                //     totalBytesRecieved += bytesRecieved;
+                //     memoryStream.Write(bytesBuffer, 0, bytesRecieved);
+                //     if(totalBytesRecieved == requestStream.Length)break;
+                //     bytesBuffer = new byte[1024 * 12];
+                // }
+                StreamReader reader = new StreamReader(requestStream, encoding); 
+                completeRequestPayload = reader.ReadToEnd();
             }
 
-            byte[] requestBytes = memoryStream.ToArray();    
-            String completeRequestPayload = completeRequestPayloadBuilder.ToString();
-        
+            byte[] requestBytes = encoding.GetBytes(completeRequestPayload);
+            // for(int xyz = 0; xyz < requestBytesArray.Count; xyz++){
+            //     requestBytes[xyz] = (byte)requestBytesArray[xyz];
+            // }
+
+            var clientOut = context.Response.OutputStream;
+
             Console.WriteLine("completeRequestPayload:" + completeRequestPayload);
             
             ResourceUtility resourceUtility = new ResourceUtility();
-            String[] requestBlocks = completeRequestPayload.Split(DOUBLEBREAK, 2);
 
-            String requestHeaderElement = requestBlocks[0];
-            String[] methodPathComponentsLookup = requestHeaderElement.Split(BREAK);
-            String methodPathComponent = methodPathComponentsLookup[0];
 
-            String[] methodPathVersionComponents = methodPathComponent.Split(SPACE);
+            Console.WriteLine(request.Url.OriginalString);
+            String portDelimeter = ":" + port.ToString();
+            String[] requestParts = request.Url.ToString().Split(portDelimeter, 2);
+            Console.WriteLine(requestParts.Length);
+            String requestAction = requestParts[1];
 
-            String networkRequestAction = methodPathVersionComponents[REQUEST_METHOD];
-            String networkRequestPath = methodPathVersionComponents[REQUEST_PATH];
-            String networkRequestVersion = methodPathVersionComponents[REQUEST_VERSION];
-
-            if(networkRequestPath.Equals(FAVICON)){
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
+            Console.WriteLine(requestAction);
+            
+            if(request.QueryString.Equals(FAVICON)){
+                PrepareNetworkRequest();
                 return;
             }
-
+            
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
             NetworkRequest networkRequest = new NetworkRequest();
             NetworkResponse networkResponse = new NetworkResponse();
-            networkRequest.setRequestAction(networkRequestAction);
-            networkRequest.setRequestPath(networkRequestPath);
+            networkRequest.setRequestAction(request.HttpMethod.ToLower());
+            networkRequest.setRequestPath(requestAction);
             networkRequest.resolveRequestAttributes();
             networkRequest.setSecurityAttributes(securityAttributes);
 
-            RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
-            requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
-            requestHeaderResolver.setNetworkRequest(networkRequest);
-            requestHeaderResolver.resolve();
+            foreach (String key in request.Headers.AllKeys){
+                String[] values = request.Headers.GetValues(key);
+                if(values.Length > 0){
+                    StringBuilder Sb = new StringBuilder();
+                    foreach (String value in values){
+                        Sb.Append(value + ";");
+                    }
+                    networkRequest.getHeaders()[key.ToLower()] = Sb.ToString();
+                }
+            }
+
+            // RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
+            // requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
+            // requestHeaderResolver.setNetworkRequest(networkRequest);
+            // requestHeaderResolver.resolve();
             
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
-            requestComponentResolver.setRequestBytes(requestBytes);
+            requestComponentResolver.setRequestPayload(completeRequestPayload);
             requestComponentResolver.setNetworkRequest(networkRequest);
+            requestComponentResolver.setEncoding(encoding);
             requestComponentResolver.resolve();
 
             RouteEndpointNegotiator routeEndpointNegotiator = new RouteEndpointNegotiator();
@@ -213,8 +237,10 @@ namespace Skyline{
 
             RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
             networkRequest.setRouteAttributes(routeAttributesFinal);
+            
             DataTransferObject dto = new DataTransferObject(persistenceConfig);
             dto.setApplicationAttributes(applicationAttributesCopy);
+
             SecurityAccess securityAccessInstance = (SecurityAccess) Activator.CreateInstance(securityAccessType, new Object[]{dto});
             SecurityManager securityManager = new SecurityManager(securityAccessInstance, securityAttributes);
             if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
@@ -231,49 +257,59 @@ namespace Skyline{
 
             RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
-            networkRequestHandler.Send(utf8.GetBytes((networkRequestVersion + " ")));
-            networkRequestHandler.Send(utf8.GetBytes(routeResult.getResponseCode()));
-            networkRequestHandler.Send(utf8.GetBytes(BREAK));
+            StringBuilder responseOutput = new StringBuilder();
+
+            Console.WriteLine("r..." + routeResult.getResponseCode());
+
+            // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
+			// context.Response.StatusDescription = "OK";
+
+            context.Response.ContentType = routeResult.getContentType();
+            Console.WriteLine("set...");
+            responseOutput.Append("HTTP/1.1 " + routeResult.getResponseCode());
+            responseOutput.Append(BREAK);
+
 
             if(networkRequest.isRedirect()) {
-                networkRequestHandler.Send(utf8.GetBytes("Content-Type:text/plain"));
-                networkRequestHandler.Send(utf8.GetBytes(BREAK));
-                networkRequestHandler.Send(utf8.GetBytes("Set-Cookie:"));
-                networkRequestHandler.Send(utf8.GetBytes(sessionValues.ToString()));
-                networkRequestHandler.Send(utf8.GetBytes(BREAK));
-                networkRequestHandler.Send(utf8.GetBytes(("Location: " +  networkRequest.getRedirectLocation() + SPACE)));
-                networkRequestHandler.Send(utf8.GetBytes(BREAK));
-                networkRequestHandler.Send(utf8.GetBytes("Content-Length: -1"));
-                networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
 
-                networkRequestHandler.Dispose();
-                networkRequestHandler.Close();
+                responseOutput.Append("Content-Type:text/plain");
+                responseOutput.Append(BREAK);
+
+                responseOutput.Append("Set-Cookie:" + sessionValues.ToString());
+                responseOutput.Append(BREAK);
+
+                responseOutput.Append("Location: " +  networkRequest.getRedirectLocation() + SPACE);
+                responseOutput.Append(BREAK);
+
+                responseOutput.Append("Content-Length: -1");
+                responseOutput.Append(DOUBLEBREAK);
+
+                clientOut.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+
+                clientOut.Close();
             
                 viewCache = new ViewCache();
                 flashMessage = new FlashMessage();
 
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
-
-                return;
+                PrepareNetworkRequest();
             }
 
+            responseOutput.Append("Content-Type:" + routeResult.getContentType());                
+            responseOutput.Append(BREAK);
 
-            networkRequestHandler.Send(utf8.GetBytes("Content-Type:"));
-            networkRequestHandler.Send(utf8.GetBytes(routeResult.getContentType()));
-            networkRequestHandler.Send(utf8.GetBytes(BREAK));
+            responseOutput.Append("Set-Cookie:" + sessionValues.ToString());
+            responseOutput.Append(DOUBLEBREAK);
 
-            networkRequestHandler.Send(utf8.GetBytes("Set-Cookie:"));
-            networkRequestHandler.Send(utf8.GetBytes(sessionValues.ToString()));
-            networkRequestHandler.Send(utf8.GetBytes(DOUBLEBREAK));
-            networkRequestHandler.Send(routeResult.getResponseOutput());
+            String resultOut = encoding.GetString(routeResult.getResponseOutput());
+            responseOutput.Append(resultOut);//hi
+ 
+            // // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
+            // // clientOut.Write(resp);
 
-            // Console.WriteLine("here..");
-            // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-            // networkRequestHandler.Send(resp);
-            networkRequestHandler.Dispose();
-            networkRequestHandler.Close();
+            clientOut.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+            clientOut.Close();
 
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ExecuteNetworkRequest));
+            PrepareNetworkRequest();
         }    
 
         static String GetBytesToStringConverted(byte[] bytes){

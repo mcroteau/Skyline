@@ -2,6 +2,12 @@ using System;
 
 namespace Skyline.Model {
     public class RequestComponent {
+
+        public RequestComponent(){
+            this.values = new List<String>();
+            this.fileComponents = new List<FileComponent>();
+        }
+
         String name;
         String value;
         Boolean hasFiles;
