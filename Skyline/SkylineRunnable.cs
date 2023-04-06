@@ -117,9 +117,14 @@ namespace Skyline{
 			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
 
 			    listener.Start();
-                StartRequestConsumers();
-
+                
                 Console.WriteLine("Ready!");
+
+                int requestCount = 0;
+                while(requestCount < numberOfRequestExecutors){ 
+                    PrepareNetworkRequest(); 
+                    requestCount++;
+                }
 
 
             }catch(Exception ex){
@@ -129,14 +134,6 @@ namespace Skyline{
             Console.ReadKey();
         }
         
-        void StartRequestConsumers(){
-            int requestCount = 0;
-            while(requestCount < numberOfRequestExecutors){ 
-                PrepareNetworkRequest(); 
-                requestCount++;
-            }
-        }
-
         void PrepareNetworkRequest(){
 			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
 			result.AsyncWaitHandle.WaitOne();
@@ -144,7 +141,7 @@ namespace Skyline{
 
         void ExecuteNetworkRequest(IAsyncResult result){
 			
-            Thread.Sleep(1000);
+            Thread.Sleep(300);
 
 			var context = listener.EndGetContext(result);
 
@@ -251,6 +248,7 @@ namespace Skyline{
         
             if(networkRequest.isRedirect()) {
                 
+                Console.WriteLine("." + networkRequest.getRedirectLocation());
                 context.Response.RedirectLocation = networkRequest.getRedirectLocation();
                 context.Response.Redirect(networkRequest.getRedirectLocation());
                 responseOutput.Append(DOUBLEBREAK);
