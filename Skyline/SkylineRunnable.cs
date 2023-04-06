@@ -117,14 +117,9 @@ namespace Skyline{
 			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
 
 			    listener.Start();
-                
-                Console.WriteLine("Ready!");
+                StartRequestConsumers();
 
-                int requestCount = 0;
-                while(requestCount < numberOfRequestExecutors){ 
-                    PrepareNetworkRequest(); 
-                    requestCount++;
-                }
+                Console.WriteLine("Ready!");
 
 
             }catch(Exception ex){
@@ -134,6 +129,14 @@ namespace Skyline{
             Console.ReadKey();
         }
         
+        void StartRequestConsumers(){
+            int requestCount = 0;
+            while(requestCount < numberOfRequestExecutors){ 
+                PrepareNetworkRequest(); 
+                requestCount++;
+            }
+        }
+
         void PrepareNetworkRequest(){
 			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
 			result.AsyncWaitHandle.WaitOne();
@@ -247,7 +250,8 @@ namespace Skyline{
             context.Response.ContentType = routeResult.getContentType();
         
             if(networkRequest.isRedirect()) {
-
+                
+                context.Response.RedirectLocation = networkRequest.getRedirectLocation();
                 context.Response.Redirect(networkRequest.getRedirectLocation());
                 responseOutput.Append(DOUBLEBREAK);
 
@@ -298,7 +302,7 @@ namespace Skyline{
             this.numberOfPartitions = numberOfPartitions;
         }
 
-        public void setNumberOfRequestExecutors(int numberOfRequestExecutors){
+        public void setNumberOfRequestNegotiators(int numberOfRequestExecutors){
             this.numberOfRequestExecutors = numberOfRequestExecutors;
         }
 

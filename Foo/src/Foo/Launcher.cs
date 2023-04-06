@@ -42,7 +42,7 @@ namespace Foo{
 
             SkylineRunnable skyline = new SkylineRunnable(4000);
             skyline.setNumberOfPartitions(30);
-            skyline.setNumberOfRequestExecutors(70);
+            skyline.setNumberOfRequestNegotiators(70);
 
 
             ViewConfig viewConfig = new ViewConfig();
