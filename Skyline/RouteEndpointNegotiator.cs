@@ -39,7 +39,7 @@ namespace Skyline{
                 RouteAttributes routeAttributes = networkRequest.getRouteAttributes();
                 RouteEndpointHolder routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
 
-                if(routeEndpointPath.Contains("/" + resourcesDirectory + "/")) {
+                if(routeEndpointPath.Contains(resourcesDirectory + "/")) {
 
                     MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
                     mimeTypeResolver.setRouteEndpointPath(routeEndpointPath);
@@ -55,7 +55,7 @@ namespace Skyline{
                     if(renderer.Equals("reload-requests")){
                         ResourceFileConverter resourcesFileConverter = new ResourceFileConverter();
                         resourcesFileConverter.setFile(routeEndpointPath);
-                        resourcesFileConverter.setFileDirectory(viewConfig.getResourcesPath());
+                        Console.WriteLine("r:" + routeEndpointPath);
                         responseOutput = resourcesFileConverter.convert();
 
                         routeResult.setStatusCode(200);
@@ -208,7 +208,6 @@ namespace Skyline{
                 if(renderer.Equals("reload-requests")){
                     ViewFileConverter viewConverter = new ViewFileConverter();
                     viewConverter.setFile(methodResponse);
-                    viewConverter.setFileDirectory(viewConfig.getViewsPath());
                     byte[] viewBytes = viewConverter.convert();
                     completePageRendered = utf8.GetString(viewBytes);
                 }
@@ -226,7 +225,6 @@ namespace Skyline{
                     if(renderer.Equals("reload-requests")){
                         ViewFileConverter layoutConverter = new ViewFileConverter();
                         layoutConverter.setFile(designUri);
-                        layoutConverter.setFileDirectory(viewConfig.getViewsPath());
                         designBytes = layoutConverter.convert(); 
                     }
 
@@ -345,7 +343,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
                     pathVariableIndex++;
                 }
-                
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean")){
                     Boolean attributeValue = Boolean.Parse(routePathUriAttributes[pathVariableIndex]);
                     methodAttribute.setAttribute(attributeValue);

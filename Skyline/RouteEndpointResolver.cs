@@ -18,8 +18,7 @@ namespace Skyline{
 
         public RouteEndpointHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
-            Path.DirectorySeparatorChar.ToString() + "Origin" + 
-            Path.DirectorySeparatorChar.ToString() + "Src" + 
+            Path.DirectorySeparatorChar.ToString() + "src" + 
             Path.DirectorySeparatorChar.ToString();
 
             InspectFilePath(sourcesDirectory, sourcesDirectory);

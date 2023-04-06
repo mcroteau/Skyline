@@ -46,8 +46,8 @@ namespace Foo{
 
 
             ViewConfig viewConfig = new ViewConfig();
-            viewConfig.setResourcesPath("Assets");
-            viewConfig.setViewsPath("Views");
+            viewConfig.setResourcesPath("assets");
+            viewConfig.setViewsPath("webapp");
             viewConfig.setRenderingScheme(RenderingScheme.RELOAD_EACH_REQUEST);
 
             skyline.setSecurityAccessType(new AuthAccess().GetType());

@@ -180,7 +180,7 @@ namespace Skyline{
             String portDelimeter = ":" + port.ToString();
             String[] requestParts = request.Url.ToString().Split(portDelimeter, 2);
 
-            String requestAction = requestParts[1];
+            String requestPath = requestParts[1];
 
             if(request.QueryString.Equals(FAVICON)){
                 PrepareNetworkRequest();
@@ -194,7 +194,7 @@ namespace Skyline{
             NetworkRequest networkRequest = new NetworkRequest();
             NetworkResponse networkResponse = new NetworkResponse();
             networkRequest.setRequestAction(request.HttpMethod.ToLower());
-            networkRequest.setRequestPath(requestAction);
+            networkRequest.setRequestPath(requestPath);
             networkRequest.resolveRequestAttributes();
             networkRequest.setSecurityAttributes(securityAttributes);
 
@@ -246,6 +246,8 @@ namespace Skyline{
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
+            Console.WriteLine("n:" + requestPath);
+
             RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
             StringBuilder responseOutput = new StringBuilder();
@@ -254,28 +256,15 @@ namespace Skyline{
 			// context.Response.StatusDescription = "OK";
 
             context.Response.ContentType = routeResult.getContentType();
-            
-            responseOutput.Append("HTTP/1.1 " + routeResult.getResponseCode());
-            responseOutput.Append(BREAK);
-
-
+        
             if(networkRequest.isRedirect()) {
 
-                responseOutput.Append("Content-Type:text/plain");
-                responseOutput.Append(BREAK);
-
-                responseOutput.Append("Set-Cookie:" + sessionValues.ToString());
-                responseOutput.Append(BREAK);
-
-                responseOutput.Append("Location: " +  networkRequest.getRedirectLocation() + SPACE);
-                responseOutput.Append(BREAK);
-
-                responseOutput.Append("Content-Length: -1");
+                context.Response.RedirectLocation = networkRequest.getRedirectLocation();
                 responseOutput.Append(DOUBLEBREAK);
 
-                clientOut.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
-
-                clientOut.Close();
+                context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+                context.Response.OutputStream.Flush();
+                context.Response.OutputStream.Close();
             
                 viewCache = new ViewCache();
                 flashMessage = new FlashMessage();
@@ -283,29 +272,18 @@ namespace Skyline{
                 PrepareNetworkRequest();
             }
 
-            responseOutput.Append("Content-Type:" + routeResult.getContentType());                
-            responseOutput.Append(BREAK);
-
-            responseOutput.Append("Set-Cookie:" + sessionValues.ToString());
-            responseOutput.Append(DOUBLEBREAK);
-
             String resultOut = encoding.GetString(routeResult.getResponseOutput());
             responseOutput.Append(resultOut);//hi
  
             // // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
             // // clientOut.Write(resp);
 
-            clientOut.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
-            clientOut.Close();
+            context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+            context.Response.OutputStream.Flush();
+            context.Response.OutputStream.Close();
 
             PrepareNetworkRequest();
         }    
-
-        static String GetBytesToStringConverted(byte[] bytes){
-            MemoryStream stream = new MemoryStream(bytes);
-            StreamReader streamReader = new StreamReader(stream);
-            return streamReader.ReadToEnd();
-        }
 
         public void setPersistenceConfig(PersistenceConfig persistenceConfig){
             this.persistenceConfig = persistenceConfig;

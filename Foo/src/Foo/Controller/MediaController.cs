@@ -19,9 +19,10 @@ namespace Foo.Controller{
             this.applicationAttributes = applicationAttributes;
         }
 
+        [Layout(file="views/Default.asp")]
         [Get(route="/upload")]
         public String upload(){
-            return "Media.asp";
+            return "views/Media.asp";
         }
         
         [Post(route="/upload")]

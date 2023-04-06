@@ -24,7 +24,7 @@ namespace Foo.Controller{
             this.applicationAttributes = applicationAttributes;
         }
         
-        [Layout(file="Default.asp")]
+        [Layout(file="views/Default.asp")]
         [Get(route="/")]
         public String index(NetworkRequest req, NetworkResponse resp, SecurityManager manager, FlashMessage flashMessage, ViewCache cache){
             cache.set("message", "");
@@ -35,10 +35,10 @@ namespace Foo.Controller{
             items.Add("Canolis");
             cache.set("items", items);
 
-            return "Index.asp";
+            return "views/Index.asp";
         }
 
-        [Layout(file="Default.asp")]
+        [Layout(file="views/Default.asp")]
         [Get(route="/secured")]
         public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
             Console.WriteLine("\n\n***************************\n\n");

@@ -4,11 +4,9 @@ using System.IO;
 namespace Skyline{
     public class ViewFileConverter{
         String file;
-        String fileDirectory;
 
         public byte[] convert(){
-            String filePath = "Origin" + Path.DirectorySeparatorChar.ToString() + fileDirectory +
-                Path.DirectorySeparatorChar.ToString() + file;
+            String filePath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString() + file;
 
             Console.WriteLine("filePath~" + filePath);
             
@@ -30,14 +28,6 @@ namespace Skyline{
 
         public void setFile(String file) {
             this.file = file;
-        }
-
-        public String getFileDirectory(){
-            return this.fileDirectory;
-        }
-
-        public void setFileDirectory(String fileDirectory){
-            this.fileDirectory = fileDirectory;
         }
     }
 }

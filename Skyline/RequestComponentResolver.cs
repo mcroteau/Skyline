@@ -49,10 +49,10 @@ namespace Skyline{
                                 RequestComponent requestComponent = new RequestComponent();
                                 String[] keyValue = entry.Split("=", 2);
                                 String key = keyValue[0].Trim();
-                                string keyNoClue = new string(key.Where(c => !char.IsControl(c)).ToArray());
+                                String keyNoClue = new String(key.Where(c => !char.IsControl(c)).ToArray());
                                 if (keyValue.Length > 1) {
                                     String value = keyValue[1].Trim();
-                                    string valueNoIdea = new string(value.Where(c => !char.IsControl(c)).ToArray());
+                                    String valueNoIdea = new String(value.Where(c => !char.IsControl(c)).ToArray());
                                     requestComponent.setName(keyNoClue);
                                     requestComponent.setValue(valueNoIdea);
                                 } else {
@@ -63,7 +63,6 @@ namespace Skyline{
                             }
                         }
                     }
-
                 }
 
             } catch (Exception ex){
@@ -78,8 +77,8 @@ namespace Skyline{
             ArrayList components = new ArrayList();
 
             int lastIndex = 3;
-            
-            foreach (Match match in Regex.Matches(requestPayload, elementRegex,
+
+            foreach(Match match in Regex.Matches(requestPayload, elementRegex,
                                                RegexOptions.None,
                                                TimeSpan.FromSeconds(1))){
                               
@@ -97,7 +96,7 @@ namespace Skyline{
                 component.setActiveBeginIndex(beginIndex);
                 component.setActiveCloseIndex(delimiterIndex);
                 components.Add(component);
-                lastIndex = delimiterIndex;
+                lastIndex = delimiterIndexWith;
 
             }
 

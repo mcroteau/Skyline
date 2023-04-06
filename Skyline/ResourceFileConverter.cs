@@ -4,11 +4,11 @@ using System.IO;
 namespace Skyline{
     public class ResourceFileConverter{
         String file;
-        String fileDirectory;
 
         public byte[] convert(){
-            String filePath = "Origin" + Path.DirectorySeparatorChar.ToString() + file;
 
+            String filePath = Directory.GetCurrentDirectory() + file;
+            
             FileStream fileInputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileInputStream);
             long byteLength = new System.IO.FileInfo(filePath).Length;
@@ -29,12 +29,5 @@ namespace Skyline{
             this.file = file;
         }
 
-        public String getFileDirectory(){
-            return this.fileDirectory;
-        }
-
-        public void setFileDirectory(String fileDirectory){
-            this.fileDirectory = fileDirectory;
-        }
     }
 }

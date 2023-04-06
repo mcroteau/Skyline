@@ -18,10 +18,10 @@ namespace Foo.Controller{
             this.applicationAttributes = applicationAttributes;
         }
 
-        [Layout(file="Default.asp")]        
+        [Layout(file="views/Default.asp")]        
         [Get(route="/signin")]
         public String signin(){
-            return "Signin.asp";
+            return "views/Signin.asp";
         }
 
         [Post(route="/signin")]

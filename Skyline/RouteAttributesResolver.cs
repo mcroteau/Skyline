@@ -8,7 +8,6 @@ namespace Skyline{
         public RouteAttributes resolve(){
             RouteAttributes routeAttributes = new RouteAttributes();
             String propertiesPath = Directory.GetCurrentDirectory() + 
-                Path.DirectorySeparatorChar.ToString() + "Origin" + 
                 Path.DirectorySeparatorChar.ToString() + propertiesConfig.getPropertiesFile();
 
             foreach(var row in File.ReadAllLines(propertiesPath)){
