@@ -45,7 +45,7 @@ namespace Foo.Controller{
             if(!manager.isAuthenticated(req)){
                 return "redirect:/";
             }
-            return "Secured.asp";
+            return "views/Secured.asp";
         }
 
     }

@@ -1,36 +1,23 @@
 using System;
-
+using System.Text;
 using Skyline.Model;
 
 namespace Skyline{
     public class RequestHeaderResolver{
         String BREAK = "\r\n";
-        String networkRequestHeaderElement;
         NetworkRequest networkRequest;
 
         public void resolve(){
-            String[] networkRequestHeaderElements = networkRequestHeaderElement.Split(BREAK);
-            foreach(String headerLineElement in networkRequestHeaderElements){
-                String[] headerLineComponents = headerLineElement.Split(":", 2);
-                
-                if(headerLineComponents.Length == 2) {
-                    String fieldKey = headerLineComponents[0].Trim();
-                    String content = headerLineComponents[1].Trim();
-                    networkRequest.getHeaders()[fieldKey.ToLower()] = content;
+            foreach (String key in networkRequest.getContext().Request.Headers.AllKeys){
+                String[] values = networkRequest.getContext().Request.Headers.GetValues(key);
+                if(values.Length > 0){
+                    StringBuilder Sb = new StringBuilder();
+                    foreach (String value in values){
+                        Sb.Append(value + ";");
+                    }
+                    networkRequest.getHeaders()[key.ToLower()] = Sb.ToString();
                 }
             }
-        }
-
-        public String getNetworkRequestHeaderElement() {
-            return this.networkRequestHeaderElement;
-        }
-
-        public void setNetworkRequestHeaderElement(String networkRequestHeaderElement) {
-            this.networkRequestHeaderElement = networkRequestHeaderElement;
-        }
-
-        public NetworkRequest getNetworkRequest() {
-            return this.networkRequest;
         }
 
         public void setNetworkRequest(NetworkRequest networkRequest) {

@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -22,6 +23,8 @@ namespace Skyline.Model {
         String securityAttributeInfo;
         SecurityAttributes securityAttributes;
         String userCredential;
+        HttpListenerContext context;
+
 
         public bool isRedirect()
         {
@@ -162,6 +165,15 @@ namespace Skyline.Model {
         {
             this.userCredential = userCredential;
         }
+
+        public void setContext(HttpListenerContext context){
+            this.context = context;
+        }
+
+        public HttpListenerContext getContext(){
+            return this.context;
+        }
+
 
         public void setValues(String parameters) {
             String[] keyValues = parameters.Split("&");

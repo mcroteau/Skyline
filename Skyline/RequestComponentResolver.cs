@@ -4,6 +4,7 @@ using System.Web;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Collections;
+using System.Collections.Specialized;
 
 using Skyline.Model;
 
@@ -11,8 +12,9 @@ namespace Skyline{
     
     public class RequestComponentResolver {
 
-        String requestPayload;
         Encoding encoding;
+        String requestPayload;
+        String queryString;
         NetworkRequest networkRequest;
 
         public void resolve(){
@@ -27,6 +29,7 @@ namespace Skyline{
                     String contentType = headers["content-type"];
                     String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
+                    Console.WriteLine("bp:" + boundaryParts.Length);
                     if (boundaryParts.Length > 1) {
                         String formDelimiter = boundaryParts[1].Replace(";", "");
                         ArrayList requestComponents = getRequestComponents(formDelimiter);
@@ -35,16 +38,12 @@ namespace Skyline{
                             String requestComponentKey = requestComponent.getName();
                             networkRequest.setRequestComponent(requestComponentKey, requestComponent);
                         }
-                    }else if(requestPayload.Length == 0){
+                    }else{
 
-                        String requestQueryComplete = "";
-                        String requestQueryFinal = HttpUtility.UrlDecode(requestQueryComplete);
-                        String[] requestBodyQuery = requestQueryFinal.Split("\r\n\r\n", 2);
+                        String requestQueryFinal = HttpUtility.UrlDecode(requestPayload);
 
-                        if(requestBodyQuery.Length == 2 &&
-                                !requestBodyQuery[1].Equals("")) {
-                            String requestQuery =  requestBodyQuery[1];
-                            String[] requestQueryParts = requestQuery.Split("&");
+                        if(!requestQueryFinal.Equals("")){
+                            String[] requestQueryParts = requestQueryFinal.Split("&");
                             foreach(String entry in requestQueryParts) {
                                 RequestComponent requestComponent = new RequestComponent();
                                 String[] keyValue = entry.Split("=", 2);
@@ -62,6 +61,7 @@ namespace Skyline{
                                 networkRequest.getRequestComponents()[keyNoClue] = requestComponent;
                             }
                         }
+                    
                     }
                 }
 
@@ -240,9 +240,13 @@ namespace Skyline{
             return fileComponent;
         
         }
-
+        
         public void setEncoding(Encoding encoding){
             this.encoding = encoding;
+        }
+
+        public void setQueryString(String queryString){
+            this.queryString = queryString;
         }
 
         public void setRequestPayload(String requestPayload){

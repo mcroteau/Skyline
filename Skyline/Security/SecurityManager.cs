@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Net;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Skyline;
@@ -68,10 +69,17 @@ namespace Skyline.Security{
                 if (!isAuthenticated(networkRequest) &&
                         password == sentPassword) {
                     String securityAttributePrincipal = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
+                    String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal;
+
+                    Console.WriteLine("sec:" + username + ":" + securityAttributeValue);
+                    
+                    Cookie securityAttribute = new Cookie();
+                    securityAttribute.Path = "/";
+                    securityAttribute.Name = "default.security";
+                    securityAttribute.Value = securityAttributeValue;
+                    networkResponse.getContext().Response.Cookies.Add(securityAttribute);
+
                     networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
-                    String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal + "; path=/;";
-                    SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-                    networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
                     return true;
                 }
 
@@ -84,9 +92,9 @@ namespace Skyline.Security{
 
         public bool signout(NetworkRequest networkRequest, NetworkResponse networkResponse){
             networkRequest.setSecurityAttributeInfo("");
-            String securityAttributeValue = ";Expires/MaxAge=-1;Expires=-1;MaxAge=-1;";
-            SecurityAttribute securityAttribute = new SecurityAttribute(securityAttributes.getSecurityElement(), securityAttributeValue);
-            networkResponse.getSecurityAttributes()["default.security"] = securityAttribute;
+            Cookie securityAttribute = new Cookie();
+            securityAttribute.Name = "default.security";
+            networkResponse.getContext().Response.Cookies.Remove(securityAttribute);
             return true;
         }
 

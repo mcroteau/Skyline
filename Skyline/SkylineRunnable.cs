@@ -192,31 +192,23 @@ namespace Skyline{
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
             NetworkRequest networkRequest = new NetworkRequest();
-            NetworkResponse networkResponse = new NetworkResponse();
             networkRequest.setRequestAction(request.HttpMethod.ToLower());
             networkRequest.setRequestPath(requestPath);
             networkRequest.resolveRequestAttributes();
             networkRequest.setSecurityAttributes(securityAttributes);
+            networkRequest.setContext(context);
 
-            foreach (String key in request.Headers.AllKeys){
-                String[] values = request.Headers.GetValues(key);
-                if(values.Length > 0){
-                    StringBuilder Sb = new StringBuilder();
-                    foreach (String value in values){
-                        Sb.Append(value + ";");
-                    }
-                    networkRequest.getHeaders()[key.ToLower()] = Sb.ToString();
-                }
-            }
+            NetworkResponse networkResponse = new NetworkResponse();
+            networkResponse.setContext(context);
 
-            // RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
-            // requestHeaderResolver.setNetworkRequestHeaderElement(requestHeaderElement);
-            // requestHeaderResolver.setNetworkRequest(networkRequest);
-            // requestHeaderResolver.resolve();
+            RequestHeaderResolver requestHeaderResolver = new RequestHeaderResolver();
+            requestHeaderResolver.setNetworkRequest(networkRequest);
+            requestHeaderResolver.resolve();
             
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
             requestComponentResolver.setRequestPayload(completeRequestPayload);
             requestComponentResolver.setNetworkRequest(networkRequest);
+            requestComponentResolver.setQueryString(requestPath);
             requestComponentResolver.setEncoding(encoding);
             requestComponentResolver.resolve();
 
@@ -246,10 +238,7 @@ namespace Skyline{
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
-            Console.WriteLine("n:" + requestPath);
-
             RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
-
             StringBuilder responseOutput = new StringBuilder();
 
             // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
@@ -259,7 +248,7 @@ namespace Skyline{
         
             if(networkRequest.isRedirect()) {
 
-                context.Response.RedirectLocation = networkRequest.getRedirectLocation();
+                context.Response.Redirect(networkRequest.getRedirectLocation());
                 responseOutput.Append(DOUBLEBREAK);
 
                 context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);

@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Text;
 
 using Skyline;
@@ -11,6 +12,27 @@ namespace Skyline{
         SecurityAttributes securityAttributes;
 
         public Boolean resolve(NetworkRequest networkRequest, NetworkResponse networkResponse) {
+            try{
+                Cookie securityAttributeValue = networkRequest.getContext().Request.Cookies["default.security"];
+                Console.WriteLine("c:" + securityAttributeValue.ToString());
+                String[] securityAttributeValueElements = securityAttributeValue.Value.Split(".");
+                String securityElementPrincipalPre = securityAttributeValueElements[1];
+        
+                byte[] securityElementPrincipalBytes = Convert.FromBase64String(securityElementPrincipalPre);
+                String securityElementPrincipal = Encoding.UTF8.GetString(securityElementPrincipalBytes);
+
+                networkRequest.setSecurityAttributeInfo(securityAttributes.getSecuredAttribute());
+                networkRequest.setUserCredential(securityElementPrincipal);
+
+            }catch(Exception ex){
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        public Boolean resolveGeneric(NetworkRequest networkRequest, NetworkResponse networkResponse) {
             try {
                 if(networkRequest.getHeaders().ContainsKey(SECURITY_KEY)){
 

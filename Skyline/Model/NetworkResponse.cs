@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Collections.Generic;
 
 using Skyline.Security;
@@ -12,6 +13,7 @@ namespace Skyline.Model {
 
         Boolean redirect;
         String contentType;
+        HttpListenerContext context;
         Dictionary<String, SecurityAttribute> securityAttributes;
 
         public Boolean getRedirect()
@@ -32,6 +34,14 @@ namespace Skyline.Model {
         public void setContentType(String contentType)
         {
             this.contentType = contentType;
+        }
+
+        public void setContext(HttpListenerContext context){
+            this.context = context;
+        }
+
+        public HttpListenerContext getContext(){
+            return this.context;
         }
 
         public Dictionary<String, SecurityAttribute> getSecurityAttributes()
