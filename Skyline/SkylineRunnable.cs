@@ -117,15 +117,15 @@ namespace Skyline{
 			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
 
 			    listener.Start();
-                Console.WriteLine("Registering request handlers, please wait...");
                 
+                Console.WriteLine("Ready!");
+
                 int requestCount = 0;
                 while(requestCount < numberOfRequestExecutors){ 
                     PrepareNetworkRequest(); 
                     requestCount++;
                 }
 
-                Console.WriteLine("Ready!");
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
@@ -136,10 +136,7 @@ namespace Skyline{
         
         void PrepareNetworkRequest(){
 			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
-			var startNew = Stopwatch.StartNew();
 			result.AsyncWaitHandle.WaitOne();
-			startNew.Stop();
-			Console.WriteLine("ElapsedMilliseconds "+ startNew.ElapsedMilliseconds);
 		}
 
         void ExecuteNetworkRequest(IAsyncResult result){
@@ -150,47 +147,41 @@ namespace Skyline{
 
             var request = context.Request;
             Encoding encoding = request.ContentEncoding;
-    
-            ArrayList requestBytesArray = new ArrayList();
+
             MemoryStream memoryStream = new MemoryStream();
-            int totalBytesRecieved = 0;
+            int totalBytesReceived = 0;
+            byte[] requestBytes = new byte[13];
             String completeRequestPayload = "";
             if(request.HttpMethod.ToUpper().Equals("POST")){          
                 Stream requestStream = request.InputStream;  
-                // Console.WriteLine("l:" + requestStream.Length);
-                // byte[] bytesBuffer = new byte[1024 * 12];
-                // int bytesRecieved;
-                // while(true){
-                //     bytesRecieved = requestStream.Read(bytesBuffer, 0, bytesBuffer.Length);
-                //     totalBytesRecieved += bytesRecieved;
-                //     memoryStream.Write(bytesBuffer, 0, bytesRecieved);
-                //     if(totalBytesRecieved == requestStream.Length)break;
-                //     bytesBuffer = new byte[1024 * 12];
-                // }
-                StreamReader reader = new StreamReader(requestStream, encoding); 
-                completeRequestPayload = reader.ReadToEnd();
+                byte[] bytesBuffer = new byte[1024 * 12];
+                int len = int.Parse(request.Headers["Content-Length"]);
+                int bytesReceived;
+                while(true){
+                    bytesReceived = request.InputStream.Read(bytesBuffer, 0, bytesBuffer.Length);
+                    totalBytesReceived += bytesReceived;
+                    memoryStream.Write(bytesBuffer, 0, bytesReceived);
+                    if(totalBytesReceived == len)break;
+                }
+
+                requestBytes = memoryStream.ToArray();
+
+                char[] requestChars = new char[len];
+                for(int xyz = 0; xyz < requestBytes.Length; xyz++){
+                    requestChars[xyz] = Convert.ToChar(requestBytes[xyz]);
+                }
+                completeRequestPayload = new String(requestChars);
+
             }
 
-            byte[] requestBytes = encoding.GetBytes(completeRequestPayload);
-            // for(int xyz = 0; xyz < requestBytesArray.Count; xyz++){
-            //     requestBytes[xyz] = (byte)requestBytesArray[xyz];
-            // }
-
-            var clientOut = context.Response.OutputStream;
-
-            Console.WriteLine("completeRequestPayload:" + completeRequestPayload);
-            
+            var clientOut = context.Response.OutputStream;            
             ResourceUtility resourceUtility = new ResourceUtility();
 
-
-            Console.WriteLine(request.Url.OriginalString);
             String portDelimeter = ":" + port.ToString();
             String[] requestParts = request.Url.ToString().Split(portDelimeter, 2);
-            Console.WriteLine(requestParts.Length);
+
             String requestAction = requestParts[1];
 
-            Console.WriteLine(requestAction);
-            
             if(request.QueryString.Equals(FAVICON)){
                 PrepareNetworkRequest();
                 return;
@@ -259,13 +250,11 @@ namespace Skyline{
 
             StringBuilder responseOutput = new StringBuilder();
 
-            Console.WriteLine("r..." + routeResult.getResponseCode());
-
             // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
 			// context.Response.StatusDescription = "OK";
 
             context.Response.ContentType = routeResult.getContentType();
-            Console.WriteLine("set...");
+            
             responseOutput.Append("HTTP/1.1 " + routeResult.getResponseCode());
             responseOutput.Append(BREAK);
 

@@ -27,7 +27,6 @@ namespace Skyline{
                     String contentType = headers["content-type"];
                     String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
-                    Console.WriteLine("boundaryParts:" + boundaryParts.Length);
                     if (boundaryParts.Length > 1) {
                         String formDelimiter = boundaryParts[1].Replace(";", "");
                         ArrayList requestComponents = getRequestComponents(formDelimiter);
@@ -86,19 +85,13 @@ namespace Skyline{
                               
                 String fileGroup = match.Value;
 
-                Console.WriteLine("x:" + requestPayload);
-
                 int beginIndex = requestPayload.IndexOf(fileGroup, lastIndex);
-                Console.WriteLine(beginIndex + ":" + delimeter);
                 int beginIndexWith = beginIndex + fileGroup.Length;
                 int delimiterIndex = requestPayload.IndexOf(delimeter, lastIndex);
                 int delimiterIndexWith = delimiterIndex + delimeter.Length;
                 int componentLength = delimiterIndexWith - beginIndex;
 
-                Console.WriteLine("beginIndex:" + beginIndex + ":" + delimiterIndex + ":" + componentLength + ":" + fileGroup);
                 String componentContent = requestPayload.Substring(beginIndex, componentLength);
-
-                Console.WriteLine(componentContent);
 
                 Component component = new Component(componentContent);
                 component.setActiveBeginIndex(beginIndex);
@@ -114,7 +107,6 @@ namespace Skyline{
             Dictionary<String, RequestComponent> requestComponentMap = new Dictionary<String, RequestComponent>();
             foreach(Component component in components){
                 String componentContent = component.getComponent();
-                Console.WriteLine("component:" + componentContent);
                 int beginNameIdx = componentContent.IndexOf(NAME);
                 int beginNameIdxWith = beginNameIdx + NAME.Length;
                 int endNameIdx = componentContent.IndexOf("\"", beginNameIdxWith);
@@ -134,8 +126,6 @@ namespace Skyline{
                     String valueDirty = componentContent.Substring(beginValueIdxWith, valueDiff);
                     String value = valueDirty.Replace("\r\n", "");
 
-                    Console.WriteLine("\n\nn:" + value);
-
                     if(requestComponentMap.ContainsKey(nameElement)){
                         RequestComponent requestComponent = requestComponentMap[nameElement];
                         requestComponent.setName(nameElement);
@@ -151,7 +141,7 @@ namespace Skyline{
                     }
 
                 }else{
-                    Console.WriteLine("file checked..." + nameElement + ":" + requestComponentMap.ContainsKey(nameElement));
+                    
                     if(requestComponentMap.ContainsKey(nameElement)){
                         RequestComponent requestComponent = requestComponentMap[nameElement];
                         requestComponent.setName(nameElement);
@@ -161,8 +151,6 @@ namespace Skyline{
                             requestComponentMap[nameElement] = requestComponent;
                         }
                     }else{
-                        Console.WriteLine("file checked dos..." + nameElement + ":" + requestComponentMap.ContainsKey(nameElement));
-                    
                         RequestComponent requestComponent = new RequestComponent();
                         requestComponent.setName(nameElement);
                         FileComponent fileComponent = getFileComponent(delimeter, component, componentContent);
@@ -197,8 +185,6 @@ namespace Skyline{
             String fileName = componentContent.Substring(startFileWith, fileDiff);
             fileComponent.setFileName(fileName);
 
-            Console.WriteLine("fileName:" + fileName);
-
             int endFileWith = endFile + 1;
 
             int startContent = componentContent.IndexOf("Content-Type", endFileWith);
@@ -212,7 +198,6 @@ namespace Skyline{
             int typeDiff = endType - startTypeWith;
 
             String contentType = componentContent.Substring(startTypeWith, typeDiff).Trim();
-            Console.WriteLine("contentType:" + contentType);
             fileComponent.setContentType(contentType);
 
             int activeCloseIndex = componentContent.IndexOf(delimeter);
@@ -247,22 +232,8 @@ namespace Skyline{
                 fileBytes[xyz] = (byte)fileBytesArray[xyz];
             }
 
-            Console.WriteLine("fileBytesArray: " + fileBytes.Length);
-            // Console.WriteLine("pre:'" + harmony + "'");
-            
-            UTF8Encoding utf8 = new UTF8Encoding();
-
-            byte[] data = System.IO.File.ReadAllBytes(@"m.png");
-            Console.WriteLine("data: " + data.Length);
-            Console.WriteLine("'" + encoding.GetString(data) + "'");
-            for(int xyz = 0; xyz < fileBytesArray.Count; xyz++){
-                fileBytes[xyz] = (byte)fileBytesArray[xyz];
-            }
-
-            using var writer = new BinaryWriter(File.OpenWrite("effort.png"));
+            using var writer = new BinaryWriter(File.OpenWrite("copy-" + fileName));
             writer.Write(fileBytes);
-
-            
 
             fileComponent.setFileBytes(fileBytes);
             fileComponent.setActiveIndex(activeCloseIndex);
