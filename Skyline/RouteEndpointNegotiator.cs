@@ -77,6 +77,12 @@ namespace Skyline{
                 routeEndpointLocator.setRouteEndpointPath(routeEndpointPath);
                 RouteEndpoint routeEndpoint = routeEndpointLocator.locate();
 
+                if(routeEndpoint == null){
+                    routeResult.setStatusCode(404);
+                    routeResult.setResponseOutput(utf8.GetBytes("404 Not Found!"));
+                    routeResult.setContentType("text/plain");
+                    return routeResult;
+                }
 
                 MethodComponents methodComponents = getMethodAttributesComponents(routeEndpointPath, viewCache, flashMessage, networkRequest, networkResponse, securityManager, routeEndpoint);
                 MethodInfo routeEndpointInstanceMethod = routeEndpoint.getRouteMethod();
@@ -182,24 +188,37 @@ namespace Skyline{
                     String redirectRouteUri = resourceUtility.getRedirect(methodResponse);
                     networkRequest.setRedirect(true);
                     networkRequest.setRedirectLocation(redirectRouteUri);
-                    return new RouteResult(utf8.GetBytes("303"), "303", "text/html");
+                
+                    routeResult.setStatusCode(303);
+                    routeResult.setResponseOutput(utf8.GetBytes("303"));
+                    routeResult.setContentType("text/plain");
+                    return routeResult;
                 }
 
 
                 Object[] jsons = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Json), true);
                 if(jsons.Length > 0){
-                    return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "application/json");
+                    routeResult.setStatusCode(200);
+                    routeResult.setResponseOutput(utf8.GetBytes(methodResponse));
+                    routeResult.setContentType("application/json");
+                    return routeResult;
                 }
 
                 Object[] texts = routeEndpointInstanceMethod.GetCustomAttributes(typeof (Text), true);
                 if(texts.Length > 0){
-                    return new RouteResult(utf8.GetBytes(methodResponse), "200 OK", "text/html");
+                    routeResult.setStatusCode(200);
+                    routeResult.setResponseOutput(utf8.GetBytes(methodResponse));
+                    routeResult.setContentType("text/plain");
+                    return routeResult;
                 }
 
                 if(renderer.Equals("cache-requests")) {
                     byte[] viewbytes = resourceUtility.getViewFileCopy(methodResponse, viewBytesMap);
                     if(viewbytes == null){
-                        return new RouteResult(utf8.GetBytes("404"), "404", "text/html");
+                        routeResult.setStatusCode(404);
+                        routeResult.setResponseOutput(utf8.GetBytes("404 Not Found!"));
+                        routeResult.setContentType("text/plain");
+                        return routeResult;
                     }
                     completePageRendered = utf8.GetString(viewbytes);
                 }

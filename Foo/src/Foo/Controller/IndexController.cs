@@ -8,6 +8,8 @@ using Skyline.Security;
 
 using Foo.Repo;
 
+using Newtonsoft.Json;
+
 namespace Foo.Controller{
     
     [NetworkController]
@@ -24,6 +26,12 @@ namespace Foo.Controller{
             this.applicationAttributes = applicationAttributes;
         }
         
+        [Text]
+        [Get(route="/status")]
+        public String index(){
+            return "hi";
+        }
+    
         [Layout(file="views/Default.asp")]
         [Get(route="/")]
         public String index(NetworkRequest req, NetworkResponse resp, SecurityManager manager, FlashMessage flashMessage, ViewCache cache){
@@ -31,8 +39,8 @@ namespace Foo.Controller{
 
             ArrayList items = new ArrayList();
             items.Add("Cinco DeMayos");
-            items.Add("Burgers n' Fries");
-            items.Add("Canolis");
+            items.Add("Dulche & Gabanas");
+            items.Add("I He^rt Radio");
             cache.set("items", items);
 
             return "views/Index.asp";

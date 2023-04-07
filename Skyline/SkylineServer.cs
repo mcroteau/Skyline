@@ -17,7 +17,7 @@ using Skyline.Security;
 
 namespace Skyline{
 
-    public class SkylineRunnable {
+    public class SkylineServer {
         
         String FAVICON = "/favicon.ico";
         String BREAK = "\r\n";
@@ -29,7 +29,7 @@ namespace Skyline{
         int REQUEST_VERSION = 2;
 
         int numberOfPartitions = 3;
-        int numberOfRequestExecutors = 7;
+        int numberOfRequestExecutors = 10;
 
         int port;
         String sourcesPath;
@@ -58,35 +58,49 @@ namespace Skyline{
         String securedAttribute = "attribute";
         String securityElement = "default.security";
 
-        public SkylineRunnable(){
-            this.port = 1301;
-            this.sourcesPath = "Src";
+        public SkylineServer(){
+            this.port = 4000;
+            this.sourcesPath = "src";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
             this.flashMessage = new FlashMessage();
         }
 
-        public SkylineRunnable(int port){
+        public SkylineServer(int port){
             this.port = port;
-            this.sourcesPath = "Src";
+            this.sourcesPath = "src";
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
             this.flashMessage = new FlashMessage();
+        }
+
+        public SkylineServer(int port, int numberOfRequestExecutors){
+            this.port = port;
+            this.sourcesPath = "src";
+            this.PROPERTIES = "System.Properties";
+            this.viewConfig = new ViewConfig();
+            this.viewCache = new ViewCache();
+            this.flashMessage = new FlashMessage();
+            this.numberOfRequestExecutors = numberOfRequestExecutors;
         }
 
         public void start(){
             try {
 
-                SpecTest specTest = new SpecTest();
-                specTest.Run();
+                // SpecTest specTest = new SpecTest();
+                // specTest.Run();
 
                 ResourceUtility skylineUtilities = new ResourceUtility();
                 
                 if (propertiesConfig == null) {
                     propertiesConfig = new PropertiesConfig();
                     propertiesConfig.setPropertiesFile(PROPERTIES);
+                }
+                
+                if(applicationAttributes == null){
+                    applicationAttributes = new ApplicationAttributes();
                 }
 
                 networkRequest = new NetworkRequest();
@@ -135,12 +149,15 @@ namespace Skyline{
         }
         
         void PrepareNetworkRequest(){
+            Console.WriteLine("prep");
 			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
 			result.AsyncWaitHandle.WaitOne();
 		}
 
         void ExecuteNetworkRequest(IAsyncResult result){
 			
+            Console.WriteLine("1");
+
             Thread.Sleep(300);
 
 			var context = listener.EndGetContext(result);
@@ -174,6 +191,8 @@ namespace Skyline{
 
             }
 
+            Console.WriteLine("2");
+
             var clientOut = context.Response.OutputStream;            
             ResourceUtility resourceUtility = new ResourceUtility();
 
@@ -187,10 +206,12 @@ namespace Skyline{
                 return;
             }
             
+            Console.WriteLine("3");
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
+            Console.WriteLine("4");
             NetworkRequest networkRequest = new NetworkRequest();
             networkRequest.setRequestAction(request.HttpMethod.ToLower());
             networkRequest.setRequestPath(requestPath);
@@ -198,6 +219,7 @@ namespace Skyline{
             networkRequest.setSecurityAttributes(securityAttributes);
             networkRequest.setContext(context);
 
+            Console.WriteLine("5");
             NetworkResponse networkResponse = new NetworkResponse();
             networkResponse.setContext(context);
 
@@ -205,6 +227,7 @@ namespace Skyline{
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
             
+            Console.WriteLine("6");
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
             requestComponentResolver.setRequestPayload(completeRequestPayload);
             requestComponentResolver.setNetworkRequest(networkRequest);
@@ -212,22 +235,28 @@ namespace Skyline{
             requestComponentResolver.setEncoding(encoding);
             requestComponentResolver.resolve();
 
+            Console.WriteLine("7");
             RouteEndpointNegotiator routeEndpointNegotiator = new RouteEndpointNegotiator();
-            routeEndpointNegotiator.setApplicationAttributes(applicationAttributes);
+            routeEndpointNegotiator.setApplicationAttributes(applicationAttributesCopy);
             routeEndpointNegotiator.setSecurityAttributes(securityAttributes);
             routeEndpointNegotiator.setRouteAttributes(routeAttributes);
             routeEndpointNegotiator.setComponentsHolder(componentsHolder);
 
+            Console.WriteLine("8");
             RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
             networkRequest.setRouteAttributes(routeAttributesFinal);
             
             DataTransferObject dto = new DataTransferObject(persistenceConfig);
             dto.setApplicationAttributes(applicationAttributesCopy);
 
-            SecurityAccess securityAccessInstance = (SecurityAccess) Activator.CreateInstance(securityAccessType, new Object[]{dto});
-            SecurityManager securityManager = new SecurityManager(securityAccessInstance, securityAttributes);
-            if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
-            
+            SecurityManager securityManager = null;
+            if(securityAccessType != null){
+                SecurityAccess securityAccessInstance = (SecurityAccess) Activator.CreateInstance(securityAccessType, new Object[]{dto});
+                securityManager = new SecurityManager(securityAccessInstance, securityAttributes);
+                if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
+            }
+
+            Console.WriteLine("9");
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
@@ -238,6 +267,7 @@ namespace Skyline{
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
+            Console.WriteLine("10");
             RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
             StringBuilder responseOutput = new StringBuilder();
 
@@ -263,6 +293,7 @@ namespace Skyline{
                 PrepareNetworkRequest();
             }
 
+            Console.WriteLine("11");
             String resultOut = encoding.GetString(routeResult.getResponseOutput());
             responseOutput.Append(resultOut);//hi
  

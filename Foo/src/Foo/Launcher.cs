@@ -40,23 +40,20 @@ namespace Foo{
             user.setPassword("effort.");
             long id = personRepo.save(user);
 
-            SkylineRunnable skyline = new SkylineRunnable(4000);
-            skyline.setNumberOfPartitions(30);
-            skyline.setNumberOfRequestNegotiators(70);
+            SkylineServer server = new SkylineServer(4000, 70);
 
+            Type authAccessKlassType = new AuthAccess().GetType();
+            server.setSecurityAccessType(authAccessKlassType);
+            server.setApplicationAttributes(applicationAttributes);
+            server.setPersistenceConfig(persistenceConfig);
 
             ViewConfig viewConfig = new ViewConfig();
             viewConfig.setResourcesPath("assets");
             viewConfig.setViewsPath("webapp");
-            viewConfig.setRenderingScheme(RenderingScheme.RELOAD_EACH_REQUEST);
+            server.setViewConfig(viewConfig);
 
-            skyline.setSecurityAccessType(new AuthAccess().GetType());
+            server.start();
 
-            skyline.setApplicationAttributes(applicationAttributes);
-            skyline.setPersistenceConfig(persistenceConfig);
-            skyline.setViewConfig(viewConfig);
-
-            skyline.start();
             return 0;
         }
     }

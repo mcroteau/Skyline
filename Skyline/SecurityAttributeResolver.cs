@@ -25,7 +25,6 @@ namespace Skyline{
                 networkRequest.setUserCredential(securityElementPrincipal);
 
             }catch(Exception ex){
-                Console.WriteLine(ex.ToString());
                 return false;
             }
 

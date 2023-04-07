@@ -10,6 +10,10 @@ namespace Skyline{
             String propertiesPath = Directory.GetCurrentDirectory() + 
                 Path.DirectorySeparatorChar.ToString() + propertiesConfig.getPropertiesFile();
 
+            if (!File.Exists(propertiesPath)) {
+                return routeAttributes;
+            }
+
             foreach(var row in File.ReadAllLines(propertiesPath)){
                 if(!row.Equals("")){
                     String key = row.Split('=')[0];

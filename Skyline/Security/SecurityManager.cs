@@ -93,9 +93,7 @@ namespace Skyline.Security{
 
         public bool signout(NetworkRequest networkRequest, NetworkResponse networkResponse){
             networkRequest.setSecurityAttributeInfo("");
-            Cookie securityAttribute = new Cookie();
-            securityAttribute.Name = "default.security";
-            networkResponse.getContext().Response.Cookies.Remove(securityAttribute);
+            networkResponse.getContext().Response.Headers.Add("Set-Cookie", "default.security=; expires=Thu, 09-Mar-1960 00:00:00 GMT; path=/");
             return true;
         }
 

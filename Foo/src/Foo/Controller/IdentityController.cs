@@ -36,5 +36,11 @@ namespace Foo.Controller{
             cache.set("message","fail.");
             return "redirect:/signin";
         }
+
+        [Get(route="/signout")]
+        public String signout(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
+            manager.signout(req, resp);
+            return "redirect:/signin";
+        }
     }
 }
