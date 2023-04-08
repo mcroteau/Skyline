@@ -1,15 +1,16 @@
 using System;
 
 namespace Driven.Model{
+
     public class Role{
-        long id;
+        int id;
         String description;
 
-        public long getId() {
+        public int getId() {
             return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(int id) {
             this.id = id;
         }
 
@@ -21,4 +22,5 @@ namespace Driven.Model{
             this.description = description;
         }
     }
+
 }

@@ -4,6 +4,9 @@ using Skyline.Model;
 using Skyline.Security;
 using Skyline.Annotation;
 
+using Driven.Model;
+using Driven.Repo;
+
 namespace Driven.Controller{
 
     [NetworkController]
@@ -22,7 +25,7 @@ namespace Driven.Controller{
 
         [Layout(file="views/Default.asp")]        
         [Get(route="/users")]
-        public String signin(){
+        public String index(NetworkRequest req, ViewCache cache){
 
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
@@ -32,7 +35,7 @@ namespace Driven.Controller{
 
         [Layout(file="views/Default.asp")]        
         [Get(route="/users/create")]
-        public String signin(){
+        public String create(NetworkRequest req, ViewCache cache){
 
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
@@ -51,9 +54,9 @@ namespace Driven.Controller{
                 return "redirect:/signin";
             }
 
-            if(!manager.hasRole(req, "super-role")){
+            if(!manager.hasRole("super-role", req)){
                 cache.set("message", "authorization required.");
-                return "redirect:/"
+                return "redirect:/";
             }
             
             User user = new User();
@@ -79,10 +82,10 @@ namespace Driven.Controller{
             }
 
             String permission = "users:maintentance:" + id;
-            if(!manager.hasRole(req, "super-role") && 
-                    !manager.hasPermission(req, permission)){
+            if(!manager.hasRole("super-role", req) && 
+                    !manager.hasPermission(permission, req)){
                 cache.set("message", "authorization required.");
-                return "redirect:/"
+                return "redirect:/";
             }
             
             String sessionuser = req.getUserCredential();
@@ -95,7 +98,7 @@ namespace Driven.Controller{
         }
 
         [Post(route="/users/update/{id}")]
-        public String edit(NetworkRequest req, 
+        public String update(NetworkRequest req, 
                             NetworkResponse resp, 
                             SecurityManager manager, 
                             ViewCache cache, 
@@ -108,10 +111,10 @@ namespace Driven.Controller{
             }
 
             String permission = "users:maintentance:" + id;
-            if(!manager.hasRole(req, "super-role") && 
-                    !manager.hasPermission(req, permission)){
+            if(!manager.hasRole("super-role", req) && 
+                    !manager.hasPermission(permission, req)){
                 cache.set("message", "authorization required.");
-                return "redirect:/"
+                return "redirect:/";
             }
             
             String email = req.getValue("email");
@@ -128,7 +131,7 @@ namespace Driven.Controller{
         }
 
         [Post(route="/users/delete/{id}")]
-        public String edit(NetworkRequest req, 
+        public String delete(NetworkRequest req, 
                             NetworkResponse resp, 
                             SecurityManager manager, 
                             ViewCache cache, 
@@ -141,10 +144,10 @@ namespace Driven.Controller{
             }
 
             String permission = "users:maintentance:" + id;
-            if(!manager.hasRole(req, "super-role") && 
-                    !manager.hasPermission(req, permission)){
+            if(!manager.hasRole("super-role", req) && 
+                    !manager.hasPermission(permission, req)){
                 cache.set("message", "authorization required.");
-                return "redirect:/"
+                return "redirect:/";
             }
             
             userRepo.delete(id);

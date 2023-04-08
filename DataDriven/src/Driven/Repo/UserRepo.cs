@@ -9,19 +9,19 @@ using Skyline.Annotation;
 
 using System.Data.SQLite;
 
-using Foo.Model;
+using Driven.Model;
 
-namespace Foo.Repo{
+namespace Driven.Repo{
 
     [Repository]
-    public class PersonRepo{
+    public class UserRepo{
 
-        public PersonRepo(){}
+        public UserRepo(){}
 
-        public PersonRepo(DataTransferObject dto){}
+        public UserRepo(DataTransferObject dto){}
     
 
-        public User getId(String email){
+        public User getId(int id){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
@@ -87,7 +87,7 @@ namespace Foo.Repo{
         }
 
 
-        public List<User> getList(String email){
+        public List<User> getList(int id){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
@@ -115,7 +115,7 @@ namespace Foo.Repo{
             return users;
         }
 
-        public long save(User user){
+        public int save(User user){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
             
@@ -136,7 +136,7 @@ namespace Foo.Repo{
             ";
             long id = (long)command.ExecuteScalar();
             
-            return id;
+            return Convert.ToInt32(id);
         }    
 
         public void update(User user){
@@ -155,7 +155,7 @@ namespace Foo.Repo{
             command.ExecuteNonQuery();
         }
 
-        public void delete(long id){
+        public void delete(int id){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
             
@@ -169,7 +169,7 @@ namespace Foo.Repo{
             command.ExecuteNonQuery();
         }
 
-        public HashSet<String> getRoles(long userId){
+        public HashSet<String> getRoles(int userId){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
@@ -192,7 +192,7 @@ namespace Foo.Repo{
             return userRoles;
         }
         
-        public HashSet<String> getPermissions(long userId){
+        public HashSet<String> getPermissions(int userId){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 

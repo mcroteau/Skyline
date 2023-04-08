@@ -19,7 +19,7 @@ namespace Driven.Controller{
 
         [Layout(file="views/Default.asp")]        
         [Get(route="/signin")]
-        public String signin(){           
+        public String signin(NetworkRequest req, ViewCache cache){           
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
             return "views/Signin.asp";

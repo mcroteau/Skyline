@@ -1,25 +1,25 @@
 using System;
 
 namespace Driven.Model{
-    
+
     public class Permission{
-        long id;
-        long userId;
+        int id;
+        int userId;
         String permission;
 
-        public long getId() {
+        public int getId() {
             return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(int id) {
             this.id = id;
         }
 
-        public long getUserId() {
+        public int getUserId() {
             return this.userId;
         }
 
-        public void setUserId(long userId) {
+        public void setUserId(int userId) {
             this.userId = userId;
         }
 

@@ -13,6 +13,7 @@
     <Reference Include="Skyline">
       <HintPath>libs\Skyline.dll</HintPath>
     </Reference>
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
   </ItemGroup>
 
 </Project>
