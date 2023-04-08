@@ -20,7 +20,7 @@ namespace Foo.Controller{
 
         [Layout(file="views/Default.asp")]        
         [Get(route="/signin")]
-        public String signin(){
+        public String signin(ViewCache cache){
             return "views/Signin.asp";
         }
 
@@ -41,6 +41,15 @@ namespace Foo.Controller{
         public String signout(NetworkRequest req, NetworkResponse resp, SecurityManager manager){
             manager.signout(req, resp);
             return "redirect:/signin";
+        }
+
+        [Layout(file="views/Default.asp")]
+        [Get(route="/secured")]
+        public String sec(NetworkRequest req, NetworkResponse resp, SecurityManager manager, ViewCache cache){
+            if(!manager.isAuthenticated(req)){
+                return "redirect:/";
+            }
+            return "views/Secured.asp";
         }
     }
 }
