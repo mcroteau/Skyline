@@ -14,7 +14,7 @@ namespace Skyline{
         public Boolean resolve(NetworkRequest networkRequest, NetworkResponse networkResponse) {
             try{
                 Cookie securityAttributeValue = networkRequest.getContext().Request.Cookies["default.security"];
-                Console.WriteLine("c:" + securityAttributeValue.ToString());
+
                 String[] securityAttributeValueElements = securityAttributeValue.Value.Split(".");
                 String securityElementPrincipalPre = securityAttributeValueElements[1];
         

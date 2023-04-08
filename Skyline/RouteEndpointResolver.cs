@@ -80,9 +80,9 @@ namespace Skyline{
                         }
                     }
 
-                    foreach(var r in routeEndpointHolder.getRouteEndpoints()){
-                        Console.WriteLine(r.Key + ":" + r.Value);
-                    }
+                    // foreach(var r in routeEndpointHolder.getRouteEndpoints()){
+                    //     Console.WriteLine(r.Key + ":" + r.Value);
+                    // }
 
                 }catch (Exception ex){
                     Console.WriteLine(ex.ToString());

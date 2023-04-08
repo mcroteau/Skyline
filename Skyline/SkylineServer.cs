@@ -35,6 +35,8 @@ namespace Skyline{
         String sourcesPath;
         String PROPERTIES;
 
+        Boolean persistentMode;
+
         ViewConfig viewConfig;
         PropertiesConfig propertiesConfig;
         PersistenceConfig persistenceConfig;
@@ -61,6 +63,7 @@ namespace Skyline{
         public SkylineServer(){
             this.port = 4000;
             this.sourcesPath = "src";
+            this.persistentMode = false;
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
@@ -70,6 +73,7 @@ namespace Skyline{
         public SkylineServer(int port){
             this.port = port;
             this.sourcesPath = "src";
+            this.persistentMode = false;
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
@@ -79,6 +83,7 @@ namespace Skyline{
         public SkylineServer(int port, int numberOfRequestExecutors){
             this.port = port;
             this.sourcesPath = "src";
+            this.persistentMode = false;
             this.PROPERTIES = "System.Properties";
             this.viewConfig = new ViewConfig();
             this.viewCache = new ViewCache();
@@ -268,7 +273,7 @@ namespace Skyline{
             }
 
             Console.WriteLine("10");
-            RouteResult routeResult = routeEndpointNegotiator.negotiate(viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
+            RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
             StringBuilder responseOutput = new StringBuilder();
 
             // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
@@ -306,6 +311,10 @@ namespace Skyline{
 
             PrepareNetworkRequest();
         }    
+
+        public void setPersistentMode(Boolean persistentMode){
+            this.persistentMode = persistentMode;
+        }
 
         public void setPersistenceConfig(PersistenceConfig persistenceConfig){
             this.persistenceConfig = persistenceConfig;

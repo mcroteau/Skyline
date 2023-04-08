@@ -17,7 +17,7 @@ namespace Skyline{
         ApplicationAttributes applicationAttributes;
         SecurityAttributes securityAttributes;
 
-        public RouteResult negotiate(String renderer, String resourcesDirectory, FlashMessage flashMessage, ViewCache viewCache, ViewConfig viewConfig, NetworkRequest networkRequest, NetworkResponse networkResponse, SecurityAttributes securityAttributes, SecurityManager securityManager, Dictionary<String, byte[]> viewBytesMap){
+        public RouteResult negotiate(Boolean persistentMode, String renderer, String resourcesDirectory, FlashMessage flashMessage, ViewCache viewCache, ViewConfig viewConfig, NetworkRequest networkRequest, NetworkResponse networkResponse, SecurityAttributes securityAttributes, SecurityManager securityManager, Dictionary<String, byte[]> viewBytesMap){
 
             var utf8 = new UTF8Encoding();
             String completePageRendered = "";
@@ -100,15 +100,26 @@ namespace Skyline{
                 
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
 
-                if(persistenceConfig != null) {
+                if(persistentMode || persistenceConfig != null) {
+                    Console.WriteLine(".");
+                    if(persistenceConfig == null) persistenceConfig = new PersistenceConfig();
+                    if(applicationAttributes == null) applicationAttributes = new ApplicationAttributes();
+
+                    Console.WriteLine(".");
                     DataTransferObject dto = new DataTransferObject(persistenceConfig);
                     dto.setApplicationAttributes(applicationAttributes);
 
+                    Console.WriteLine(".");
+                    
                     FieldInfo[] routeFields = routeEndpointInstance.GetType().GetFields();
                     foreach(FieldInfo routeFieldInfo in routeFields) {
                         Object[] binds = routeFieldInfo.GetCustomAttributes(typeof (Bind), true);
                         if(binds.Length > 0){
                             String fieldInfoKey = routeFieldInfo.Name.ToLower();
+                            foreach(var za in componentsHolder.getRepositories()){
+                                Console.WriteLine("zz:"  + za.Key + ":" + za.Value);
+                            }
+
                             if (componentsHolder.getRepositories().ContainsKey(fieldInfoKey)) {
                                 Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
                                 Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto}, new Object[]{});
@@ -285,6 +296,7 @@ namespace Skyline{
                 }
 
             }catch(Exception ex){
+                Console.WriteLine(ex.ToString());
                 return new RouteResult(utf8.GetBytes("issue. " + ex.Message), "500", "text/plain");
             }
 
@@ -307,6 +319,10 @@ namespace Skyline{
                 RouteAttribute routeAttribute = routeEndpoint.getRouteAttributes()[methodAttributeKey];
                 MethodAttribute methodAttribute = new MethodAttribute();
                 methodAttribute.setDescription(description);
+
+                if(routeAttribute.getRoutePosition() != null){
+                    pathVariableIndex = routeAttribute.getRoutePosition();
+                }
 
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("Skyline.Security.SecurityManager")){
                     methodAttribute.setDescription("securitymanager");
@@ -344,7 +360,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
-                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int64")){
                     Int64 attributeValue = Int64.Parse(routePathUriAttributes[pathVariableIndex]);
@@ -352,7 +367,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
-                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Int128")){
                     Int128 attributeValue = Int128.Parse(routePathUriAttributes[pathVariableIndex]);
@@ -360,7 +374,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
-                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.Boolean")){
                     Boolean attributeValue = Boolean.Parse(routePathUriAttributes[pathVariableIndex]);
@@ -368,7 +381,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
-                    pathVariableIndex++;
                 }
                 if(endpointMethodAttribute.ParameterType.ToString().Equals("System.String")){
                     String attributeValue = new String(routePathUriAttributes[pathVariableIndex]);
@@ -376,7 +388,6 @@ namespace Skyline{
                     methodComponents.getRouteMethodAttributes().Add(methodAttribute.getDescription().ToLower(), methodAttribute);
                     methodComponents.getRouteMethodAttributesList().Add(attributeValue);
                     methodComponents.getRouteMethodAttributeVariablesList().Add(attributeValue);
-                    pathVariableIndex++;
                 }
             }
 

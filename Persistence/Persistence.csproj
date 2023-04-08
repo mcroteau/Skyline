@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningLevel>0</WarningLevel>
+    <StartupObject>Persistence.Launcher</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <Reference Include="Skyline">
+      <HintPath>libs\Skyline.dll</HintPath>
+    </Reference> -->
+    <ProjectReference Include="../Skyline/Skyline.csproj"/>
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
+  </ItemGroup>
+
+</Project>

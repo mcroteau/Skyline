@@ -765,8 +765,10 @@ namespace Skyline{
                 }
 
                 activeSubjectObject = cache.get(subjectElement);
-                subjectValue = ((String)activeSubjectObject).Trim();
-
+                if(activeSubjectObject != null){
+                    subjectValue = ((String)activeSubjectObject).Trim();
+                }
+                
                 if (activeSubjectObject == null) {
                     if (!passesNilSpec(activeSubjectObject, predicateElementClean, conditionalElement)) return false;
                     return true;

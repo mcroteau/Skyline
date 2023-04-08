@@ -39,6 +39,8 @@ namespace Skyline {
                     String klassPath = klassPathBefore.Replace(".cs", "");
 
                     if(filePath.EndsWith(".cs")){
+                        Console.WriteLine("zq:" + assembly);
+                        Console.WriteLine("zqa:" + klassPath);
                         Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
                         Type repositoryKlassType = klassInstanceValidate.GetType();
                         Object[] attrs = klassInstanceValidate.GetType().GetCustomAttributes(typeof(Repository), true);
