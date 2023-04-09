@@ -9,7 +9,7 @@ namespace Persistence{
         SQLiteConnection connection;
 
         public DatabaseSetup(){
-            this.connection = new SQLiteConnection("Data Source=app.db;Version=3;New=True");
+            this.connection = new SQLiteConnection("Data Source=system.db;Version=3;New=True");
         }
 
         public void setup(){
@@ -47,7 +47,7 @@ namespace Persistence{
             connection.Close();
         }    
         public DatabaseSetup clean(){
-            File.Delete("app.db");
+            File.Delete("system.db");
             return this;
         }
         public SQLiteConnection getConnection(){

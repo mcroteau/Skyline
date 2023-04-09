@@ -21,7 +21,7 @@ namespace Persistence.Repo{
         public UserRepo(DataTransferObject dto){}
 
         public User getId(int id){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -54,7 +54,7 @@ namespace Persistence.Repo{
 
 
         public User getEmail(String email){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -87,7 +87,7 @@ namespace Persistence.Repo{
 
 
         public ArrayList getList(){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -113,7 +113,7 @@ namespace Persistence.Repo{
         }
 
         public int save(User user){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
             
             var command = connection.CreateCommand();
@@ -137,7 +137,7 @@ namespace Persistence.Repo{
         }      
 
         public void update(User user){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
             
             var command = connection.CreateCommand();
@@ -153,7 +153,7 @@ namespace Persistence.Repo{
         }
 
         public void delete(int id){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
             
             var command = connection.CreateCommand();
@@ -167,7 +167,7 @@ namespace Persistence.Repo{
         }
 
         public HashSet<String> getRoles(User user){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -190,7 +190,7 @@ namespace Persistence.Repo{
         }
         
         public HashSet<String> getPermissions(User user){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
 
             var command = connection.CreateCommand();

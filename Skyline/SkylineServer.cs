@@ -136,8 +136,10 @@ namespace Skyline{
 			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
 
 			    listener.Start();
-                
-                Console.WriteLine("Skyline Ready!");
+
+
+                Console.WriteLine("\nRunning! http://localhost:" + port.ToString() + "/");
+                 
 
                 int requestCount = 0;
                 while(requestCount < numberOfRequestExecutors){ 

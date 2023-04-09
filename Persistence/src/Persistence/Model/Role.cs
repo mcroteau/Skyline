@@ -22,5 +22,4 @@ namespace Persistence.Model{
             this.description = description;
         }
     }
-
 }

@@ -21,7 +21,7 @@ namespace Persistence.Repo{
         public PermissionRepo(DataTransferObject dto){}
 
         public int save(Permission permission){
-            var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
+            var connection = new SQLiteConnection("Data Source=system.db;Version=3;New=False");
             connection.Open();
             
             var command = connection.CreateCommand();
