@@ -17,6 +17,12 @@ namespace Persistence.Controller{
         [Bind]
         public UserRepo userRepo;
 
+        [Bind]
+        public RoleRepo roleRepo;
+
+        [Bind]
+        public PermissionRepo permissionRepo;
+
         ApplicationAttributes applicationAttributes;
         
         public UserController(){}
@@ -32,8 +38,6 @@ namespace Persistence.Controller{
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
 
-            Console.WriteLine("r:" + userRepo);
-
             ArrayList users = userRepo.getList();
             cache.set("users", users);
 
@@ -42,7 +46,12 @@ namespace Persistence.Controller{
 
         [Layout(file="pages/Default.asp")]        
         [Get(route="/users/create")]
-        public String create(NetworkRequest req, ViewCache cache){
+        public String create(NetworkRequest req, SecurityManager manager, ViewCache cache){
+            
+            if(!manager.isAuthenticated(req)){
+                cache.set("message", "authorization required.");
+                return "redirect:/signin";
+            }
 
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
@@ -55,7 +64,6 @@ namespace Persistence.Controller{
             String email = req.getValue("email");
             String password = req.getValue("password");
         
-            cache.set("message", "");
             if(!manager.isAuthenticated(req)){
                 cache.set("message", "authorization required.");
                 return "redirect:/signin";
@@ -71,18 +79,28 @@ namespace Persistence.Controller{
             user.setPassword(password);
             long id = userRepo.save(user);
 
+            UserRole userRole = new UserRole();
+            userRole.setUserId(Convert.ToInt32(id));
+            userRole.setRoleId(1);
+            roleRepo.save(userRole);
+
+            Permission permission = new Permission();
+            permission.setUserId(Convert.ToInt32(id));
+            permission.setPermission("users:maintenance:" + id);
+            permissionRepo.save(permission);
+
             cache.set("message", "success.");
-            return "redirect/users/edit/" + id;
+            return "redirect:/users/edit/" + id;
         }
         
+        [Layout(file="pages/Default.asp")]
         [Get(route="/users/edit/{id}")]
         public String edit([Variable] Int32 id,
                             NetworkRequest req, 
                             NetworkResponse resp, 
                             SecurityManager manager, 
                             ViewCache cache){
-                                            
-            cache.set("message", "");
+                                     
             if(!manager.isAuthenticated(req)){
                 cache.set("message", "authorization required.");
                 return "redirect:/signin";
@@ -101,7 +119,7 @@ namespace Persistence.Controller{
             User user = userRepo.getId(id);
             cache.set("user", user);
 
-            return "redirect/users";
+            return "pages/Users/Edit.asp";
         }
 
         [Post(route="/users/update/{id}")]
@@ -110,8 +128,7 @@ namespace Persistence.Controller{
                             NetworkResponse resp, 
                             SecurityManager manager, 
                             ViewCache cache){
-                                            
-            cache.set("message", "");
+                                     
             if(!manager.isAuthenticated(req)){
                 cache.set("message", "authorization required.");
                 return "redirect:/signin";
@@ -134,17 +151,16 @@ namespace Persistence.Controller{
             userRepo.update(user);
 
             cache.set("message", "success.");
-            return "redirect/users/edit/" + id;
+            return "redirect:/users/edit/" + id;
         }
 
-        [Post(route="/users/delete/{id}")]
+        [Get(route="/users/delete/{id}")]
         public String delete([Variable] Int32 id,
                             NetworkRequest req, 
                             NetworkResponse resp, 
                             SecurityManager manager, 
                             ViewCache cache){
-                                            
-            cache.set("message", "");
+                                     
             if(!manager.isAuthenticated(req)){
                 cache.set("message", "authorization required.");
                 return "redirect:/signin";
@@ -160,7 +176,7 @@ namespace Persistence.Controller{
             userRepo.delete(id);
             
             cache.set("message", "success.");
-            return "redirect/users";
+            return "redirect:/users";
         }
     }
 }

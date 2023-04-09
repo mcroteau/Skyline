@@ -7,8 +7,6 @@ namespace Skyline{
 
         public byte[] convert(){
             String filePath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString() + file;
-
-            Console.WriteLine("filePath~" + filePath);
             
             FileStream fileInputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileInputStream);

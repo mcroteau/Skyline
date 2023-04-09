@@ -94,8 +94,8 @@ namespace Skyline{
         public void start(){
             try {
 
-                // SpecTest specTest = new SpecTest();
-                // specTest.Run();
+                SpecTest specTest = new SpecTest();
+                specTest.Run();
 
                 ResourceUtility skylineUtilities = new ResourceUtility();
                 
@@ -137,7 +137,7 @@ namespace Skyline{
 
 			    listener.Start();
                 
-                Console.WriteLine("Ready!");
+                Console.WriteLine("Skyline Ready!");
 
                 int requestCount = 0;
                 while(requestCount < numberOfRequestExecutors){ 
@@ -154,15 +154,12 @@ namespace Skyline{
         }
         
         void PrepareNetworkRequest(){
-            Console.WriteLine("prep");
 			var result = listener.BeginGetContext(ExecuteNetworkRequest, listener);
 			result.AsyncWaitHandle.WaitOne();
 		}
 
         void ExecuteNetworkRequest(IAsyncResult result){
-			
-            Console.WriteLine("1");
-
+		
             Thread.Sleep(300);
 
 			var context = listener.EndGetContext(result);
@@ -196,7 +193,6 @@ namespace Skyline{
 
             }
 
-            Console.WriteLine("2");
 
             var clientOut = context.Response.OutputStream;            
             ResourceUtility resourceUtility = new ResourceUtility();
@@ -211,12 +207,10 @@ namespace Skyline{
                 return;
             }
             
-            Console.WriteLine("3");
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
             SecurityAttributes securityAttributes = new SecurityAttributes(securityElement, securedAttribute);
 
-            Console.WriteLine("4");
             NetworkRequest networkRequest = new NetworkRequest();
             networkRequest.setRequestAction(request.HttpMethod.ToLower());
             networkRequest.setRequestPath(requestPath);
@@ -224,7 +218,6 @@ namespace Skyline{
             networkRequest.setSecurityAttributes(securityAttributes);
             networkRequest.setContext(context);
 
-            Console.WriteLine("5");
             NetworkResponse networkResponse = new NetworkResponse();
             networkResponse.setContext(context);
 
@@ -232,7 +225,6 @@ namespace Skyline{
             requestHeaderResolver.setNetworkRequest(networkRequest);
             requestHeaderResolver.resolve();
             
-            Console.WriteLine("6");
             RequestComponentResolver requestComponentResolver = new RequestComponentResolver();
             requestComponentResolver.setRequestPayload(completeRequestPayload);
             requestComponentResolver.setNetworkRequest(networkRequest);
@@ -240,14 +232,12 @@ namespace Skyline{
             requestComponentResolver.setEncoding(encoding);
             requestComponentResolver.resolve();
 
-            Console.WriteLine("7");
             RouteEndpointNegotiator routeEndpointNegotiator = new RouteEndpointNegotiator();
             routeEndpointNegotiator.setApplicationAttributes(applicationAttributesCopy);
             routeEndpointNegotiator.setSecurityAttributes(securityAttributes);
             routeEndpointNegotiator.setRouteAttributes(routeAttributes);
             routeEndpointNegotiator.setComponentsHolder(componentsHolder);
 
-            Console.WriteLine("8");
             RouteAttributes routeAttributesFinal = routeEndpointNegotiator.getRouteAttributes();
             networkRequest.setRouteAttributes(routeAttributesFinal);
             
@@ -261,7 +251,6 @@ namespace Skyline{
                 if(securityManager != null) securityManager.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             }
 
-            Console.WriteLine("9");
             SecurityAttributeResolver securityAttributeResolver = new SecurityAttributeResolver();
             securityAttributeResolver.setSecurityAttributes(routeEndpointNegotiator.getSecurityAttributes());
             securityAttributeResolver.resolve(networkRequest, networkResponse);
@@ -272,7 +261,6 @@ namespace Skyline{
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
-            Console.WriteLine("10");
             RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
             StringBuilder responseOutput = new StringBuilder();
 
@@ -280,10 +268,10 @@ namespace Skyline{
 			// context.Response.StatusDescription = "OK";
 
             context.Response.ContentType = routeResult.getContentType();
+            context.Response.ContentEncoding = Encoding.UTF8;
         
             if(networkRequest.isRedirect()) {
                 
-                Console.WriteLine("." + networkRequest.getRedirectLocation());
                 context.Response.RedirectLocation = networkRequest.getRedirectLocation();
                 context.Response.Redirect(networkRequest.getRedirectLocation());
                 responseOutput.Append(DOUBLEBREAK);
@@ -291,23 +279,19 @@ namespace Skyline{
                 context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
                 context.Response.OutputStream.Flush();
                 context.Response.OutputStream.Close();
-            
-                viewCache = new ViewCache();
-                flashMessage = new FlashMessage();
 
                 PrepareNetworkRequest();
             }
 
-            Console.WriteLine("11");
             String resultOut = encoding.GetString(routeResult.getResponseOutput());
             responseOutput.Append(resultOut);//hi
  
-            // // byte[] resp = utf8.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhi");
-            // // clientOut.Write(resp);
-
             context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
             context.Response.OutputStream.Flush();
             context.Response.OutputStream.Close();
+
+            viewCache = new ViewCache();
+            flashMessage = new FlashMessage();
 
             PrepareNetworkRequest();
         }    

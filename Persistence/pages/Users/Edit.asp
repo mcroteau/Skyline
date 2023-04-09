@@ -1,6 +1,9 @@
-<h1>Edit User</h1>
-<form action="/signin" method="post">
-    <input type="text" name="email" value=""/>
-    <input type="text" name="password" value=""/>
-    <input type="submit" value="save"/>
+<h1>Edit User # ${user.id}</h1>
+<form action="/users/update/${user.id}" method="post">
+    <label>Email</label>
+    <input type="text" name="email" value="${user.email}"/>
+
+    <label>Password</label>
+    <input type="text" name="password" value="${user.password}"/>
+    <input type="submit" value="update"/>
 </form>

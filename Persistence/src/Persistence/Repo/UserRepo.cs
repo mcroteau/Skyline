@@ -106,8 +106,6 @@ namespace Persistence.Repo{
                 user.setPassword(reader.GetString(2));
                 users.Add(user);
             }
-            
-            Console.WriteLine("users:" + users.Count);
 
             connection.Close();
             
@@ -136,7 +134,7 @@ namespace Persistence.Repo{
             long id = (long)command.ExecuteScalar();
             
             return Convert.ToInt32(id);
-        }    
+        }      
 
         public void update(User user){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
@@ -168,7 +166,7 @@ namespace Persistence.Repo{
             command.ExecuteNonQuery();
         }
 
-        public HashSet<String> getRoles(int userId){
+        public HashSet<String> getRoles(User user){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
@@ -176,10 +174,10 @@ namespace Persistence.Repo{
             command.CommandText =
             @"
                 SELECT description    
-                FROM user_roles outer join on user_roles.role_id = roles.id
-                WHERE user_id = '$userId'
+                FROM user_roles inner join roles on user_roles.role_id = roles.id
+                WHERE user_id = $userId
             ";
-            command.Parameters.AddWithValue("$userId", userId);
+            command.Parameters.AddWithValue("$userId", user.getId());
 
             HashSet<String> userRoles = new HashSet<String>();
             var reader = command.ExecuteReader();
@@ -191,7 +189,7 @@ namespace Persistence.Repo{
             return userRoles;
         }
         
-        public HashSet<String> getPermissions(int userId){
+        public HashSet<String> getPermissions(User user){
             var connection = new SQLiteConnection("Data Source=app.db;Version=3;New=False");
             connection.Open();
 
@@ -199,10 +197,10 @@ namespace Persistence.Repo{
             command.CommandText =
             @"
                 SELECT permission    
-                FROM permissions
-                WHERE user_id = '$userId'
+                FROM user_permissions 
+                WHERE user_id = $userId
             ";
-            command.Parameters.AddWithValue("$userId", userId);
+            command.Parameters.AddWithValue("$userId", user.getId());
 
             HashSet<String> permissions = new HashSet<String>();
             var reader = command.ExecuteReader();

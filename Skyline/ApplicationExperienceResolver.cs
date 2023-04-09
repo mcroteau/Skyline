@@ -581,7 +581,7 @@ namespace Skyline{
                 }
             }
 
-            String subjectValue = (String)(activeSubjectObject);
+            String subjectValue = (activeSubjectObject).ToString();
 
             if(predicateElement.Contains(".")){
 
@@ -597,13 +597,13 @@ namespace Skyline{
                     }
                 }
 
-                predicateValue = (String)(activePredicateObject);
+                predicateValue = (activePredicateObject).ToString();
                 passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
 
             }else if(!predicateElement.Contains("'")){
                 Object activePredicateObject = cache.get(predicateElement);
-                predicateValue = (String)(activePredicateObject);
+                predicateValue = (activePredicateObject).ToString();
                 passesSpecification = passesSpec(subjectValue, predicateValue, conditionalElement);
                 return passesSpecification;
             }
@@ -695,7 +695,7 @@ namespace Skyline{
                     String predicateElement = expressionElements[ONE];
 
                     if(predicateElement.Contains("'")){
-                        subjectValue = (String)(activeSubjectObject);
+                        subjectValue = (activeSubjectObject).ToString();
                         String predicateValue = predicateElement.Replace("'", "").Trim();
                         if(passesSpec(subjectValue, predicateValue, conditionalElement))return true;
                         return false;
@@ -709,8 +709,8 @@ namespace Skyline{
                             activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                         }
 
-                        subjectValue = (String)(activeSubjectObject);
-                        String predicateValue = (String)(activeSubjectObject);
+                        subjectValue = (activeSubjectObject).ToString();
+                        String predicateValue = (activeSubjectObject).ToString();
 
                         if (activeSubjectObject == null) {
                             if(!passesNilSpec(activeSubjectObject, predicateValue, conditionalElement))return false;
@@ -752,8 +752,8 @@ namespace Skyline{
                         activePredicateObject = getObjectValue(activeFieldElement, activePredicateObject);
                     }
 
-                    subjectValue = ((String)activeSubjectObject).Trim();
-                    String predicateValue = ((String)activePredicateObject).Trim();
+                    subjectValue = (activeSubjectObject).ToString().Trim();
+                    String predicateValue = (activePredicateObject).ToString().Trim();
 
                     if (activeSubjectObject == null) {
                         if (passesNilSpec(activeSubjectObject, predicateValue, conditionalElement)) return true;
@@ -766,7 +766,7 @@ namespace Skyline{
 
                 activeSubjectObject = cache.get(subjectElement);
                 if(activeSubjectObject != null){
-                    subjectValue = ((String)activeSubjectObject).Trim();
+                    subjectValue = (activeSubjectObject).ToString().Trim();
                 }
                 
                 if (activeSubjectObject == null) {
@@ -1007,7 +1007,7 @@ namespace Skyline{
                     }
 
                     if (activeObject == null) return null;
-                    return (String)(activeObject);
+                    return (activeObject).ToString();
 
                 }
             }else{
@@ -1030,7 +1030,7 @@ namespace Skyline{
                         Object activeObject = getObjectMethodValue(cache, cacheValue, objectField);
                         if(activeObject == null) return null;
 
-                        return (String)(activeObject);
+                        return (activeObject).ToString();
 
                     }else{
 
@@ -1039,12 +1039,12 @@ namespace Skyline{
                     }
 
                     if (objectValue == null) return null;
-                    return (String)(objectValue);
+                    return (objectValue).ToString();
 
                 }else{
 
                     if (cacheValue == null) return null;
-                    return (String)(cacheValue);
+                    return (cacheValue).ToString();
                 }
             }
             return null;

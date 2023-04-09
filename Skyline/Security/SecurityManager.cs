@@ -72,8 +72,6 @@ namespace Skyline.Security{
                     String securityAttributePrincipal = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
                     String securityAttributeValue = securityAttributes.getSecuredAttribute() + "." + securityAttributePrincipal;
 
-                    Console.WriteLine("sec:" + username + ":" + securityAttributeValue);
-                    
                     Cookie securityAttribute = new Cookie();
                     securityAttribute.Path = "/";
                     securityAttribute.Name = "default.security";

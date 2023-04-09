@@ -25,8 +25,6 @@ namespace Skyline{
 
             try {
 
-                viewCache.set("message", flashMessage.getMessage());
-
                 RouteResult routeResult = new RouteResult();
                 byte[] responseOutput = new byte[]{};
 
@@ -55,7 +53,6 @@ namespace Skyline{
                     if(renderer.Equals("reload-requests")){
                         ResourceFileConverter resourcesFileConverter = new ResourceFileConverter();
                         resourcesFileConverter.setFile(routeEndpointPath);
-                        Console.WriteLine("r:" + routeEndpointPath);
                         responseOutput = resourcesFileConverter.convert();
 
                         routeResult.setStatusCode(200);
@@ -101,25 +98,17 @@ namespace Skyline{
                 PersistenceConfig persistenceConfig = routeAttributes.getPersistenceConfig();
 
                 if(persistentMode || persistenceConfig != null) {
-                    Console.WriteLine(".");
                     if(persistenceConfig == null) persistenceConfig = new PersistenceConfig();
                     if(applicationAttributes == null) applicationAttributes = new ApplicationAttributes();
 
-                    Console.WriteLine(".");
                     DataTransferObject dto = new DataTransferObject(persistenceConfig);
                     dto.setApplicationAttributes(applicationAttributes);
-
-                    Console.WriteLine(".");
                     
                     FieldInfo[] routeFields = routeEndpointInstance.GetType().GetFields();
                     foreach(FieldInfo routeFieldInfo in routeFields) {
                         Object[] binds = routeFieldInfo.GetCustomAttributes(typeof (Bind), true);
                         if(binds.Length > 0){
                             String fieldInfoKey = routeFieldInfo.Name.ToLower();
-                            foreach(var za in componentsHolder.getRepositories()){
-                                Console.WriteLine("zz:"  + za.Key + ":" + za.Value);
-                            }
-
                             if (componentsHolder.getRepositories().ContainsKey(fieldInfoKey)) {
                                 Type repositoryKlassType = componentsHolder.getRepositories()[fieldInfoKey];
                                 Object repositoryKlassInstance = Activator.CreateInstance(repositoryKlassType, new Object[]{dto}, new Object[]{});

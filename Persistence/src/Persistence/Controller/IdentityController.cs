@@ -22,19 +22,24 @@ namespace Persistence.Controller{
         public String signin(NetworkRequest req, ViewCache cache){           
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
+
             return "pages/Signin.asp";
         }
 
         [Post(route="/signin")]
-        public String signin(NetworkRequest req, NetworkResponse resp, SecurityManager manager, ViewCache cache){            
+        public String signin(NetworkRequest req, 
+                            NetworkResponse resp, 
+                            SecurityManager manager, 
+                            ViewCache cache){            
             String email = req.getValue("email");
             String password = req.getValue("password");
-        
-            cache.set("message", "");
+            
+            manager.signout(req, resp);
+
             if(manager.signin(email, password, req, resp)){
                 return "redirect:/secured";
             }
-            cache.set("message","fail.");
+            cache.set("message", "fail.");
             return "redirect:/signin";
         }
 

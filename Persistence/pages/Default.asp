@@ -5,8 +5,18 @@
     </head>
     <body>
         <c:if spec="${sessionuser == ''}">
-            <a href="/sigin">Signin</a>
+            <a href="/signin">Signin</a>
         </c:if>
+        <c:if spec="${sessionuser != ''}">
+            welcome ${sessionuser} <a href="/signout">Signout</a>
+        </c:if>
+        
+        <a href="/users/create">Create User</a> <a href="/users">List Users</a>
+
+        <c:if spec="${message != ''}">
+            <p class="alert">${message}</p>
+        </c:if>
+
         <c:content/>
     </body>
 </html>

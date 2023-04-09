@@ -32,17 +32,23 @@ namespace Persistence{
                     user_id integer,
                     role_id integer
                 );
-                CREATE TABLE permissions (
+                CREATE TABLE user_permissions (
                     id integer not null primary key autoincrement,
                     user_id integer,
                     permission text not null
                 );
+                insert into users (id, email, password) values (1, 'abc@plsar.net', 'effort.');
+                insert into roles (id, description) values (1, 'super-role');
+                insert into user_roles (id, user_id, role_id) values (1, 1, 1);
+                insert into user_permissions (id, user_id, permission) values (1, 1, 'users:maintenance:1');
             ";
             command.ExecuteNonQuery();
+
             connection.Close();
         }    
-        public void clean(){
+        public DatabaseSetup clean(){
             File.Delete("app.db");
+            return this;
         }
         public SQLiteConnection getConnection(){
             return this.connection;

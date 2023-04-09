@@ -29,7 +29,6 @@ namespace Skyline{
                     String contentType = headers["content-type"];
                     String[] boundaryParts = contentType != null ? contentType.Split("boundary=") : new String[]{};
 
-                    Console.WriteLine("bp:" + boundaryParts.Length);
                     if (boundaryParts.Length > 1) {
                         String formDelimiter = boundaryParts[1].Replace(";", "");
                         ArrayList requestComponents = getRequestComponents(formDelimiter);
