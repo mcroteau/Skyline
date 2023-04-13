@@ -39,9 +39,9 @@ namespace Skyline{
 
                 if(routeEndpointPath.Contains(resourcesDirectory + "/")) {
 
-                    MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
-                    mimeTypeResolver.setRouteEndpointPath(routeEndpointPath);
-                    String mime = mimeTypeResolver.resolve();
+                    MimeResolver mimeResolver = new MimeResolver();
+                    mimeResolver.setRouteEndpointPath(routeEndpointPath);
+                    String mime = mimeResolver.resolve();
 
                     if (renderer.Equals("cache-requests")) {
                         byte[] responseBytes = resourceUtility.getViewFileCopy(routeEndpointPath, viewBytesMap);
@@ -252,11 +252,11 @@ namespace Skyline{
                         return new RouteResult(utf8.GetBytes("design not found."), "200 OK", "text/html");
                     }
 
-                    if(!designTemplate.Contains("<c:content/>")){
-                        return new RouteResult(utf8.GetBytes("Template is missing <c:content/>"), "200 OK", "text/html");
+                    if(!designTemplate.Contains("<c:render/>")){
+                        return new RouteResult(utf8.GetBytes("Template is missing <c:render/>"), "200 OK", "text/html");
                     }
 
-                    String[] designPartials = designTemplate.Split("<c:content/>");
+                    String[] designPartials = designTemplate.Split("<c:render/>");
                     String headerPartial = designPartials[0];
                     String footerPartial = "";
                     if(designPartials.Length > 1) footerPartial = designPartials[1];

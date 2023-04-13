@@ -1,0 +1,13 @@
+<h2>Signin</h2>
+
+<form action="/signin" method="post">
+    <div class="frm-group">
+        <label>Email</label>
+        <input type="text" name="email" value="abc@plsar.net"/>
+    </div>
+    <div class="frm-group">
+        <label>Password</label>
+        <input type="text" name="password" value="effort."/>
+    </div>
+    <input type="submit" value="signin"/>
+</form>

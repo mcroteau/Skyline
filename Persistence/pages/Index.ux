@@ -1,0 +1,79 @@
+
+
+<h1>A Simple yet Powerful Multi-Theaded Http/TCP Server</h1>
+
+<p>Skyline is in essence ASP.NET + ASP MVC.NET + IIS packaged into one single 
+composite runnable. You will not need to deploy to the IIS Application server. 
+Running Skyline is as easy as running a simple command:</p>
+
+<pre><code>$ dotnet run</code></pre>
+
+<p>That's it!</p>
+
+<p>I thank you for purchasing Skyline. I appreciate your support. 
+Forgive me, if you downloaded for Nuget, your version has limited resources available, 
+meaning concurrency is greatly limited. Purchasing the enterprise version has unlimited 
+resources and performance is determined by your CPU. So if you purchased, then 
+you have server that boasts unlimited concurrent request negotiation.</p>
+
+<p>Here is what you need..</p>
+
+<h2>src/Launcher.cs</h2>
+
+<pre>
+<code>using Skyline;
+
+namespace RestEasy {
+    public class Launcher{
+        public static int Main(String[] args){
+            SkylineServer server = new SkylineServer(4000);
+            server.start();
+            return 0;
+        }
+    }
+}</code>
+</pre>
+
+<h2>src/IndexController.cs</h2>
+<pre>
+<code>using Skyline;
+using Skyline.Model;
+using Skyline.Annotation;
+
+namespace RestEasy{
+
+    [NetworkController]
+    public class IndexController{
+        
+        ApplicationAttributes applicationAttributes;
+
+        public IndexController(){}
+
+        public IndexController(ApplicationAttributes applicationAttributes){
+            this.applicationAttributes = applicationAttributes;
+        }
+
+        [Text]
+        [Get(route="/")]
+        public String index(){
+            return "Hi!";
+        }
+    }
+}</code>
+</pre>
+
+<p>Running:</p>
+
+<pre><code>$ dotnet run</code></pre>
+
+<p>After these two classes will create an instance of Skyline running on the port you 
+specified. In this example: 4000. Open a web browser and browse to:</p>
+
+<pre><code>http://localhost:4000</code></pre>
+
+<p>You should see "Hi!"</p>
+
+<p class="thankyou">You guys are the best!</p>
+
+
+

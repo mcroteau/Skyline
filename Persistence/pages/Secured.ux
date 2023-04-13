@@ -1,0 +1,7 @@
+
+<h1>Secured.</h1>
+
+<p>This is an example of a secured http endpoint. You may not 
+browse to it without being signed in.</p>
+
+<a href="/users/create">Create New User</a>

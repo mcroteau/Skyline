@@ -8,7 +8,7 @@ namespace Skyline{
         public byte[] convert(){
 
             String filePath = Directory.GetCurrentDirectory() + file;
-            
+        
             FileStream fileInputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileInputStream);
             long byteLength = new System.IO.FileInfo(filePath).Length;

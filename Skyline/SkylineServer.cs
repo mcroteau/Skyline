@@ -138,7 +138,7 @@ namespace Skyline{
 			    listener.Start();
 
 
-                Console.WriteLine("\nRunning! http://localhost:" + port.ToString() + "/");
+                Console.WriteLine("Running! http://localhost:" + port.ToString() + "/");
                  
 
                 int requestCount = 0;
@@ -264,7 +264,6 @@ namespace Skyline{
             }
 
             RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
-            StringBuilder responseOutput = new StringBuilder();
 
             // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
 			// context.Response.StatusDescription = "OK";
@@ -273,22 +272,16 @@ namespace Skyline{
             context.Response.ContentEncoding = Encoding.UTF8;
         
             if(networkRequest.isRedirect()) {
-                
                 context.Response.RedirectLocation = networkRequest.getRedirectLocation();
                 context.Response.Redirect(networkRequest.getRedirectLocation());
-                responseOutput.Append(DOUBLEBREAK);
-
-                context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+                context.Response.OutputStream.Write(encoding.GetBytes(DOUBLEBREAK), 0, DOUBLEBREAK.Length);
                 context.Response.OutputStream.Flush();
                 context.Response.OutputStream.Close();
 
                 PrepareNetworkRequest();
             }
-
-            String resultOut = encoding.GetString(routeResult.getResponseOutput());
-            responseOutput.Append(resultOut);//hi
- 
-            context.Response.OutputStream.Write(encoding.GetBytes(responseOutput.ToString()), 0, responseOutput.ToString().Length);
+            
+            context.Response.OutputStream.Write(routeResult.getResponseOutput(), 0, routeResult.getResponseOutput().Length);
             context.Response.OutputStream.Flush();
             context.Response.OutputStream.Close();
 

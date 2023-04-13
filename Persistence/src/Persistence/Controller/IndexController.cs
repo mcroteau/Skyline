@@ -17,24 +17,24 @@ namespace Persistence.Controller{
             this.applicationAttributes = applicationAttributes;
         }
     
-        [Layout(file="pages/Default.asp")]        
+        [Layout(file="pages/Default.ux")]        
         [Get(route="/")]
         public String index(NetworkRequest req, ViewCache cache){
 
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
 
-            return "pages/Index.asp";
+            return "pages/Index.ux";
         }
 
-        [Layout(file="pages/Default.asp")]        
+        [Layout(file="pages/Default.ux")]        
         [Get(route="/secured")]
         public String secured(NetworkRequest req, ViewCache cache){
 
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
 
-            return "pages/Secured.asp";
+            return "pages/Secured.ux";
         }
 
     }

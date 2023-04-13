@@ -31,7 +31,7 @@ namespace Persistence.Controller{
             this.applicationAttributes = applicationAttributes;
         }
 
-        [Layout(file="pages/Default.asp")]        
+        [Layout(file="pages/Default.ux")]        
         [Get(route="/users")]
         public String index(NetworkRequest req, ViewCache cache){
 
@@ -41,10 +41,10 @@ namespace Persistence.Controller{
             ArrayList users = userRepo.getList();
             cache.set("users", users);
 
-            return "pages/Users/Index.asp";
+            return "pages/Users/Index.ux";
         }
 
-        [Layout(file="pages/Default.asp")]        
+        [Layout(file="pages/Default.ux")]        
         [Get(route="/users/create")]
         public String create(NetworkRequest req, SecurityManager manager, ViewCache cache){
             
@@ -56,7 +56,7 @@ namespace Persistence.Controller{
             String sessionuser = req.getUserCredential();
             cache.set("sessionuser", sessionuser);
 
-            return "pages/Users/Create.asp";
+            return "pages/Users/Create.ux";
         }
 
         [Post(route="/users/save")]
@@ -93,7 +93,7 @@ namespace Persistence.Controller{
             return "redirect:/users/edit/" + id;
         }
         
-        [Layout(file="pages/Default.asp")]
+        [Layout(file="pages/Default.ux")]
         [Get(route="/users/edit/{id}")]
         public String edit([Variable] Int32 id,
                             NetworkRequest req, 
@@ -119,7 +119,7 @@ namespace Persistence.Controller{
             User user = userRepo.getId(id);
             cache.set("user", user);
 
-            return "pages/Users/Edit.asp";
+            return "pages/Users/Edit.ux";
         }
 
         [Post(route="/users/update/{id}")]

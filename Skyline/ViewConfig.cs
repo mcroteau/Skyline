@@ -6,7 +6,7 @@ namespace Skyline{
         public ViewConfig(){
             this.viewsPath = "pages";
             this.resourcesPath = "assets";
-            this.viewExtension = ".asp";
+            this.viewExtension = ".ux";
             this.renderingScheme = RenderingScheme.RELOAD_EACH_REQUEST;
         }
 

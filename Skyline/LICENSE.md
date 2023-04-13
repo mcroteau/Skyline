@@ -1,0 +1,1 @@
+You may not copy the source, sell the source sell the project.
