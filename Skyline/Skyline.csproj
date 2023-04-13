@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Aeon.Skyline</PackageId>
-    <PackageVersion>1.0</PackageVersion>
+    <PackageVersion>2.0</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>identity-80x80.png</PackageIcon>
     <ProjectURL>http://www.openskyline.io</ProjectURL>

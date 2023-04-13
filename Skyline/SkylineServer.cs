@@ -138,11 +138,18 @@ namespace Skyline{
 			    listener.Start();
 
 
-                Console.WriteLine("Running! http://localhost:" + port.ToString() + "/");
+                Console.WriteLine("   _____ __         ___");          
+                Console.WriteLine("  / ___// /____  __/ (_)___  ___"); 
+                Console.WriteLine("  \\__ \\/ //_/ / / / / / __ \\/ _ \\");
+                Console.WriteLine(" ___/ / ,< / /_/ / / / / / /  __/");
+                Console.WriteLine("/____/_/|_|\\__, /_/_/_/ /_/\\___/");
+                Console.WriteLine("          /____/");            
+
+                Console.WriteLine("\nRunning! http://localhost:" + port.ToString() + "/");
                  
 
                 int requestCount = 0;
-                while(requestCount < numberOfRequestExecutors){ 
+                while(requestCount < 1000){ 
                     PrepareNetworkRequest(); 
                     requestCount++;
                 }
