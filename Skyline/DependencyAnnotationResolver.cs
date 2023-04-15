@@ -1,5 +1,7 @@
 
 using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 using Skyline.Annotation;
 using Skyline.Model;
@@ -16,7 +18,6 @@ namespace Skyline {
 
         public ComponentsHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
-                Path.DirectorySeparatorChar.ToString() + "src" + 
                 Path.DirectorySeparatorChar.ToString();
                 
             InspectFilePath(sourcesDirectory, sourcesDirectory);
@@ -28,18 +29,31 @@ namespace Skyline {
                 
                 try {
 
-                    Char separator = Path.DirectorySeparatorChar;
-                    String[] klassPathParts = filePath.Split(sourcesDirectory);
-                    String klassPathSlashesRemoved =  klassPathParts[1].Replace("\\", ".");
-                    String klassPathPeriod = klassPathSlashesRemoved.Replace("/", ".");
-                    String klassPathBefore = klassPathPeriod.Replace("."+ "class", "");
-                    int separatorIndex = klassPathBefore.IndexOf(".");
-                    String assemblyCopy = klassPathBefore;
-                    String assembly = assemblyCopy.Substring(0, separatorIndex);
-                    String klassPath = klassPathBefore.Replace(".cs", "");
+                    if(filePath.EndsWith(".cs") && !filePath.Contains("bin") && !filePath.Contains("obj")){
 
-                    if(filePath.EndsWith(".cs")){
-                        Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
+                        Char separator = Path.DirectorySeparatorChar;;
+                        String assembly = Assembly.GetEntryAssembly().GetName().Name;
+
+                        int directoryIndex = filePath.IndexOf(assembly);
+                        int directoryIndexWith = directoryIndex + 1;
+                        int nextSeparatorIndex = filePath.IndexOf(separator, directoryIndexWith);
+                        int directoryDiff = nextSeparatorIndex - directoryIndex;
+                        
+                        String directoryInfoBefore = filePath.Substring(directoryIndex, directoryDiff);
+                        String directoryInfo = directoryInfoBefore.Replace(separator.ToString(), ".");
+                        String directoryInfoFinal = directoryInfo.Replace(".", "");
+
+                        int endDiff = filePath.Length - directoryIndex;
+                        
+                        String klassInfoBefore = filePath.Substring(directoryIndex, endDiff);
+                        String klassInfo = klassInfoBefore.Replace(separator.ToString(), ".");
+                        String klassDependencyBefore = klassInfo.Replace(".cs", "");
+                        String klassDependency = klassDependencyBefore.Replace(directoryInfoFinal, "");
+                        
+                        var regex = new Regex(Regex.Escape("."));
+                        var dependencyInfo = regex.Replace(klassDependency, "", 1);
+                        
+                        Object klassInstanceValidate = Activator.CreateInstance(assembly, dependencyInfo).Unwrap();
                         Type repositoryKlassType = klassInstanceValidate.GetType();
                         Object[] attrs = klassInstanceValidate.GetType().GetCustomAttributes(typeof(Repository), true);
                         if(attrs.Length > 0) {

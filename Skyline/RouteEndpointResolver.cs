@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 using Skyline.Model;
 using Skyline.Annotation;
@@ -18,7 +19,6 @@ namespace Skyline{
 
         public RouteEndpointHolder resolve(){
             String sourcesDirectory = Directory.GetCurrentDirectory() + 
-            Path.DirectorySeparatorChar.ToString() + "src" + 
             Path.DirectorySeparatorChar.ToString();
 
             InspectFilePath(sourcesDirectory, sourcesDirectory);
@@ -30,18 +30,31 @@ namespace Skyline{
                 
                 try {
 
-                    Char separator = Path.DirectorySeparatorChar;
-                    String[] klassPathParts = filePath.Split(sourcesDirectory);
-                    String klassPathSlashesRemoved =  klassPathParts[1].Replace("\\", ".");
-                    String klassPathPeriod = klassPathSlashesRemoved.Replace("/", ".");
-                    String klassPathBefore = klassPathPeriod.Replace("."+ "class", "");
-                    int separatorIndex = klassPathBefore.IndexOf(".");
-                    String assemblyCopy = klassPathBefore;
-                    String assembly = assemblyCopy.Substring(0, separatorIndex);
-                    String klassPath = klassPathBefore.Replace(".cs", "");
+                    if(filePath.EndsWith(".cs") && !filePath.Contains("bin") && !filePath.Contains("obj")){
 
-                    if(filePath.EndsWith(".cs")){
-                        Object klassInstanceValidate = Activator.CreateInstance(assembly, klassPath).Unwrap();
+                        Char separator = Path.DirectorySeparatorChar;;
+                        String assembly = Assembly.GetEntryAssembly().GetName().Name;
+
+                        int directoryIndex = filePath.IndexOf(assembly);
+                        int directoryIndexWith = directoryIndex + 1;
+                        int nextSeparatorIndex = filePath.IndexOf(separator, directoryIndexWith);
+                        int directoryDiff = nextSeparatorIndex - directoryIndex;
+                        
+                        String directoryInfoBefore = filePath.Substring(directoryIndex, directoryDiff);
+                        String directoryInfo = directoryInfoBefore.Replace(separator.ToString(), ".");
+                        String directoryInfoFinal = directoryInfo.Replace(".", "");
+
+                        int endDiff = filePath.Length - directoryIndex;
+                        
+                        String klassInfoBefore = filePath.Substring(directoryIndex, endDiff);
+                        String klassInfo = klassInfoBefore.Replace(separator.ToString(), ".");
+                        String klassDependencyBefore = klassInfo.Replace(".cs", "");
+                        String klassDependency = klassDependencyBefore.Replace(directoryInfoFinal, "");
+                        
+                        var regex = new Regex(Regex.Escape("."));
+                        var dependencyInfo = regex.Replace(klassDependency, "", 1);
+
+                        Object klassInstanceValidate = Activator.CreateInstance(assembly, dependencyInfo).Unwrap();
                         Type klassType = klassInstanceValidate.GetType();
                         Object[] attrs = klassType.GetCustomAttributes(typeof(NetworkController), true);
                         if(attrs.Length > 0) {
@@ -54,7 +67,7 @@ namespace Skyline{
                                 if(gets.Length > 0){
                                     Get get = (Get) gets[0];
                                     routePath = get.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassPath);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassDependency);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
@@ -63,7 +76,7 @@ namespace Skyline{
                                 if(posts.Length > 0){
                                     Post post = (Post) posts[0];
                                     routePath = post.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, assembly, klassPath);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, assembly, klassDependency);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
@@ -72,17 +85,13 @@ namespace Skyline{
                                 if(deletes.Length > 0){
                                     Delete delete = (Delete) deletes[0];
                                     routePath = delete.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, assembly, klassPath);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, assembly, klassDependency);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
                             }
                         }
                     }
-
-                    // foreach(var r in routeEndpointHolder.getRouteEndpoints()){
-                    //     Console.WriteLine(r.Key + ":" + r.Value);
-                    // }
 
                 }catch (Exception ex){
                     Console.WriteLine(ex.ToString());

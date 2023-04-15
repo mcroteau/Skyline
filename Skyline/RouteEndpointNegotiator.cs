@@ -37,7 +37,7 @@ namespace Skyline{
                 RouteAttributes routeAttributes = networkRequest.getRouteAttributes();
                 RouteEndpointHolder routeEndpointHolder = routeAttributes.getRouteEndpointHolder();
 
-                if(routeEndpointPath.Contains(resourcesDirectory + "/")) {
+                if(routeEndpointPath.IndexOf(resourcesDirectory + "/", StringComparison.OrdinalIgnoreCase) >= 0) {
 
                     MimeResolver mimeResolver = new MimeResolver();
                     mimeResolver.setRouteEndpointPath(routeEndpointPath);

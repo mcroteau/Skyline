@@ -31,7 +31,7 @@ namespace Skyline{
         int numberOfPartitions = 3;
         int numberOfRequestExecutors = 10;
 
-        int port;
+        Int32[] prefixes;
         String sourcesPath;
         String PROPERTIES;
 
@@ -61,7 +61,6 @@ namespace Skyline{
         String securityElement = "default.security";
 
         public SkylineServer(){
-            this.port = 4000;
             this.sourcesPath = "src";
             this.persistentMode = false;
             this.PROPERTIES = "System.Properties";
@@ -70,32 +69,17 @@ namespace Skyline{
             this.flashMessage = new FlashMessage();
         }
 
-        public SkylineServer(int port){
-            this.port = port;
-            this.sourcesPath = "src";
-            this.persistentMode = false;
-            this.PROPERTIES = "System.Properties";
-            this.viewConfig = new ViewConfig();
-            this.viewCache = new ViewCache();
-            this.flashMessage = new FlashMessage();
-        }
-
-        public SkylineServer(int port, int numberOfRequestExecutors){
-            this.port = port;
-            this.sourcesPath = "src";
-            this.persistentMode = false;
-            this.PROPERTIES = "System.Properties";
-            this.viewConfig = new ViewConfig();
-            this.viewCache = new ViewCache();
-            this.flashMessage = new FlashMessage();
-            this.numberOfRequestExecutors = numberOfRequestExecutors;
-        }
 
         public void start(){
             try {
 
                 SpecTest specTest = new SpecTest();
                 specTest.Run();
+
+                if(prefixes == null){
+                    Console.WriteLine("Specify at least one prefix/port # example: new Int32[]{9000}");
+                    throw new Exception();
+                }
 
                 ResourceUtility skylineUtilities = new ResourceUtility();
                 
@@ -133,7 +117,9 @@ namespace Skyline{
 
 
 			    listener = new HttpListener();
-			    listener.Prefixes.Add("http://*:" + port.ToString() + "/");
+                foreach(int prefix in prefixes){
+			        listener.Prefixes.Add("http://*:" + prefix.ToString() + "/");
+                }
 
 			    listener.Start();
 
@@ -143,17 +129,20 @@ namespace Skyline{
                 Console.WriteLine("  \\__ \\/ //_/ / / / / / __ \\/ _ \\");
                 Console.WriteLine(" ___/ / ,< / /_/ / / / / / /  __/");
                 Console.WriteLine("/____/_/|_|\\__, /_/_/_/ /_/\\___/");
-                Console.WriteLine("          /____/");            
+                Console.WriteLine("          /____/\n");            
 
-                Console.WriteLine("\nRunning! http://localhost:" + port.ToString() + "/");
                  
+                foreach(int prefix in prefixes){
+                    Console.WriteLine("http://localhost:" + prefix.ToString() + "/");
+                }
+                Console.WriteLine("\nRunning!");
+
 
                 int requestCount = 0;
-                while(requestCount < 1000){ 
+                while(requestCount < numberOfPartitions){ 
                     PrepareNetworkRequest(); 
                     requestCount++;
                 }
-
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
@@ -206,7 +195,8 @@ namespace Skyline{
             var clientOut = context.Response.OutputStream;            
             ResourceUtility resourceUtility = new ResourceUtility();
 
-            String portDelimeter = ":" + port.ToString();
+
+            String portDelimeter = ":" + ((IPEndPoint)context.Request.LocalEndPoint).Port.ToString();
             String[] requestParts = request.Url.ToString().Split(portDelimeter, 2);
 
             String requestPath = requestParts[1];
@@ -272,9 +262,6 @@ namespace Skyline{
 
             RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
 
-            // context.Response.StatusCode = int.Parse(routeResult.getResponseCode());
-			// context.Response.StatusDescription = "OK";
-
             context.Response.ContentType = routeResult.getContentType();
             context.Response.ContentEncoding = Encoding.UTF8;
         
@@ -332,6 +319,10 @@ namespace Skyline{
 
         public void setApplicationAttributes(ApplicationAttributes applicationAttributes){
             this.applicationAttributes = applicationAttributes;
+        }
+        
+        public void setPorts(Int32[] prefixes){
+            this.prefixes = prefixes;
         }
     }
 }
