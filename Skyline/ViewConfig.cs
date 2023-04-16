@@ -7,7 +7,14 @@ namespace Skyline{
             this.viewsPath = "Pages";
             this.resourcesPath = "Assets";
             this.viewExtension = ".ux";
-            this.renderingScheme = RenderingScheme.RELOAD_EACH_REQUEST;
+            this.renderingScheme = RenderingSchemes.RELOAD_EACH_REQUEST;
+        }
+
+        public ViewConfig(ViewConfig viewConfig){
+            this.viewsPath = viewConfig.getViewsPath();
+            this.resourcesPath = viewConfig.getResourcesPath();
+            this.viewExtension = viewConfig.getViewExtension();
+            this.renderingScheme = viewConfig.getRenderingScheme();
         }
 
         String viewsPath;

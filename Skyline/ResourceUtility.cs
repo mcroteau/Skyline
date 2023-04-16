@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using Skyline;
 using Skyline.Specs;
+using Skyline.Model;
 
 namespace Skyline{
     public class ResourceUtility{
@@ -44,63 +45,62 @@ namespace Skyline{
         }
 
         public byte[] getViewFileCopy(String viewKey, Dictionary<String, byte[]> viewBytesMap) {
+            
+            if(!viewKey.StartsWith("/"))viewKey = "/" + viewKey;
+            
             if(viewBytesMap.ContainsKey(viewKey)){
-                byte[] byteArray = viewBytesMap.GetValueOrDefault(viewKey, new byte[]{});
-                byte[] byteArrayCopy = new byte[byteArray.GetLength(0)];
-                int indx = 0;
-                foreach(byte b in byteArray){
-                    byteArrayCopy[indx] = b;
-                    indx++;
-                }
-                return byteArrayCopy;
+                return viewBytesMap[viewKey];
             }
             return new byte[]{};
         }
 
-        public Dictionary<String, byte[]> getViewBytesMap(ViewConfig viewConfig) {
-            Dictionary<String, byte[]> viewFilesBytesMap = new Dictionary<String, byte[]>();
+        public ResourcesHolder getResourcesHolder(ViewConfig viewConfig) {
+            ResourcesHolder resourcesHolder = new ResourcesHolder();
 
             if(Directory.Exists(viewConfig.getViewsPath())){
-                String[] viewFiles = Directory.GetFiles(viewConfig.getViewsPath());
-                getFileBytesMap(viewFiles, viewConfig, viewFilesBytesMap);
+                String[] viewFiles = Directory.GetFiles(@viewConfig.getViewsPath());
+                getFileBytesMap(viewFiles, viewConfig, resourcesHolder);
+
+                String[] directories = Directory.GetDirectories(@viewConfig.getViewsPath(), "*", SearchOption.TopDirectoryOnly);
+                getFileBytesMap(directories, viewConfig, resourcesHolder);
             }
 
             if(Directory.Exists(viewConfig.getResourcesPath())) {
-                String[] resourceFiles = Directory.GetFiles(viewConfig.getResourcesPath());
-                getFileBytesMap(resourceFiles, viewConfig, viewFilesBytesMap);
+                String[] resourceFiles = Directory.GetFiles(@viewConfig.getResourcesPath());
+                getFileBytesMap(resourceFiles, viewConfig, resourcesHolder);
+                
+                String[] directories = Directory.GetDirectories(@viewConfig.getResourcesPath(), "*", SearchOption.TopDirectoryOnly);
+                getFileBytesMap(directories, viewConfig, resourcesHolder);
             }
 
-            return viewFilesBytesMap;
+            return resourcesHolder;
         }
 
-        Dictionary<String, byte[]> getFileBytesMap(String[] viewFiles, ViewConfig viewConfig, Dictionary<String, byte[]> viewFilesBytesMap){
-            foreach(String viewFile in viewFiles) {
-                
-                if(Directory.Exists(viewFile)){
-                    String[] directoryFiles = Directory.GetFiles(viewFile);
-                    getFileBytesMap(directoryFiles, viewConfig, viewFilesBytesMap);
-                    continue;
+        ResourcesHolder getFileBytesMap(String[] viewFiles, ViewConfig viewConfig, ResourcesHolder resourcesHolder){
+            foreach(String file in viewFiles) {
+
+                if(Directory.Exists(file)) {
+                    String[] files = Directory.GetFiles(file);
+                    getFileBytesMap(files, viewConfig, resourcesHolder);
                 }
-
-                try {
-
-                    Stream source = File.OpenRead(viewFile); 
-                    MemoryStream dest = new MemoryStream();
-                    byte[] buffer = new byte[1024 * 3];
-                    int bytesRead;
-                    while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
-                        dest.Write(buffer, 0, bytesRead);
-                    }
                 
-                    byte[] viewFileBytes = dest.ToArray();
-                    String viewKey = viewFile.ToString().Replace(viewConfig.getViewsPath(), "");
-                    viewFilesBytesMap.Add(viewKey, viewFileBytes);
+                if(File.Exists(file)){
 
-                } catch (IOException ex) {
-                    Console.WriteLine(ex.Message);
+                    try {
+
+                        byte[] bytes = File.ReadAllBytes(file); 
+                        
+                        String resourceKey = file;
+                        if(!resourceKey.StartsWith("/"))resourceKey = "/" + resourceKey;
+                    
+                        resourcesHolder.getResources().Add(resourceKey, bytes);
+
+                    } catch (IOException ex) {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
             }
-            return viewFilesBytesMap;
+            return resourcesHolder;
         }
     }
 }

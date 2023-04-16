@@ -27,6 +27,11 @@ class Launcher{
         server.setNumberOfRequestNegotiators(1000);
         server.setPersistentMode(true);
         server.setSecurityAccessType(new AuthAccess().GetType());
+
+        ViewConfig viewConfig = new ViewConfig();
+        viewConfig.setRenderingScheme(RenderingSchemes.CACHE_REQUESTS);
+        server.setViewConfig(viewConfig);
+
         server.start();
 
         return 0;

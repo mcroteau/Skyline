@@ -46,7 +46,7 @@ namespace Skyline{
                     if (renderer.Equals("cache-requests")) {
                         byte[] responseBytes = resourceUtility.getViewFileCopy(routeEndpointPath, viewBytesMap);
                         routeResult.setStatusCode(200);
-                        routeResult.setResponseOutput(responseOutput);
+                        routeResult.setResponseOutput(responseBytes);
                         routeResult.setContentType(mime);
                         return routeResult;
                     }

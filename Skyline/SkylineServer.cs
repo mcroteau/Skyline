@@ -45,7 +45,7 @@ namespace Skyline{
 
         ViewCache viewCache;
         FlashMessage flashMessage;
-        Dictionary<String, byte[]> viewBytesMap;
+        ResourcesHolder resourcesHolder;
         
         ComponentsHolder componentsHolder;
         RouteEndpointHolder routeEndpointHolder;
@@ -101,7 +101,7 @@ namespace Skyline{
                 routeAttributes.setPersistenceConfig(persistenceConfig);
 
                 String resourcesDirectory = viewConfig.getResourcesPath();
-                viewBytesMap = skylineUtilities.getViewBytesMap(viewConfig);
+                resourcesHolder = skylineUtilities.getResourcesHolder(viewConfig);
 
                 ResourceUtility resourceUtility = new ResourceUtility();
 
@@ -205,6 +205,7 @@ namespace Skyline{
                 PrepareNetworkRequest();
                 return;
             }
+
             
             RouteAttributes routeAttributesCopy = new RouteAttributes(routeAttributes);
             ApplicationAttributes applicationAttributesCopy = new ApplicationAttributes(applicationAttributes);
@@ -260,7 +261,11 @@ namespace Skyline{
                 sessionValues.Append(securityAttribute.getName()).Append("=").Append(securityAttribute.getValue());
             }
 
-            RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfig, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMap);
+            ResourcesHolder resourcesHolderCopy = new ResourcesHolder(resourcesHolder);
+            Dictionary<String, byte[]> viewBytesMapCopy = resourcesHolder.getResources();
+
+            ViewConfig viewConfigCopy = new ViewConfig(viewConfig);
+            RouteResult routeResult = routeEndpointNegotiator.negotiate(persistentMode, viewConfig.getRenderingScheme(), viewConfig.getResourcesPath(), flashMessage, viewCache, viewConfigCopy, networkRequest, networkResponse, securityAttributes, securityManager, viewBytesMapCopy);
 
             context.Response.ContentType = routeResult.getContentType();
             context.Response.ContentEncoding = Encoding.UTF8;
