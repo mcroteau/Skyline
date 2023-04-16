@@ -67,7 +67,7 @@ namespace Skyline{
                                 if(gets.Length > 0){
                                     Get get = (Get) gets[0];
                                     routePath = get.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, klassDependency);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("get", routePath, routeMethod, assembly, dependencyInfo);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath().ToLower();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
@@ -76,7 +76,7 @@ namespace Skyline{
                                 if(posts.Length > 0){
                                     Post post = (Post) posts[0];
                                     routePath = post.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, assembly, klassDependency);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("post", routePath, routeMethod, assembly, dependencyInfo);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }
@@ -85,7 +85,7 @@ namespace Skyline{
                                 if(deletes.Length > 0){
                                     Delete delete = (Delete) deletes[0];
                                     routePath = delete.getRoute();
-                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, assembly, klassDependency);
+                                    RouteEndpoint routeEndpoint = getCompleteRouteEndpoint("delete", routePath, routeMethod, assembly, dependencyInfo);
                                     routeKey = routeEndpoint.getRouteVerb() + ":" + routeEndpoint.getRoutePath();
                                     routeEndpointHolder.getRouteEndpoints().Add(routeKey, routeEndpoint);
                                 }

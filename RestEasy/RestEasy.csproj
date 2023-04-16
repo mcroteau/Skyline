@@ -10,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <Reference Include="Skyline">
+    <Reference Include="Skyline">
       <HintPath>Libs\Skyline.dll</HintPath>
-    </Reference> -->
-    <ProjectReference Include="..\Skyline\Skyline.csproj" />
+    </Reference>
+    <!-- <ProjectReference Include="..\Skyline\Skyline.csproj" /> -->
   </ItemGroup>
 
 </Project>

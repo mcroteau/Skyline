@@ -2,19 +2,22 @@
 
   <PropertyGroup>
     <PackageId>Aeon.Skyline</PackageId>
-    <PackageVersion>2.0</PackageVersion>
+    <PackageVersion>3.0</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>identity-80x80.png</PackageIcon>
     <ProjectURL>http://www.openskyline.io</ProjectURL>
     <Company>ae0n</Company>
     <PackageTags>Http Server;Dependency Injection;Inversion of Control;View Data Binding;MVC;Http;</PackageTags>
     <Description>
-Skyline is ASP.NET + ASP MVC.NET + IIS packaged into one single composite runnable. 
-You will not need to deploy to the IIS Application server. Running Skyline is as easy as running a simple command:
+Skyline is like combining ASP.NET + ASP MVC.NET + IIS packaged into one single composite runnable. 
+You will not need to deploy to the IIS Application server. You can even boast your own view extensions. 
+Running Skyline is as easy as running a simple command:
 
 $ dotnet run
 
 That's it!
+
+http://openskyline.io
     </Description>
     <Copyright>Copyright (c) 2023 ae0n</Copyright> 
     <OutputType>Library</OutputType>

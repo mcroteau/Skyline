@@ -10,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <Reference Include="Skyline">
+    <Reference Include="Skyline">
       <HintPath>Libs\Skyline.dll</HintPath>
-    </Reference> -->
-    <ProjectReference Include="..\Skyline\Skyline.csproj" />
+    </Reference>
+    <!-- <ProjectReference Include="..\Skyline\Skyline.csproj" /> -->
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
   </ItemGroup>
 

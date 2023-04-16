@@ -139,7 +139,7 @@ namespace Skyline{
 
 
                 int requestCount = 0;
-                while(requestCount < numberOfPartitions){ 
+                while(requestCount < numberOfRequestExecutors){ 
                     PrepareNetworkRequest(); 
                     requestCount++;
                 }
